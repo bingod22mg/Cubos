@@ -1,0 +1,1297 @@
+<Alter AllowCreate="true" ObjectExpansion="ExpandFull" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
+  <Object>
+    <DatabaseID>SemanticModel</DatabaseID>
+  </Object>
+  <ObjectDefinition>
+    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500">
+      <ID>SemanticModel</ID>
+      <Name>SemanticModel</Name>
+      <Annotations>
+        <Annotation>
+          <Name>SandboxVersion</Name>
+          <Value>SQL11_Denali</Value>
+        </Annotation>
+      </Annotations>
+      <ddl200:CompatibilityLevel>1100</ddl200:CompatibilityLevel>
+      <ddl200_200:StorageEngineUsed>InMemory</ddl200_200:StorageEngineUsed>
+      <Language>12298</Language>
+      <DataSourceImpersonationInfo>
+        <ImpersonationMode>Default</ImpersonationMode>
+      </DataSourceImpersonationInfo>
+      <Dimensions>
+        <Dimension>
+          <ID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</ID>
+          <Name>DWHInformacionHistoricaCaptacionesCartera</Name>
+          <Annotations>
+            <Annotation>
+              <Name>TableWidgetSerialization</Name>
+            </Annotation>
+            <Annotation>
+              <Name>QueryEditorSerialization</Name>
+            </Annotation>
+            <Annotation>
+              <Name>IsQueryEditorUsed</Name>
+              <Value>True</Value>
+            </Annotation>
+          </Annotations>
+          <Source xsi:type="DataSourceViewBinding">
+            <DataSourceViewID>Sandbox</DataSourceViewID>
+          </Source>
+          <UnknownMember valuens="ddl200_200">AutomaticNull</UnknownMember>
+          <ErrorConfiguration>
+            <KeyNotFound>IgnoreError</KeyNotFound>
+            <KeyDuplicate>ReportAndStop</KeyDuplicate>
+            <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
+          </ErrorConfiguration>
+          <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+          <Language>12298</Language>
+          <UnknownMemberName>Unknown</UnknownMemberName>
+          <Attributes>
+            <Attribute>
+              <ID>RowNumber</ID>
+              <Name>RowNumber</Name>
+              <Type valuens="ddl200_200">RowNumber</Type>
+              <Usage>Key</Usage>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <DataSize>4</DataSize>
+                  <NullProcessing>Error</NullProcessing>
+                  <Source xsi:type="ddl200_200:RowNumberBinding" />
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>4</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <Source xsi:type="ddl200_200:RowNumberBinding" />
+              </NameColumn>
+              <AttributeRelationships>
+                <AttributeRelationship>
+                  <AttributeID>Fecha</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Fecha</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>clCodigoAgencia</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>CodigoAgencia</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>Agencia</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Agencia</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>agNombreZona</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Zona</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>agNombreSubregion</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Subregion</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>agNombreRegion</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Region</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>caCodigoCanal</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Canal</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>ccCodigoIndicador</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>ccCodigoIndicador</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>ccFamiliaProducto</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>FamiliaProducto</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>Indicador</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Grupo</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>Saldo</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>Saldo</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>caDescripcionAgrupacionCanal</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>AgrupacionCanal</Name>
+                </AttributeRelationship>
+              </AttributeRelationships>
+              <OrderBy>Key</OrderBy>
+              <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="General" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>Fecha</ID>
+              <Name>Fecha</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>Fecha</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>Fecha</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="General" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>clCodigoAgencia</ID>
+              <Name>CodigoAgencia</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>clCodigoAgencia</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>clCodigoAgencia</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>Agencia</ID>
+              <Name>Agencia</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>Agencia</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>Agencia</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>agNombreZona</ID>
+              <Name>Zona</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>agNombreZona</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>agNombreZona</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>agNombreSubregion</ID>
+              <Name>Subregion</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>agNombreSubregion</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>agNombreSubregion</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>agNombreRegion</ID>
+              <Name>Region</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>agNombreRegion</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>agNombreRegion</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>caCodigoCanal</ID>
+              <Name>Canal</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>caCodigoCanal</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>caCodigoCanal</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="General" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>ccCodigoIndicador</ID>
+              <Name>ccCodigoIndicador</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>ccCodigoIndicador</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>ccCodigoIndicador</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+              <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>ccFamiliaProducto</ID>
+              <Name>FamiliaProducto</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>ccFamiliaProducto</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>ccFamiliaProducto</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>Indicador</ID>
+              <Name>Grupo</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>Indicador</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>Indicador</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="General" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>Saldo</ID>
+              <Name>Saldo</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Double</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>Saldo</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>Saldo</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+              <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+            </Attribute>
+            <Attribute>
+              <ID>caDescripcionAgrupacionCanal</ID>
+              <Name>AgrupacionCanal</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>WChar</DataType>
+                  <DataSize>32768</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    <ColumnID>caDescripcionAgrupacionCanal</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>32768</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                  <ColumnID>caDescripcionAgrupacionCanal</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+          </Attributes>
+          <ProactiveCaching>
+            <SilenceInterval>-PT1S</SilenceInterval>
+            <Latency>-PT1S</Latency>
+            <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
+            <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
+            <Source xsi:type="ProactiveCachingInheritedBinding" />
+          </ProactiveCaching>
+        </Dimension>
+      </Dimensions>
+      <Cubes>
+        <Cube>
+          <ID>Model</ID>
+          <Name>Model</Name>
+          <Annotations>
+            <Annotation>
+              <Name>DefaultMeasure</Name>
+              <Value>__No measures defined</Value>
+            </Annotation>
+          </Annotations>
+          <Language>12298</Language>
+          <Dimensions>
+            <Dimension>
+              <ID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</ID>
+              <Name>DWHInformacionHistoricaCaptacionesCartera</Name>
+              <DimensionID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</DimensionID>
+              <Attributes>
+                <Attribute>
+                  <AttributeID>RowNumber</AttributeID>
+                  <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>Fecha</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>clCodigoAgencia</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>Agencia</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>agNombreZona</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>agNombreSubregion</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>agNombreRegion</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>caCodigoCanal</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>ccCodigoIndicador</AttributeID>
+                  <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>ccFamiliaProducto</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>Indicador</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>Saldo</AttributeID>
+                  <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>caDescripcionAgrupacionCanal</AttributeID>
+                </Attribute>
+              </Attributes>
+            </Dimension>
+          </Dimensions>
+          <CubePermissions>
+            <CubePermission>
+              <ID>CubePermission</ID>
+              <Name>CubePermission</Name>
+              <RoleID>Role</RoleID>
+              <Read>Allowed</Read>
+              <ReadSourceData>None</ReadSourceData>
+            </CubePermission>
+            <CubePermission>
+              <ID>CubePermission 1</ID>
+              <Name>CubePermission 1</Name>
+              <RoleID>Role 1</RoleID>
+              <Process>true</Process>
+              <Read>Allowed</Read>
+              <ReadSourceData>None</ReadSourceData>
+            </CubePermission>
+          </CubePermissions>
+          <MeasureGroups>
+            <MeasureGroup>
+              <ID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</ID>
+              <Name>DWHInformacionHistoricaCaptacionesCartera</Name>
+              <Measures>
+                <Measure>
+                  <ID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</ID>
+                  <Name>_Count DWHInformacionHistoricaCaptacionesCartera</Name>
+                  <AggregateFunction>Count</AggregateFunction>
+                  <DataType>BigInt</DataType>
+                  <Source>
+                    <DataType>BigInt</DataType>
+                    <DataSize>8</DataSize>
+                    <Source xsi:type="RowBinding">
+                      <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                    </Source>
+                  </Source>
+                  <Visible>false</Visible>
+                </Measure>
+              </Measures>
+              <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+              <ErrorConfiguration>
+                <KeyNotFound>IgnoreError</KeyNotFound>
+                <KeyDuplicate>ReportAndStop</KeyDuplicate>
+                <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
+              </ErrorConfiguration>
+              <ProcessingMode>Regular</ProcessingMode>
+              <Dimensions>
+                <Dimension xsi:type="DegenerateMeasureGroupDimension">
+                  <CubeDimensionID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</CubeDimensionID>
+                  <Attributes>
+                    <Attribute>
+                      <AttributeID>RowNumber</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera</TableID>
+                            <ColumnID>RowNumber</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                      <Type>Granularity</Type>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Fecha</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>Fecha</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>clCodigoAgencia</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>clCodigoAgencia</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agencia</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>Agencia</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>agNombreZona</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>agNombreZona</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>agNombreSubregion</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>agNombreSubregion</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>agNombreRegion</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>agNombreRegion</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>caCodigoCanal</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>caCodigoCanal</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>ccCodigoIndicador</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>ccCodigoIndicador</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>ccFamiliaProducto</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>ccFamiliaProducto</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Indicador</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>Indicador</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Saldo</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Double</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>Saldo</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>caDescripcionAgrupacionCanal</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>WChar</DataType>
+                          <DataSize>32768</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</TableID>
+                            <ColumnID>caDescripcionAgrupacionCanal</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                  </Attributes>
+                  <ddl200_200:ShareDimensionStorage>Shared</ddl200_200:ShareDimensionStorage>
+                </Dimension>
+              </Dimensions>
+              <Partitions>
+                <Partition>
+                  <ID>DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f</ID>
+                  <Name>DWHInformacionHistoricaCaptacionesCartera</Name>
+                  <Source xsi:type="QueryBinding">
+                    <DataSourceID>7d301af5-1511-4470-9864-774509261219</DataSourceID>
+                    <QueryDefinition>SET NOCOUNT ON
+
+---Variables
+
+declare @fechaini int 
+
+select @fechaini = left(convert(char,dateadd(mm,-48,fefecha),112),6)+'01' from DWDFecha where fediaactual = 1
+
+
+if object_id('[tempdb]..#DWDFecha') is not null
+begin
+       drop table #DWDFecha
+end
+
+if object_id('[tempdb]..#DWHVista') is not null
+begin
+       drop table #DWHVista
+end
+
+
+select feidfecha
+into #DWDFecha
+from DWDFecha 
+where feIdFecha &gt;= @fechaini and feCierreMes = 1 
+and feFutura = 0
+ order by feIdFecha
+
+if object_id('[tempdb]..#IndicadoresCartera') is not null
+begin
+       drop table #IndicadoresCartera
+end
+
+       SELECT DISTINCT 
+       p.CpCodigoIndicador,p2.CpCodigoIndicador indicadorNivel3
+       into #IndicadoresCartera
+    FROM DWDClasificacionProductos p
+    join DWDClasificacionProductos p1 ON p1.CpPadre=p.CpCodigoIndicador
+   join DWDClasificacionProductos p2 ON p2.CpPadre=p1.CpCodigoIndicador
+    WHERE p.CpCodigoIndicador in (1,3)
+    and  p.CpNivel=1 and p1.CpNivel=2 and p2.CpNivel=3
+       
+if object_id('[tempdb]..#IndicadoresCaptaciones') is not null
+begin
+       drop table #IndicadoresCaptaciones
+end
+
+       SELECT DISTINCT 
+       p2.CpCodigoIndicador indicadorNivel3
+       into #IndicadoresCaptaciones
+    FROM DWDClasificacionProductos p
+    join DWDClasificacionProductos p1 ON p1.CpPadre=p.CpCodigoIndicador
+    join DWDClasificacionProductos p2 ON p2.CpPadre=p1.CpCodigoIndicador
+    WHERE p.CpCodigoIndicador in (2)
+    and  p.CpNivel=1 and p1.CpNivel=2 and p2.CpNivel=3
+       and p2.CpCodigoIndicador &gt; 53
+       
+if object_id('[tempdb]..#DWHCuotaOperacion') is not null
+begin
+       drop table #DWHCuotaOperacion
+end
+
+create table TempCarteraIndicadores (
+coIdFecha int,
+coIdAgencia int,
+coIdCliente int,
+coidcuentacontable int,
+coidproducto int,
+coidasesorprincipal int,
+coCuotaCapital float
+)
+
+insert into TempCarteraIndicadores
+select 
+coIdFecha ,coIdAgencia,coIdCliente,coidcuentacontable,coidproducto ,
+coidasesorprincipal ,sum(coCuotaCapital) coCuotaCapital
+from DWHCuotaOperacion
+inner join #DWDFecha on coIdFecha = feidfecha
+group by coIdFecha ,coIdAgencia,coIdCliente,coidcuentacontable,coidproducto ,coidasesorprincipal
+
+-- CARTERA 
+select  caDescripcionAgrupacionCanal,coIdFecha Fecha,clCodigoAgencia,clAgencia Agencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccFamiliaProducto,ccGrupo Indicador,SUM(coCuotaCapital) Saldo
+into #DWHVista
+from TempCarteraIndicadores T1 
+inner join DWDCliente  T2 on T1.coIdCliente=T2.clidcliente 
+inner join DWDAgenciaOperacion T4 on T1.coIdAgencia = agIdAgencia
+inner join dwdcuentacontable T5 on T1.coidcuentacontable = T5.ccidcuentacontable
+inner join #IndicadoresCartera on ccCodigoIndicador = indicadorNivel3 and CpCodigoIndicador = 1
+inner join DWDCanal T6 on clIdCanal = caIdCanal
+where caCodigoCanal IN ('JUR', 'NGE', 'NNG', 'PJI', 'PRI', 'INS', 'IFI', 'COR', 'TES')
+group by caDescripcionAgrupacionCanal,coIdFecha,clCodigoAgencia,clAgencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccGrupo,ccFamiliaProducto
+
+
+
+-----------------------------------------------------
+--CAPTACIONES:
+
+if object_id('[tempdb]..#DWHPasivoOperacion') is not null
+begin
+       drop table #DWHPasivoOperacion
+end
+
+create table TempCapatacionesIndicadores (
+poIdFecha int,
+poIdCliente int,
+poIdAgencia int,
+poidcuentacontable int,
+poSaldoOperacionUSD float
+)
+
+insert into TempCapatacionesIndicadores
+select 
+poIdFecha ,poIdCliente,poIdCliente,poidcuentacontable,SUM(poSaldoOperacionUSD) poSaldoOperacionUSD
+from DWHPasivoOperacion
+inner join #DWDFecha on poIdFecha = feidfecha
+group by poIdFecha ,poIdCliente,poIdCliente,poidcuentacontable
+
+insert into #DWHVista
+select caDescripcionAgrupacionCanal,poIdFecha Fecha,clCodigoAgencia,clAgencia Agencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccFamiliaProducto,ccGrupo Indicador,SUM(poSaldoOperacionUSD) Saldo
+from TempCapatacionesIndicadores T1 
+inner join DWDCliente  T2 on T1.poIdCliente=T2.clidcliente 
+inner join DWDAgenciaOperacion T4 on T2.clIdAgencia = agIdAgencia
+inner join dwdcuentacontable T5 on T1.poidcuentacontable = T5.ccidcuentacontable
+inner join #IndicadoresCaptaciones on ccCodigoIndicador = indicadorNivel3
+inner join DWDCanal T6 on clIdCanal = caIdCanal
+where caCodigoaGRUPACIONCanal IN ('RED', 'COR', 'TES')
+group by caDescripcionAgrupacionCanal,poIdFecha,clCodigoAgencia,clAgencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccGrupo,ccFamiliaProducto
+
+
+--------------------------
+--CONTINGENTES
+OPEN SYMMETRIC KEY ClaveMIS02
+DECRYPTION BY CERTIFICATE Certi01
+
+if object_id('[tempdb]..#DWDCuentaContable') is not null
+begin
+drop table #DWDCuentaContable
+end
+if object_id('[tempdb]..#TempContingentes') is not null
+begin
+drop table #TempContingentes
+end
+
+select 
+ccIdCuentaContable,
+ccCodigoMoneda,
+ccSubGrupo,
+ccGrupo,
+ccFamiliaProducto,
+ccCodigoIndicador,
+ccCodigoNivel6=CONVERT(varchar(15), DecryptByKey(ccCodigoNivel6)),
+ccDescripcionNivel6=CONVERT(varchar(150), DecryptByKey(ccDescripcionNivel6))
+into #DWDCuentaContable
+from DWDCuentaContable
+
+CLOSE SYMMETRIC KEY ClaveMIS02
+
+select 
+coIdFecha ,
+coIdCliente ,
+coidcuentacontable ,
+coCuotaCapital ,
+coidagencia= 
+case when convert(varchar(15),cc.ccCodigoNivel6) in (630281802003,640215802003)
+             then co.coidagencia 
+             else case when cl.clIdAgencia is null then co.coidagencia
+             else cl.clIdAgencia end 
+             end ,
+AgrupacionCanalCta=
+             case when convert(varchar(15),cc.ccCodigoNivel6) in (630281802003,640215802003)
+             then (case when asCodigoAsesor in ('IBS','-1') 
+                      then isnull((select caDescripcionAgrupacionCanal from dwdcanal where caIdCanal=cl.clIdCanal),(select caDescripcionAgrupacionCanal from dwdcanal where caCodigoCanal='NNG') )
+                      else isnull((select caDescripcionAgrupacionCanal from dwdcanal where rtrim(ltrim(caCodigoCanal))= case when ltrim(rtrim(ase.asCodigoCanal)) in ('N/A','-1') then 'NDI' else ltrim(rtrim(ase.asCodigoCanal))  end )
+                           ,isnull(caDescripcionAgrupacionCanal,(select caDescripcionAgrupacionCanal from dwdcanal where caCodigoCanal='NNG')))end)
+             else isnull(
+             (select caDescripcionAgrupacionCanal from dwdcanal where caIdCanal=cl.clIdCanal),(select caDescripcionAgrupacionCanal from dwdcanal where caCodigoCanal='NNG'))
+             end 
+into #TempContingentes
+from TempCarteraIndicadores co
+inner join #DWDCuentaContable cc on co.coIdCuentaContable=cc.ccIdCuentaContable
+inner join DWDCliente cl on co.coIdCliente=cl.clIdCliente                                                   
+inner join DWDProducto pr on pr.prIdProducto=co.coIdProducto       
+inner join DWDCanal ca on cl.clCodigoCanal=ca.caCodigoCanal  
+inner join #IndicadoresCartera on ccCodigoIndicador = indicadorNivel3 and CpCodigoIndicador = 3
+left outer join DWDAsesorOperacion ase on ase.asIdAsesor=co.coIdAsesorPrincipal
+where cc.ccCodigoIndicador in (22,23,24,25,26,27,28,34,35,62,333,334,335,336)
+
+insert into #DWHVista
+select AgrupacionCanalCta,coIdFecha Fecha,clCodigoAgencia,clAgencia Agencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccFamiliaProducto,ccGrupo Indicador,SUM(coCuotaCapital) Saldo
+from #TempContingentes T1 
+inner join DWDCliente  T2 on T1.coIdCliente=T2.clidcliente 
+inner join DWDAgenciaOperacion T4 on T1.coIdAgencia = agIdAgencia
+inner join dwdcuentacontable T5 on T1.coidcuentacontable = T5.ccidcuentacontable
+inner join DWDCanal T6 on clIdCanal = caIdCanal
+where caCodigoCanal IN ('JUR', 'NGE', 'NNG', 'PJI', 'PRI', 'INS', 'IFI', 'COR', 'TES')
+group by AgrupacionCanalCta,coIdFecha,clCodigoAgencia,clAgencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccGrupo,ccFamiliaProducto
+
+
+
+select * from #DWHVista
+
+drop table TempCapatacionesIndicadores
+drop table TempCarteraIndicadores</QueryDefinition>
+                  </Source>
+                  <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+                  <ProcessingMode>Regular</ProcessingMode>
+                  <ErrorConfiguration>
+                    <KeyNotFound>IgnoreError</KeyNotFound>
+                    <KeyDuplicate>ReportAndStop</KeyDuplicate>
+                    <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
+                  </ErrorConfiguration>
+                  <ProactiveCaching>
+                    <SilenceInterval>-PT1S</SilenceInterval>
+                    <Latency>-PT1S</Latency>
+                    <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
+                    <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
+                    <Source xsi:type="ProactiveCachingInheritedBinding" />
+                  </ProactiveCaching>
+                </Partition>
+              </Partitions>
+              <ProactiveCaching>
+                <SilenceInterval>-PT1S</SilenceInterval>
+                <Latency>-PT1S</Latency>
+                <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
+                <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
+                <Source xsi:type="ProactiveCachingInheritedBinding" />
+              </ProactiveCaching>
+            </MeasureGroup>
+          </MeasureGroups>
+          <Source>
+            <DataSourceViewID>Sandbox</DataSourceViewID>
+          </Source>
+          <MdxScripts>
+            <MdxScript>
+              <ID>MdxScript</ID>
+              <Name>MdxScript</Name>
+              <Commands>
+                <Command>
+                  <Text>CALCULATE; 
+CREATE MEMBER CURRENTCUBE.Measures.[__No measures defined] AS 1; 
+ALTER CUBE CURRENTCUBE UPDATE DIMENSION Measures, Default_Member = [__No measures defined]; </Text>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHInformacionHistoricaCaptacionesCartera'[Valor]=SUM([Saldo]);
+</Text>
+                </Command>
+              </Commands>
+              <CalculationProperties>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[Valor]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <CalculationReference>Measures.[__No measures defined]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Visible>false</Visible>
+                </CalculationProperty>
+              </CalculationProperties>
+            </MdxScript>
+          </MdxScripts>
+          <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+          <ProactiveCaching>
+            <SilenceInterval>-PT1S</SilenceInterval>
+            <Latency>-PT1S</Latency>
+            <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
+            <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
+            <Source xsi:type="ProactiveCachingInheritedBinding" />
+          </ProactiveCaching>
+        </Cube>
+      </Cubes>
+      <DataSources>
+        <DataSource xsi:type="RelationalDataSource">
+          <ID>7d301af5-1511-4470-9864-774509261219</ID>
+          <Name>CxCorporativo</Name>
+          <Annotations>
+            <Annotation>
+              <Name>ConnectionEditUISource</Name>
+              <Value>SqlServer</Value>
+            </Annotation>
+          </Annotations>
+          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
+          <ImpersonationInfo>
+            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
+            <Account>banintern\bincarro</Account>
+          </ImpersonationInfo>
+          <ManagedProvider>System.Data.SqlClient</ManagedProvider>
+          <Timeout>PT0S</Timeout>
+          <MaxActiveConnections>50</MaxActiveConnections>
+        </DataSource>
+      </DataSources>
+      <DataSourceViews>
+        <DataSourceView>
+          <ID>Sandbox</ID>
+          <Name>Sandbox</Name>
+          <DataSourceID>7d301af5-1511-4470-9864-774509261219</DataSourceID>
+          <Schema>
+            <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+              <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:Locale="es-EC">
+                <xs:complexType>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="DWHInformacionHistoricaCaptacionesCartera_a67a06f1-3022-4b91-816b-225ebb31a28f" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWHInformacionHistoricaCaptacionesCartera" msprop:DbTableName="DWHInformacionHistoricaCaptacionesCartera" msprop:TableType="View" msprop:Description="DWHInformacionHistoricaCaptacionesCartera" msprop:QueryDefinition="SET NOCOUNT ON&#xD;&#xA;&#xD;&#xA;---Variables&#xD;&#xA;&#xD;&#xA;declare @fechaini int &#xD;&#xA;&#xD;&#xA;select @fechaini = left(convert(char,dateadd(mm,-48,fefecha),112),6)+'01' from DWDFecha where fediaactual = 1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWDFecha') is not null&#xD;&#xA;begin&#xD;&#xA;       drop table #DWDFecha&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWHVista') is not null&#xD;&#xA;begin&#xD;&#xA;       drop table #DWHVista&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select feidfecha&#xD;&#xA;into #DWDFecha&#xD;&#xA;from DWDFecha &#xD;&#xA;where feIdFecha=20181130 -- &gt;= @fechaini&#xD;&#xA;--and feCierreMes = 1&#xD;&#xA;--and feFutura = 0&#xD;&#xA;order by feIdFecha&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#IndicadoresCartera') is not null&#xD;&#xA;begin&#xD;&#xA;       drop table #IndicadoresCartera&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;       SELECT DISTINCT &#xD;&#xA;       p.CpCodigoIndicador,p2.CpCodigoIndicador indicadorNivel3&#xD;&#xA;       into #IndicadoresCartera&#xD;&#xA;    FROM DWDClasificacionProductos p&#xD;&#xA;    join DWDClasificacionProductos p1 ON p1.CpPadre=p.CpCodigoIndicador&#xD;&#xA;   join DWDClasificacionProductos p2 ON p2.CpPadre=p1.CpCodigoIndicador&#xD;&#xA;    WHERE p.CpCodigoIndicador in (1,3)&#xD;&#xA;    and  p.CpNivel=1 and p1.CpNivel=2 and p2.CpNivel=3&#xD;&#xA;       &#xD;&#xA;if object_id('[tempdb]..#IndicadoresCaptaciones') is not null&#xD;&#xA;begin&#xD;&#xA;       drop table #IndicadoresCaptaciones&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;       SELECT DISTINCT &#xD;&#xA;       p2.CpCodigoIndicador indicadorNivel3&#xD;&#xA;       into #IndicadoresCaptaciones&#xD;&#xA;    FROM DWDClasificacionProductos p&#xD;&#xA;    join DWDClasificacionProductos p1 ON p1.CpPadre=p.CpCodigoIndicador&#xD;&#xA;    join DWDClasificacionProductos p2 ON p2.CpPadre=p1.CpCodigoIndicador&#xD;&#xA;    WHERE p.CpCodigoIndicador in (2)&#xD;&#xA;    and  p.CpNivel=1 and p1.CpNivel=2 and p2.CpNivel=3&#xD;&#xA;       and p2.CpCodigoIndicador &gt; 53&#xD;&#xA;       &#xD;&#xA;if object_id('[tempdb]..#DWHCuotaOperacion') is not null&#xD;&#xA;begin&#xD;&#xA;       drop table #DWHCuotaOperacion&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;create table TempCarteraIndicadores (&#xD;&#xA;coIdFecha int,&#xD;&#xA;coIdAgencia int,&#xD;&#xA;coIdCliente int,&#xD;&#xA;coidcuentacontable int,&#xD;&#xA;coidproducto int,&#xD;&#xA;coidasesorprincipal int,&#xD;&#xA;coCuotaCapital float&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;insert into TempCarteraIndicadores&#xD;&#xA;select &#xD;&#xA;coIdFecha ,coIdAgencia,coIdCliente,coidcuentacontable,coidproducto ,&#xD;&#xA;coidasesorprincipal ,sum(coCuotaCapital) coCuotaCapital&#xD;&#xA;from DWHCuotaOperacion&#xD;&#xA;inner join #DWDFecha on coIdFecha = feidfecha&#xD;&#xA;group by coIdFecha ,coIdAgencia,coIdCliente,coidcuentacontable,coidproducto ,coidasesorprincipal&#xD;&#xA;&#xD;&#xA;-- CARTERA &#xD;&#xA;select  caDescripcionAgrupacionCanal,coIdFecha Fecha,clCodigoAgencia,clAgencia Agencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccFamiliaProducto,ccGrupo Indicador,SUM(coCuotaCapital) Saldo&#xD;&#xA;into #DWHVista&#xD;&#xA;from TempCarteraIndicadores T1 &#xD;&#xA;inner join DWDCliente  T2 on T1.coIdCliente=T2.clidcliente &#xD;&#xA;inner join DWDAgenciaOperacion T4 on T1.coIdAgencia = agIdAgencia&#xD;&#xA;inner join dwdcuentacontable T5 on T1.coidcuentacontable = T5.ccidcuentacontable&#xD;&#xA;inner join #IndicadoresCartera on ccCodigoIndicador = indicadorNivel3 and CpCodigoIndicador = 1&#xD;&#xA;inner join DWDCanal T6 on clIdCanal = caIdCanal&#xD;&#xA;where caCodigoCanal IN ('JUR', 'NGE', 'NNG', 'PJI', 'PRI', 'INS', 'IFI', 'COR', 'TES')&#xD;&#xA;group by caDescripcionAgrupacionCanal,coIdFecha,clCodigoAgencia,clAgencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccGrupo,ccFamiliaProducto&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;-----------------------------------------------------&#xD;&#xA;--CAPTACIONES:&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWHPasivoOperacion') is not null&#xD;&#xA;begin&#xD;&#xA;       drop table #DWHPasivoOperacion&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;create table TempCapatacionesIndicadores (&#xD;&#xA;poIdFecha int,&#xD;&#xA;poIdCliente int,&#xD;&#xA;poIdAgencia int,&#xD;&#xA;poidcuentacontable int,&#xD;&#xA;poSaldoOperacionUSD float&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;insert into TempCapatacionesIndicadores&#xD;&#xA;select &#xD;&#xA;poIdFecha ,poIdCliente,poIdCliente,poidcuentacontable,SUM(poSaldoOperacionUSD) poSaldoOperacionUSD&#xD;&#xA;from DWHPasivoOperacion&#xD;&#xA;inner join #DWDFecha on poIdFecha = feidfecha&#xD;&#xA;group by poIdFecha ,poIdCliente,poIdCliente,poidcuentacontable&#xD;&#xA;&#xD;&#xA;insert into #DWHVista&#xD;&#xA;select caDescripcionAgrupacionCanal,poIdFecha Fecha,clCodigoAgencia,clAgencia Agencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccFamiliaProducto,ccGrupo Indicador,SUM(poSaldoOperacionUSD) Saldo&#xD;&#xA;from TempCapatacionesIndicadores T1 &#xD;&#xA;inner join DWDCliente  T2 on T1.poIdCliente=T2.clidcliente &#xD;&#xA;inner join DWDAgenciaOperacion T4 on T2.clIdAgencia = agIdAgencia&#xD;&#xA;inner join dwdcuentacontable T5 on T1.poidcuentacontable = T5.ccidcuentacontable&#xD;&#xA;inner join #IndicadoresCaptaciones on ccCodigoIndicador = indicadorNivel3&#xD;&#xA;inner join DWDCanal T6 on clIdCanal = caIdCanal&#xD;&#xA;where caCodigoaGRUPACIONCanal IN ('RED', 'COR', 'TES')&#xD;&#xA;group by caDescripcionAgrupacionCanal,poIdFecha,clCodigoAgencia,clAgencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccGrupo,ccFamiliaProducto&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--------------------------&#xD;&#xA;--CONTINGENTES&#xD;&#xA;OPEN SYMMETRIC KEY ClaveMIS02&#xD;&#xA;DECRYPTION BY CERTIFICATE Certi01&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWDCuentaContable') is not null&#xD;&#xA;begin&#xD;&#xA;drop table #DWDCuentaContable&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#TempContingentes') is not null&#xD;&#xA;begin&#xD;&#xA;drop table #TempContingentes&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;select &#xD;&#xA;ccIdCuentaContable,&#xD;&#xA;ccCodigoMoneda,&#xD;&#xA;ccSubGrupo,&#xD;&#xA;ccGrupo,&#xD;&#xA;ccFamiliaProducto,&#xD;&#xA;ccCodigoIndicador,&#xD;&#xA;ccCodigoNivel6=CONVERT(varchar(15), DecryptByKey(ccCodigoNivel6)),&#xD;&#xA;ccDescripcionNivel6=CONVERT(varchar(150), DecryptByKey(ccDescripcionNivel6))&#xD;&#xA;into #DWDCuentaContable&#xD;&#xA;from DWDCuentaContable&#xD;&#xA;&#xD;&#xA;CLOSE SYMMETRIC KEY ClaveMIS02&#xD;&#xA;&#xD;&#xA;select &#xD;&#xA;coIdFecha ,&#xD;&#xA;coIdCliente ,&#xD;&#xA;coidcuentacontable ,&#xD;&#xA;coCuotaCapital ,&#xD;&#xA;coidagencia= &#xD;&#xA;case when convert(varchar(15),cc.ccCodigoNivel6) in (630281802003,640215802003)&#xD;&#xA;             then co.coidagencia &#xD;&#xA;             else case when cl.clIdAgencia is null then co.coidagencia&#xD;&#xA;             else cl.clIdAgencia end &#xD;&#xA;             end ,&#xD;&#xA;AgrupacionCanalCta=&#xD;&#xA;             case when convert(varchar(15),cc.ccCodigoNivel6) in (630281802003,640215802003)&#xD;&#xA;             then (case when asCodigoAsesor in ('IBS','-1') &#xD;&#xA;                      then isnull((select caDescripcionAgrupacionCanal from dwdcanal where caIdCanal=cl.clIdCanal),(select caDescripcionAgrupacionCanal from dwdcanal where caCodigoCanal='NNG') )&#xD;&#xA;                      else isnull((select caDescripcionAgrupacionCanal from dwdcanal where rtrim(ltrim(caCodigoCanal))= case when ltrim(rtrim(ase.asCodigoCanal)) in ('N/A','-1') then 'NDI' else ltrim(rtrim(ase.asCodigoCanal))  end )&#xD;&#xA;                           ,isnull(caDescripcionAgrupacionCanal,(select caDescripcionAgrupacionCanal from dwdcanal where caCodigoCanal='NNG')))end)&#xD;&#xA;             else isnull(&#xD;&#xA;             (select caDescripcionAgrupacionCanal from dwdcanal where caIdCanal=cl.clIdCanal),(select caDescripcionAgrupacionCanal from dwdcanal where caCodigoCanal='NNG'))&#xD;&#xA;             end &#xD;&#xA;into #TempContingentes&#xD;&#xA;from TempCarteraIndicadores co&#xD;&#xA;inner join #DWDCuentaContable cc on co.coIdCuentaContable=cc.ccIdCuentaContable&#xD;&#xA;inner join DWDCliente cl on co.coIdCliente=cl.clIdCliente                                                   &#xD;&#xA;inner join DWDProducto pr on pr.prIdProducto=co.coIdProducto       &#xD;&#xA;inner join DWDCanal ca on cl.clCodigoCanal=ca.caCodigoCanal  &#xD;&#xA;inner join #IndicadoresCartera on ccCodigoIndicador = indicadorNivel3 and CpCodigoIndicador = 3&#xD;&#xA;left outer join DWDAsesorOperacion ase on ase.asIdAsesor=co.coIdAsesorPrincipal&#xD;&#xA;where cc.ccCodigoIndicador in (22,23,24,25,26,27,28,34,35,62,333,334,335,336)&#xD;&#xA;&#xD;&#xA;insert into #DWHVista&#xD;&#xA;select AgrupacionCanalCta,coIdFecha Fecha,clCodigoAgencia,clAgencia Agencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccFamiliaProducto,ccGrupo Indicador,SUM(coCuotaCapital) Saldo&#xD;&#xA;from #TempContingentes T1 &#xD;&#xA;inner join DWDCliente  T2 on T1.coIdCliente=T2.clidcliente &#xD;&#xA;inner join DWDAgenciaOperacion T4 on T1.coIdAgencia = agIdAgencia&#xD;&#xA;inner join dwdcuentacontable T5 on T1.coidcuentacontable = T5.ccidcuentacontable&#xD;&#xA;inner join DWDCanal T6 on clIdCanal = caIdCanal&#xD;&#xA;where caCodigoCanal IN ('JUR', 'NGE', 'NNG', 'PJI', 'PRI', 'INS', 'IFI', 'COR', 'TES')&#xD;&#xA;group by AgrupacionCanalCta,coIdFecha,clCodigoAgencia,clAgencia,agNombreZona,agNombreSubregion,agNombreRegion,caCodigoCanal,ccCodigoIndicador,ccGrupo,ccFamiliaProducto&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select * from #DWHVista&#xD;&#xA;&#xD;&#xA;drop table TempCapatacionesIndicadores&#xD;&#xA;drop table TempCarteraIndicadores">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Fecha" msprop:DbColumnName="Fecha" msprop:FriendlyName="Fecha" type="xs:int" minOccurs="0" />
+                          <xs:element name="clCodigoAgencia" msprop:DbColumnName="clCodigoAgencia" msprop:FriendlyName="clCodigoAgencia" type="xs:int" minOccurs="0" />
+                          <xs:element name="Agencia" msprop:DbColumnName="Agencia" msprop:FriendlyName="Agencia" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="agNombreZona" msprop:DbColumnName="agNombreZona" msprop:FriendlyName="agNombreZona" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="agNombreSubregion" msprop:DbColumnName="agNombreSubregion" msprop:FriendlyName="agNombreSubregion" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="agNombreRegion" msprop:DbColumnName="agNombreRegion" msprop:FriendlyName="agNombreRegion" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="caCodigoCanal" msprop:DbColumnName="caCodigoCanal" msprop:FriendlyName="caCodigoCanal" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="ccCodigoIndicador" msprop:DbColumnName="ccCodigoIndicador" msprop:FriendlyName="ccCodigoIndicador" type="xs:int" minOccurs="0" />
+                          <xs:element name="ccFamiliaProducto" msprop:DbColumnName="ccFamiliaProducto" msprop:FriendlyName="ccFamiliaProducto" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="Indicador" msprop:DbColumnName="Indicador" msprop:FriendlyName="Indicador" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                          <xs:element name="Saldo" msprop:DbColumnName="Saldo" msprop:FriendlyName="Saldo" type="xs:double" minOccurs="0" />
+                          <xs:element name="caDescripcionAgrupacionCanal" msprop:DbColumnName="caDescripcionAgrupacionCanal" msprop:FriendlyName="caDescripcionAgrupacionCanal" minOccurs="0">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:maxLength value="32768" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:choice>
+                </xs:complexType>
+              </xs:element>
+            </xs:schema>
+            <NewDataSet xmlns="" />
+          </Schema>
+        </DataSourceView>
+      </DataSourceViews>
+      <Roles>
+        <Role>
+          <ID>Role</ID>
+          <Name>Lectura</Name>
+          <Members>
+            <Member>
+              <Name>BANINTERN\bincalda</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-5239</Sid>
+            </Member>
+          </Members>
+        </Role>
+        <Role>
+          <ID>Role 1</ID>
+          <Name>Admin</Name>
+        </Role>
+      </Roles>
+      <DatabasePermissions>
+        <DatabasePermission>
+          <ID>DatabasePermission</ID>
+          <Name>DatabasePermission</Name>
+          <RoleID>Role</RoleID>
+          <Read>Allowed</Read>
+        </DatabasePermission>
+        <DatabasePermission>
+          <ID>DatabasePermission 1</ID>
+          <Name>DatabasePermission 1</Name>
+          <RoleID>Role 1</RoleID>
+          <Process>true</Process>
+          <Read>Allowed</Read>
+          <Administer>true</Administer>
+        </DatabasePermission>
+      </DatabasePermissions>
+    </Database>
+  </ObjectDefinition>
+</Alter>
