@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32126.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbIngresos", "CbIngresos\CbIngresos.smproj", "{23E07EBC-5776-4F00-BA3B-4BBD61940933}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbIngresos", "CbIngresos\CbIngresos.smproj", "{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}"
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbHojaPosicion", "cbHojaPosicion\cbHojaPosicion.smproj", "{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}"
-EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbInformacionHistoricaCaptacionesCartera", "cbInformacionHistoricaCaptacionesCartera\cbInformacionHistoricaCaptacionesCartera.smproj", "{03481E3E-C910-4772-9079-638463BEF42A}"
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbMonitorIndicadoresCliente", "CbMonitorIndicadoresCliente\CbMonitorIndicadoresCliente.smproj", "{34E436A9-3A15-49FC-8B16-02814252AB9D}"
 EndProject
@@ -19,26 +17,25 @@ Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbSDI", "CbSDI\CbSDI.smproj
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbGestionEstrategica", "cbGestionEstrategica\cbGestionEstrategica.smproj", "{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbMonitorCanales", "CbMonitorCanales\cbMonitorCanales.smproj", "{B36FAD0A-DFA7-4DBE-90E3-6E3C4BEB86D5}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbInformacionHistoricaCaptacionesCartera", "cbInformacionHistoricaCaptacionesCartera\cbInformacionHistoricaCaptacionesCartera.smproj", "{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}"
+EndProject
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbMonitorCanales", "CbMonitorCanales\CbMonitorCanales.smproj", "{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}"
+EndProject
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbMonitorCaptaciones", "cbMonitorCaptaciones\cbMonitorCaptaciones.smproj", "{E611F492-076D-4371-97F7-2EFE3ED4CE3F}"
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbBalance", "CbBalance\CbBalance.smproj", "{8CE414BB-95B2-4C99-9E03-51BA72086E22}"
-EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbMonitorCaptaciones", "cbMonitorCaptaciones\cbMonitorCaptaciones.smproj", "{47488A9C-C8B1-4A4F-9636-D5E28226C1E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Development|x86 = Development|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{23E07EBC-5776-4F00-BA3B-4BBD61940933}.Development|x86.ActiveCfg = Development|x86
-		{23E07EBC-5776-4F00-BA3B-4BBD61940933}.Development|x86.Build.0 = Development|x86
-		{23E07EBC-5776-4F00-BA3B-4BBD61940933}.Development|x86.Deploy.0 = Development|x86
+		{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}.Development|x86.ActiveCfg = Development|x86
+		{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}.Development|x86.Build.0 = Development|x86
+		{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}.Development|x86.Deploy.0 = Development|x86
 		{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}.Development|x86.ActiveCfg = Development|x86
 		{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}.Development|x86.Build.0 = Development|x86
 		{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}.Development|x86.Deploy.0 = Development|x86
-		{03481E3E-C910-4772-9079-638463BEF42A}.Development|x86.ActiveCfg = Development|x86
-		{03481E3E-C910-4772-9079-638463BEF42A}.Development|x86.Build.0 = Development|x86
-		{03481E3E-C910-4772-9079-638463BEF42A}.Development|x86.Deploy.0 = Development|x86
 		{34E436A9-3A15-49FC-8B16-02814252AB9D}.Development|x86.ActiveCfg = Development|x86
 		{34E436A9-3A15-49FC-8B16-02814252AB9D}.Development|x86.Build.0 = Development|x86
 		{34E436A9-3A15-49FC-8B16-02814252AB9D}.Development|x86.Deploy.0 = Development|x86
@@ -54,15 +51,18 @@ Global
 		{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}.Development|x86.ActiveCfg = Development|x86
 		{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}.Development|x86.Build.0 = Development|x86
 		{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}.Development|x86.Deploy.0 = Development|x86
-		{B36FAD0A-DFA7-4DBE-90E3-6E3C4BEB86D5}.Development|x86.ActiveCfg = Development|x86
-		{B36FAD0A-DFA7-4DBE-90E3-6E3C4BEB86D5}.Development|x86.Build.0 = Development|x86
-		{B36FAD0A-DFA7-4DBE-90E3-6E3C4BEB86D5}.Development|x86.Deploy.0 = Development|x86
+		{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}.Development|x86.ActiveCfg = Development|x86
+		{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}.Development|x86.Build.0 = Development|x86
+		{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}.Development|x86.Deploy.0 = Development|x86
+		{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}.Development|x86.ActiveCfg = Development|x86
+		{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}.Development|x86.Build.0 = Development|x86
+		{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}.Development|x86.Deploy.0 = Development|x86
+		{E611F492-076D-4371-97F7-2EFE3ED4CE3F}.Development|x86.ActiveCfg = Development|x86
+		{E611F492-076D-4371-97F7-2EFE3ED4CE3F}.Development|x86.Build.0 = Development|x86
+		{E611F492-076D-4371-97F7-2EFE3ED4CE3F}.Development|x86.Deploy.0 = Development|x86
 		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Development|x86.ActiveCfg = Development|x86
 		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Development|x86.Build.0 = Development|x86
 		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Development|x86.Deploy.0 = Development|x86
-		{47488A9C-C8B1-4A4F-9636-D5E28226C1E8}.Development|x86.ActiveCfg = Development|x86
-		{47488A9C-C8B1-4A4F-9636-D5E28226C1E8}.Development|x86.Build.0 = Development|x86
-		{47488A9C-C8B1-4A4F-9636-D5E28226C1E8}.Development|x86.Deploy.0 = Development|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

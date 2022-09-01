@@ -4988,7 +4988,6 @@ where [dbo].[DWDFecha].[feCalAnio] between @anio-1 and @anio&lt;/RSQueryCommandT
               </Annotations>
               <ID>feCalAnio</ID>
               <Name>Anio</Name>
-              <Description>ESTE ES EL AÑO</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>BigInt</DataType>
@@ -35494,10 +35493,9 @@ CREATE KPI CURRENTCUBE.[ProyeccionResumen_Miles_UsdOtrosG] AS Measures.[Proyecci
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
+          <ConnectionString>Data Source=172.16.75.16,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=True;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
-            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\bincarro</Account>
+            <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
           </ImpersonationInfo>
           <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>

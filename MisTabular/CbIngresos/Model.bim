@@ -10880,61 +10880,79 @@ CLOSE SYMMETRIC KEY ClaveMIS02</QueryDefinition>
                     <DataSourceID>aa175e45-e970-475e-b30a-6f53b05b0304</DataSourceID>
                     <QueryDefinition>set nocount on
 declare @anio int
-select @anio =feCalAnio-1 from DWDFecha where feDiaActual=1
+select @anio =feCalAnio -1 from DWDFecha where feDiaActual=1
 ---EN EL CUBO
+ if object_id('[tempdb]..#fecha') is not null
+begin
+drop table #fecha
+end
+select ccIdCuentaContable,feIdFecha
+into #fecha
+from dwdcuentacontable
+cross join dwdfecha 
+where ccAgrupacionContable='CUENTAS INGRESOS'
+and feCalAnio = @anio
+and feCierreMesTodosAnios = 1
+
+
 SELECT C.pnIdFecha,
- C.pnIdCuentaContable,
- pnValorPresupuesto   = CASE WHEN SUM(C.pnValorPresupuesto) = 0 THEN null ELSE SUM(C.pnValorPresupuesto) END,
- pnValorProyeccion    = CASE WHEN SUM(C.pnValorProyeccion)  = 0 THEN null ELSE SUM(C.pnValorProyeccion) END,
- pnPresupuestoAcumMes = CASE WHEN E.valor = 0 THEN null ELSE E.valor END
+C.pnIdCuentaContable,
+pnValorPresupuesto   = CASE WHEN SUM(C.pnValorPresupuesto) = 0 THEN 0 ELSE SUM(isnull(C.pnValorPresupuesto,0)) END,
+pnValorProyeccion    = CASE WHEN SUM(C.pnValorProyeccion)  = 0 THEN 0 ELSE SUM(isnull(C.pnValorProyeccion ,0)) END,
+pnPresupuestoAcumMes = sum(CASE WHEN E.valor = 0 THEN 0 ELSE isnull(E.valor,0) END)
 FROM
   (
-    select cIdCuentaContable, pnIdFecha, pnIdCuentaContable, SUM(pnValorPresupuesto) pnValorPresupuesto, SUM(pnValorProyeccion)			
-		pnValorProyeccion
-    from(
-		 SELECT LEFT([pnIdFecha],4) cAnio, 
-		 CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END cIdCuentaContable,
-		 pnIdFecha,
-		 CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END pnIdCuentaContable,
-		 CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorPresupuesto ELSE  pnValorPresupuesto END pnValorPresupuesto,
-		 CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorProyeccion  ELSE  pnValorProyeccion  END pnValorProyeccion
-		 FROM [DWHPresupuestoNegocio] A
-		 INNER JOIN [DWDCuentaContable] C ON A.pnIdCuentaContable = C.ccIdCuentaContable
-		 INNER JOIN [DWDFecha] F ON A.pnIdFecha = F.feIdFecha
-		 WHERE f.feCierreMesTodosAnios = 1 and feCalAnio=@anio
-		 AND ccAgrupacionContable='CUENTAS INGRESOS'
-		 and pnIdIndicadorMedidaFinanciera=-10
-	)s
-    group by cIdCuentaContable, pnIdFecha, pnIdCuentaContable
+         select a.ccIdCuentaContable, a.feIdFecha pnidfecha, a.ccIdCuentaContable pnIdCuentaContable, SUM(isnull(pnValorPresupuesto,0)) pnValorPresupuesto, SUM(isnull(pnValorProyeccion,0)) pnValorProyeccion
+         from(
+             SELECT LEFT([pnIdFecha],4) cAnio, 
+                     CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END cIdCuentaContable,
+                    pnIdFecha,
+                    CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END pnIdCuentaContable,
+                    CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorPresupuesto ELSE  pnValorPresupuesto END pnValorPresupuesto,
+                    CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorProyeccion  ELSE  pnValorProyeccion  END pnValorProyeccion             
+              FROM [DWHPresupuestoNegocio] A
+             INNER JOIN [DWDCuentaContable] C ON A.pnIdCuentaContable = C.ccIdCuentaContable
+             INNER JOIN [DWDFecha] F ON A.pnIdFecha = F.feIdFecha
+             WHERE f.feCierreMesTodosAnios = 1 and feCalAnio = @anio
+             AND ccAgrupacionContable='CUENTAS INGRESOS'
+             and pnIdIndicadorMedidaFinanciera=-10                
+             )s
+			 right join #fecha a on a.feIdFecha=pnIdFecha and a.ccIdCuentaContable=pnIdCuentaContable
+			 --where a.ccIdCuentaContable = 1137
+             group by a.ccIdCuentaContable, a.feIdFecha, pnIdCuentaContable
   ) C
 
 LEFT OUTER JOIN
 (
-   SELECT q.Fecha eIdFecha,
-          q.eIdCuentaContable,
-          SUM(q.valor) OVER (PARTITION BY left(Fecha,4), eIdCuentaContable ORDER BY Fecha ROWS UNBOUNDED PRECEDING) valor
+   SELECT Fecha eIdFecha,
+          ccIdCuentaContable,
+          SUM(q.valor) OVER (PARTITION BY left(Fecha,4), ccIdCuentaContable ORDER BY Fecha ROWS UNBOUNDED PRECEDING) valor
    FROM (
-		select Fecha,eIdCuentaContable,SUM(valor) Valor
-        from(
+          select feidFecha Fecha,ccIdCuentaContable,SUM(isnull(valor,0)) Valor
+          from(
           SELECT A.pnIdFecha fecha, 
           CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END eIdCuentaContable,
-          CASE WHEN c.ccCuentaSigno &lt; 0 THEN -SUM(pnValorPresupuesto) ELSE SUM(pnValorPresupuesto) END valor,
-          c.ccCuentaSigno
+          CASE WHEN c.ccCuentaSigno &lt; 0 THEN -SUM(pnValorPresupuesto) ELSE SUM(pnValorPresupuesto) END valor       
           FROM [DWHPresupuestoNegocio] A
           INNER JOIN DWDFecha f  ON A.pnIdFecha = f.feIdFecha
           INNER JOIN [DWDCuentaContable] C ON A.pnIdCuentaContable = C.ccIdCuentaContable
-           WHERE f.feCierreMesTodosAnios = 1 and feCalAnio=@anio 
+          WHERE f.feCierreMesTodosAnios = 1 and feCalAnio = @anio 
           AND ccAgrupacionContable='CUENTAS INGRESOS'
-		  and pnIdIndicadorMedidaFinanciera=-10
-          GROUP BY A.pnIdFecha, 
+          and pnIdIndicadorMedidaFinanciera=-10
+		  --and   pnIdCuentaContable = 1137
+		  GROUP BY A.pnIdFecha, 
           CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) then pnIdCuentaContable else c.ccCuentaPadre end,
           c.ccCuentaSigno
-		)t
-        group by fecha,eIdCuentaContable
+          )t 
+		  right join #fecha a on a.feIdFecha=Fecha and a.ccIdCuentaContable=eIdCuentaContable
+		  --where ccIdCuentaContable = 1137
+   group by feidFecha,ccIdCuentaContable
    ) q
 ) E
-ON C.pnIdFecha = E.eIdFecha AND C.cIdCuentaContable = E.eIdCuentaContable
-GROUP BY C.pnIdFecha, C.pnIdCuentaContable, E.Valor</QueryDefinition>
+ON C.pnIdFecha = E.eIdFecha AND C.ccIdCuentaContable = E.ccIdCuentaContable
+--where c.ccIdCuentaContable = 1137
+GROUP BY C.pnIdFecha, C.pnIdCuentaContable
+having SUM(isnull(C.pnValorPresupuesto,0)) + SUM(isnull(C.pnValorProyeccion ,0)) + sum(isnull(E.valor,0))&gt;0</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -10958,16 +10976,29 @@ GROUP BY C.pnIdFecha, C.pnIdCuentaContable, E.Valor</QueryDefinition>
                     <DataSourceID>aa175e45-e970-475e-b30a-6f53b05b0304</DataSourceID>
                     <QueryDefinition>set nocount on
 declare @anio int
-select @anio =feCalAnio from DWDFecha where feDiaActual=1
+select @anio =feCalAnio  from DWDFecha where feDiaActual=1
 ---EN EL CUBO
+ if object_id('[tempdb]..#fecha') is not null
+begin
+drop table #fecha
+end
+select ccIdCuentaContable,feIdFecha
+into #fecha
+from dwdcuentacontable
+cross join dwdfecha 
+where ccAgrupacionContable='CUENTAS INGRESOS'
+and feCalAnio = @anio
+and feCierreMesTodosAnios = 1
+
+
 SELECT C.pnIdFecha,
 C.pnIdCuentaContable,
-pnValorPresupuesto   = CASE WHEN SUM(C.pnValorPresupuesto) = 0 THEN null ELSE SUM(C.pnValorPresupuesto) END,
-pnValorProyeccion    = CASE WHEN SUM(C.pnValorProyeccion)  = 0 THEN null ELSE SUM(C.pnValorProyeccion) END,
-pnPresupuestoAcumMes = CASE WHEN E.valor = 0 THEN null ELSE E.valor END
+pnValorPresupuesto   = CASE WHEN SUM(C.pnValorPresupuesto) = 0 THEN 0 ELSE SUM(isnull(C.pnValorPresupuesto,0)) END,
+pnValorProyeccion    = CASE WHEN SUM(C.pnValorProyeccion)  = 0 THEN 0 ELSE SUM(isnull(C.pnValorProyeccion ,0)) END,
+pnPresupuestoAcumMes = sum(CASE WHEN E.valor = 0 THEN 0 ELSE isnull(E.valor,0) END)
 FROM
   (
-         select cIdCuentaContable, pnIdFecha, pnIdCuentaContable, SUM(pnValorPresupuesto) pnValorPresupuesto, SUM(pnValorProyeccion) pnValorProyeccion
+         select a.ccIdCuentaContable, a.feIdFecha pnidfecha, a.ccIdCuentaContable pnIdCuentaContable, SUM(isnull(pnValorPresupuesto,0)) pnValorPresupuesto, SUM(isnull(pnValorProyeccion,0)) pnValorProyeccion
          from(
              SELECT LEFT([pnIdFecha],4) cAnio, 
                      CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END cIdCuentaContable,
@@ -10982,34 +11013,42 @@ FROM
              AND ccAgrupacionContable='CUENTAS INGRESOS'
              and pnIdIndicadorMedidaFinanciera=-10                
              )s
-             group by cIdCuentaContable, pnIdFecha, pnIdCuentaContable
+			 right join #fecha a on a.feIdFecha=pnIdFecha and a.ccIdCuentaContable=pnIdCuentaContable
+			 --where a.ccIdCuentaContable = 1137
+             group by a.ccIdCuentaContable, a.feIdFecha, pnIdCuentaContable
   ) C
 
 LEFT OUTER JOIN
 (
-   SELECT q.Fecha eIdFecha,
-          q.eIdCuentaContable,
-          SUM(q.valor) OVER (PARTITION BY left(Fecha,4), eIdCuentaContable ORDER BY Fecha ROWS UNBOUNDED PRECEDING) valor
+   SELECT Fecha eIdFecha,
+          ccIdCuentaContable,
+          SUM(q.valor) OVER (PARTITION BY left(Fecha,4), ccIdCuentaContable ORDER BY Fecha ROWS UNBOUNDED PRECEDING) valor
    FROM (
-             select Fecha,eIdCuentaContable,SUM(valor) Valor
-             from(
+          select feidFecha Fecha,ccIdCuentaContable,SUM(isnull(valor,0)) Valor
+          from(
           SELECT A.pnIdFecha fecha, 
-                           CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END eIdCuentaContable,
-                           CASE WHEN c.ccCuentaSigno &lt; 0 THEN -SUM(pnValorPresupuesto) ELSE SUM(pnValorPresupuesto) END valor       
+          CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END eIdCuentaContable,
+          CASE WHEN c.ccCuentaSigno &lt; 0 THEN -SUM(pnValorPresupuesto) ELSE SUM(pnValorPresupuesto) END valor       
           FROM [DWHPresupuestoNegocio] A
           INNER JOIN DWDFecha f  ON A.pnIdFecha = f.feIdFecha
           INNER JOIN [DWDCuentaContable] C ON A.pnIdCuentaContable = C.ccIdCuentaContable
           WHERE f.feCierreMesTodosAnios = 1 and feCalAnio = @anio 
           AND ccAgrupacionContable='CUENTAS INGRESOS'
-               and pnIdIndicadorMedidaFinanciera=-10                    GROUP BY A.pnIdFecha, 
+          and pnIdIndicadorMedidaFinanciera=-10
+		  --and   pnIdCuentaContable = 1137
+		  GROUP BY A.pnIdFecha, 
           CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) then pnIdCuentaContable else c.ccCuentaPadre end,
-                    c.ccCuentaSigno
-               )t
-               group by fecha,eIdCuentaContable
+          c.ccCuentaSigno
+          )t 
+		  right join #fecha a on a.feIdFecha=Fecha and a.ccIdCuentaContable=eIdCuentaContable
+		  --where ccIdCuentaContable = 1137
+   group by feidFecha,ccIdCuentaContable
    ) q
 ) E
-ON C.pnIdFecha = E.eIdFecha AND C.cIdCuentaContable = E.eIdCuentaContable
-GROUP BY C.pnIdFecha, C.pnIdCuentaContable, E.Valor</QueryDefinition>
+ON C.pnIdFecha = E.eIdFecha AND C.ccIdCuentaContable = E.ccIdCuentaContable
+--where c.ccIdCuentaContable = 1137
+GROUP BY C.pnIdFecha, C.pnIdCuentaContable --
+having SUM(isnull(C.pnValorPresupuesto,0)) + SUM(isnull(C.pnValorProyeccion ,0)) + sum(isnull(E.valor,0))&lt;&gt;0</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -11028,61 +11067,79 @@ GROUP BY C.pnIdFecha, C.pnIdCuentaContable, E.Valor</QueryDefinition>
                     <DataSourceID>aa175e45-e970-475e-b30a-6f53b05b0304</DataSourceID>
                     <QueryDefinition>set nocount on
 declare @anio int
-select @anio =feCalAnio-2 from DWDFecha where feDiaActual=1
+select @anio =feCalAnio -2 from DWDFecha where feDiaActual=1
 ---EN EL CUBO
+ if object_id('[tempdb]..#fecha') is not null
+begin
+drop table #fecha
+end
+select ccIdCuentaContable,feIdFecha
+into #fecha
+from dwdcuentacontable
+cross join dwdfecha 
+where ccAgrupacionContable='CUENTAS INGRESOS'
+and feCalAnio = @anio
+and feCierreMesTodosAnios = 1
+
+
 SELECT C.pnIdFecha,
- C.pnIdCuentaContable,
- pnValorPresupuesto   = CASE WHEN SUM(C.pnValorPresupuesto) = 0 THEN null ELSE SUM(C.pnValorPresupuesto) END,
- pnValorProyeccion    = CASE WHEN SUM(C.pnValorProyeccion)  = 0 THEN null ELSE SUM(C.pnValorProyeccion) END,
- pnPresupuestoAcumMes = CASE WHEN E.valor = 0 THEN null ELSE E.valor END
+C.pnIdCuentaContable,
+pnValorPresupuesto   = CASE WHEN SUM(C.pnValorPresupuesto) = 0 THEN 0 ELSE SUM(isnull(C.pnValorPresupuesto,0)) END,
+pnValorProyeccion    = CASE WHEN SUM(C.pnValorProyeccion)  = 0 THEN 0 ELSE SUM(isnull(C.pnValorProyeccion ,0)) END,
+pnPresupuestoAcumMes = sum(CASE WHEN E.valor = 0 THEN 0 ELSE isnull(E.valor,0) END)
 FROM
   (
-  select cIdCuentaContable, pnIdFecha, pnIdCuentaContable, SUM(pnValorPresupuesto) pnValorPresupuesto, SUM(pnValorProyeccion)			
-		pnValorProyeccion
-    from(
-	 SELECT LEFT([pnIdFecha],4) cAnio, 
-	 CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END cIdCuentaContable,
-	 pnIdFecha,
-	 CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END pnIdCuentaContable,
-	 CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorPresupuesto ELSE  pnValorPresupuesto END pnValorPresupuesto,
-	 CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorProyeccion  ELSE  pnValorProyeccion  END pnValorProyeccion
-	 FROM [DWHPresupuestoNegocio] A
-	 INNER JOIN [DWDCuentaContable] C ON A.pnIdCuentaContable = C.ccIdCuentaContable
-	 INNER JOIN [DWDFecha] F ON A.pnIdFecha = F.feIdFecha
-	 WHERE f.feCierreMesTodosAnios = 1 and feCalAnio=@anio
-	 AND ccAgrupacionContable='CUENTAS INGRESOS'
-	 and pnIdIndicadorMedidaFinanciera=-10
-	 )s
-    group by cIdCuentaContable, pnIdFecha, pnIdCuentaContable
+         select a.ccIdCuentaContable, a.feIdFecha pnidfecha, a.ccIdCuentaContable pnIdCuentaContable, SUM(isnull(pnValorPresupuesto,0)) pnValorPresupuesto, SUM(isnull(pnValorProyeccion,0)) pnValorProyeccion
+         from(
+             SELECT LEFT([pnIdFecha],4) cAnio, 
+                     CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END cIdCuentaContable,
+                    pnIdFecha,
+                    CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END pnIdCuentaContable,
+                    CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorPresupuesto ELSE  pnValorPresupuesto END pnValorPresupuesto,
+                    CASE WHEN ccCuentaSigno &lt; 0 THEN -pnValorProyeccion  ELSE  pnValorProyeccion  END pnValorProyeccion             
+              FROM [DWHPresupuestoNegocio] A
+             INNER JOIN [DWDCuentaContable] C ON A.pnIdCuentaContable = C.ccIdCuentaContable
+             INNER JOIN [DWDFecha] F ON A.pnIdFecha = F.feIdFecha
+             WHERE f.feCierreMesTodosAnios = 1 and feCalAnio = @anio
+             AND ccAgrupacionContable='CUENTAS INGRESOS'
+             and pnIdIndicadorMedidaFinanciera=-10                
+             )s
+			 right join #fecha a on a.feIdFecha=pnIdFecha and a.ccIdCuentaContable=pnIdCuentaContable
+			 --where a.ccIdCuentaContable = 1137
+             group by a.ccIdCuentaContable, a.feIdFecha, pnIdCuentaContable
   ) C
 
 LEFT OUTER JOIN
 (
-   SELECT q.Fecha eIdFecha,
-          q.eIdCuentaContable,
-          SUM(q.valor) OVER (PARTITION BY left(Fecha,4), eIdCuentaContable ORDER BY Fecha ROWS UNBOUNDED PRECEDING) valor
+   SELECT Fecha eIdFecha,
+          ccIdCuentaContable,
+          SUM(q.valor) OVER (PARTITION BY left(Fecha,4), ccIdCuentaContable ORDER BY Fecha ROWS UNBOUNDED PRECEDING) valor
    FROM (
-	select Fecha,eIdCuentaContable,SUM(valor) Valor
-        from(
+          select feidFecha Fecha,ccIdCuentaContable,SUM(isnull(valor,0)) Valor
+          from(
           SELECT A.pnIdFecha fecha, 
           CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) THEN pnIdCuentaContable ELSE c.ccCuentaPadre END eIdCuentaContable,
-          CASE WHEN c.ccCuentaSigno &lt; 0 THEN -SUM(pnValorPresupuesto) ELSE SUM(pnValorPresupuesto) END valor,
-          c.ccCuentaSigno
+          CASE WHEN c.ccCuentaSigno &lt; 0 THEN -SUM(pnValorPresupuesto) ELSE SUM(pnValorPresupuesto) END valor       
           FROM [DWHPresupuestoNegocio] A
           INNER JOIN DWDFecha f  ON A.pnIdFecha = f.feIdFecha
           INNER JOIN [DWDCuentaContable] C ON A.pnIdCuentaContable = C.ccIdCuentaContable
-           WHERE f.feCierreMesTodosAnios = 1 and feCalAnio=@anio 
+          WHERE f.feCierreMesTodosAnios = 1 and feCalAnio = @anio 
           AND ccAgrupacionContable='CUENTAS INGRESOS'
-		  and pnIdIndicadorMedidaFinanciera=-10
-          GROUP BY A.pnIdFecha, 
+          and pnIdIndicadorMedidaFinanciera=-10
+		  --and   pnIdCuentaContable = 1137
+		  GROUP BY A.pnIdFecha, 
           CASE WHEN (c.ccCuentaPadre is null or c.ccCuentaPadre=0) then pnIdCuentaContable else c.ccCuentaPadre end,
           c.ccCuentaSigno
-	)t
-    group by fecha,eIdCuentaContable
+          )t 
+		  right join #fecha a on a.feIdFecha=Fecha and a.ccIdCuentaContable=eIdCuentaContable
+		  --where ccIdCuentaContable = 1137
+   group by feidFecha,ccIdCuentaContable
    ) q
 ) E
-ON C.pnIdFecha = E.eIdFecha AND C.cIdCuentaContable = E.eIdCuentaContable
-GROUP BY C.pnIdFecha, C.pnIdCuentaContable, E.Valor</QueryDefinition>
+ON C.pnIdFecha = E.eIdFecha AND C.ccIdCuentaContable = E.ccIdCuentaContable
+--where c.ccIdCuentaContable = 1137
+GROUP BY C.pnIdFecha, C.pnIdCuentaContable
+having SUM(isnull(C.pnValorPresupuesto,0)) + SUM(isnull(C.pnValorProyeccion ,0)) + sum(isnull(E.valor,0))&gt;0</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -14709,17 +14766,16 @@ CREATE KPI CURRENTCUBE.[KPI_presupuesto_acumulado] AS Measures.[KPI_presupuesto_
       <DataSources>
         <DataSource xsi:type="RelationalDataSource">
           <ID>aa175e45-e970-475e-b30a-6f53b05b0304</ID>
-          <Name>CxCorporativo</Name>
+          <Name>localhost.corporativo.test</Name>
           <Annotations>
             <Annotation>
               <Name>ConnectionEditUISource</Name>
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
+          <ConnectionString>Data Source=172.16.75.16,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
-            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\bincarro</Account>
+            <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
           </ImpersonationInfo>
           <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
