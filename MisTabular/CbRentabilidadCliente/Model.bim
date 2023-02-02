@@ -30292,7 +30292,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30398,7 +30398,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30518,7 +30518,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30624,7 +30624,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30744,7 +30744,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30850,7 +30850,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30970,7 +30970,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31076,7 +31076,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31196,7 +31196,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31302,7 +31302,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31422,7 +31422,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31528,7 +31528,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31648,7 +31648,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31754,7 +31754,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31874,7 +31874,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31980,7 +31980,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32100,7 +32100,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32206,7 +32206,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32326,7 +32326,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32432,7 +32432,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32552,7 +32552,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32658,7 +32658,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32778,7 +32778,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32884,7 +32884,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -81849,6 +81849,25 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                     </Annotation>
                   </Annotations>
                 </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHIngresoOperacion'[ValIngresoAcumuladoMesFiscal]=sum(DWHIngresoOperacion[ioSaldoAcumuladoMensualFiscal]);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>ValIngresoAcumuladoMesFiscal</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHIngresoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
               </Commands>
               <CalculationProperties>
                 <CalculationProperty>
@@ -86527,6 +86546,27 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                   <CalculationType>Member</CalculationType>
                 </CalculationProperty>
                 <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[ValIngresoAcumuladoMesFiscal]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
                   <CalculationReference>Measures.[__No measures defined]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Visible>false</Visible>
@@ -86554,7 +86594,7 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Integrated Security=SSPI;Persist Security Info=False;User ID=;Initial Catalog=DWHCORPORATIVO;Data Source=172.16.76.4;Initial File Name=;Server SPN=</ConnectionString>
+          <ConnectionString>Provider=SQLNCLI11.1;Integrated Security=SSPI;Persist Security Info=False;User ID=;Initial Catalog=DWHCORPORATIVO;Data Source=172.16.172.160;Initial File Name=;Server SPN=</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
             <Account>banintern\binxaste</Account>
