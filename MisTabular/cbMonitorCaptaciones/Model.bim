@@ -26984,7 +26984,8 @@ and feFeriado=0
 and feFinSemana=0
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
+--select fe1.feIdFecha,(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #DWDFecha fe1
 inner join 
 (
@@ -26995,7 +26996,6 @@ inner join
  from #DWDFecha
 ) as fe2 on fe1.feIdFecha=fe2.feIdFecha
  
-
 /* ---- Cuenta Contable  ---- */
 
 if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
@@ -27034,7 +27034,7 @@ select
 ,ao.aoidcliente
 ,ao.aoIdCuentaContable
 ,ao.aoIdProducto
-,aoMontoSaldoDolar=sum( (ao.aoMontoSaldoDolar + fe.feCalDia ) )
+,aoMontoSaldoDolar=sum( (ao.aoMontoSaldoDolar * fe.feCalDia ) )
 from #DWHActivoOperacion ao
 inner join #DWDFecha fe on 1=1
 inner join #DWDCuentaContable cc on ao.aoIdCuentaContable = cc.ccIdCuentaContable
@@ -27095,7 +27095,8 @@ and feFeriado=0
 and feFinSemana=0
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
+--select fe1.feIdFecha,(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #DWDFecha fe1
 inner join 
 (
@@ -27106,7 +27107,6 @@ inner join
  from #DWDFecha
 ) as fe2 on fe1.feIdFecha=fe2.feIdFecha
  
-
 /* ---- Cuenta Contable  ---- */
 
 if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
@@ -27145,7 +27145,7 @@ select
 ,ao.aoidcliente
 ,ao.aoIdCuentaContable
 ,ao.aoIdProducto
-,aoMontoSaldoDolar=sum( (ao.aoMontoSaldoDolar + fe.feCalDia ) )
+,aoMontoSaldoDolar=sum( (ao.aoMontoSaldoDolar * fe.feCalDia ) )
 from #DWHActivoOperacion ao
 inner join #DWDFecha fe on 1=1
 inner join #DWDCuentaContable cc on ao.aoIdCuentaContable = cc.ccIdCuentaContable
@@ -38169,7 +38169,7 @@ and feIdFecha not in (select pnIdFecha from #ListaFechas)
 
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #CTE_Fecha fe1
 inner join 
 (
@@ -38275,7 +38275,7 @@ and feIdFecha not in (select pnIdFecha from #ListaFechas)
 
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #CTE_Fecha fe1
 inner join 
 (
@@ -44157,7 +44157,7 @@ and fecierremes=1
 and feIdFecha not in (select bsfIdFecha from #ListaFechas)
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #DWDFecha fe1
 inner join 
 (
@@ -44238,7 +44238,7 @@ and fecierremes=1
 and feIdFecha not in (select bsfIdFecha from #ListaFechas)
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #DWDFecha fe1
 inner join 
 (
@@ -50457,7 +50457,7 @@ and feFeriado=0
 and feFinSemana=0
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #DWDFecha fe1
 inner join 
 (
@@ -50489,7 +50489,7 @@ select
  tcoIdFecha=fe.feIdFecha
 ,tco.tcoIdCliente
 ,tco.tcoIdCuentaContable
-,tcoSaldo=sum(isnull(tco.tcoSaldo,0) +  fe.feCalDia  ) 
+,tcoSaldo=sum(isnull(tco.tcoSaldo,0) *  fe.feCalDia  ) 
 from #TarjetaCreditoOperacion tco
 inner join #DWDFecha fe on 1=1
 where tco.tcoSaldo!=0
@@ -50548,7 +50548,7 @@ and feFeriado=0
 and feFinSemana=0
 
 update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)
+set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
 from #DWDFecha fe1
 inner join 
 (
@@ -50580,7 +50580,7 @@ select
  tcoIdFecha=fe.feIdFecha
 ,tco.tcoIdCliente
 ,tco.tcoIdCuentaContable
-,tcoSaldo=sum(isnull(tco.tcoSaldo,0) +  fe.feCalDia  ) 
+,tcoSaldo=sum(isnull(tco.tcoSaldo,0) *  fe.feCalDia  ) 
 from #TarjetaCreditoOperacion tco
 inner join #DWDFecha fe on 1=1
 where tco.tcoSaldo!=0
@@ -59796,7 +59796,7 @@ CREATE MEASURE 'DWHTarjetaCreditoOperacion'[tcoValTarjetaHaceUnAnio]=CALCULATE([
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHTarjetaCreditoOperacion'[tcoValTarjetaVarAnioCorrido]= [tcoValSaldoTarjetaMM] - [tcoValTarjetaHaceUnAnio] + 0;
+CREATE MEASURE 'DWHTarjetaCreditoOperacion'[tcoValTarjetaVarAnioCorrido]=[tcoValSaldoTarjetaMM] - [tcoValTarjetaHaceUnAnio] + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -59922,7 +59922,7 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValSisFinVarAnualAnioCorridoPorc
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoHaceUnAnio]=CALCULATE(SUM(DWHPresupuestoNegocio[pnValorPresupuesto]), FILTER(ALL(DWDFecha),DWDFecha[feIdFecha]=max(DWDFecha[feIdFechaAnioAnt]))) + 0;
+CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoHaceUnAnio]=CALCULATE([pnValorRealPresupuestoMM], FILTER(ALL(DWDFecha),DWDFecha[feIdFecha]=max(DWDFecha[feIdFechaAnioAnt]))) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -59941,7 +59941,7 @@ CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoHaceUnAnio]=CALCULATE(SUM
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoVarAnioCorrido]=SUM(DWHPresupuestoNegocio[pnValorPresupuesto])- [pnValPresupuestoHaceUnAnio] + 0;
+CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoVarAnioCorrido]=[pnValorRealPresupuestoMM] - [pnValPresupuestoHaceUnAnio] + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60040,7 +60040,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualAnioCorridoESPPorc]=CALC
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiarioMM]= (sum(DWHActivoOperacion[aoMontoSaldoDolar]) / 1000000) + 0;
+CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiarioMM]=(sum(DWHActivoOperacion[aoMontoSaldoDolar]) / 1000000) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60059,7 +60059,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiarioMM]= (sum(DWHActivoOperacion
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHTarjetaCreditoOperacion'[tcoValSaldoTarjetaMM]=(SUM(DWHTarjetaCreditoOperacion[tcoSaldo])/1000000) + 0 ;
+CREATE MEASURE 'DWHTarjetaCreditoOperacion'[tcoValSaldoTarjetaMM]=(SUM(DWHTarjetaCreditoOperacion[tcoSaldo])/1000000) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60088,6 +60088,25 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMM]=(SUM(DWHBalanceSistem
                     <Annotation>
                       <Name>Table</Name>
                       <Value>DWHBalanceSistemaFinanciero</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPresupuestoNegocio'[pnValorRealPresupuestoMM]=(SUM([pnValorPresupuesto])/1000000) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>pnValorRealPresupuestoMM</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPresupuestoNegocio</Value>
                     </Annotation>
                   </Annotations>
                 </Command>
@@ -69164,7 +69183,7 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMM]=(SUM(DWHBalanceSistem
                     </Annotation>
                     <Annotation>
                       <Name>IsPrivate</Name>
-                      <Value>True</Value>
+                      <Value>False</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Format</Name>
@@ -69176,7 +69195,6 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMM]=(SUM(DWHBalanceSistem
                   <CalculationReference>[aoValActivoHaceUnAnio]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Description>Valor del saldo de la fecha de hace un año con respecto a cada fecha en curso</Description>
-                  <Visible>false</Visible>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -69187,7 +69205,7 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMM]=(SUM(DWHBalanceSistem
                     </Annotation>
                     <Annotation>
                       <Name>IsPrivate</Name>
-                      <Value>True</Value>
+                      <Value>False</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Format</Name>
@@ -69198,7 +69216,6 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMM]=(SUM(DWHBalanceSistem
                   </Annotations>
                   <CalculationReference>[tcoValTarjetaHaceUnAnio]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Visible>false</Visible>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -69528,6 +69545,27 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMM]=(SUM(DWHBalanceSistem
                     </Annotation>
                   </Annotations>
                   <CalculationReference>[bsfValRealMM]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[pnValorRealPresupuestoMM]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
