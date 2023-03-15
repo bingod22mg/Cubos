@@ -69,9 +69,6 @@ declare
 ,@fecha15diasDate date
 ,@fechamax int
 ,@DiaAAnterior int
-,@DiciembreAnioAnt int
-,@Diciembre2AnioAnt int
-,@Diciembre3AnioAnt int
 
 if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end
 
@@ -5515,6 +5512,7 @@ where indicadorNivel1 &lt;&gt; 64&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandTy
             <Attribute>
               <ID>ccCalProductoNivel1</ID>
               <Name>ccCalProductoNivel1</Name>
+              <Description>Descripción de los productos manejados en el banco</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -5542,6 +5540,7 @@ where indicadorNivel1 &lt;&gt; 64&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandTy
             <Attribute>
               <ID>ccCalProductoNivel2</ID>
               <Name>ccCalProductoNivel2</Name>
+              <Description>Descripción de los sub productos manejados en el banco</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -7354,6 +7353,7 @@ drop table #DWHActivoOperacion&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
                 </Source>
               </NameColumn>
               <OrderBy>Key</OrderBy>
+              <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
             </Attribute>
             <Attribute>
               <ID>aoIdCuentaContable</ID>
@@ -7408,6 +7408,7 @@ drop table #DWHActivoOperacion&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
                 </Source>
               </NameColumn>
               <OrderBy>Key</OrderBy>
+              <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
             </Attribute>
             <Attribute>
               <ID>aoidcliente</ID>
@@ -9001,6 +9002,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -9031,6 +9034,8 @@ SELECT
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente
 ,poIdFecha
@@ -9044,7 +9049,6 @@ group by clidcliente
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
-
 
 if object_id('[tempdb]..#CTE_Pasivos') is not null
 begin
@@ -9255,6 +9259,16 @@ end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandT
                   <AttributeID>poidcliente</AttributeID>
                   <OverrideBehavior>None</OverrideBehavior>
                   <Name>poidcliente</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>poIntPromedioMensualFiscal</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>poIntPromedioMensualFiscal</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>poSaldoPromedioMensualFiscal</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>poSaldoPromedioMensualFiscal</Name>
                 </AttributeRelationship>
               </AttributeRelationships>
               <OrderBy>Key</OrderBy>
@@ -10094,6 +10108,60 @@ end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandT
                 <Source xsi:type="ColumnBinding">
                   <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
                   <ColumnID>poidcliente</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <ID>poIntPromedioMensualFiscal</ID>
+              <Name>poIntPromedioMensualFiscal</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Double</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
+                    <ColumnID>poIntPromedioMensualFiscal</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
+                  <ColumnID>poIntPromedioMensualFiscal</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <ID>poSaldoPromedioMensualFiscal</ID>
+              <Name>poSaldoPromedioMensualFiscal</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Double</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
+                    <ColumnID>poSaldoPromedioMensualFiscal</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
+                  <ColumnID>poSaldoPromedioMensualFiscal</ColumnID>
                 </Source>
               </NameColumn>
               <OrderBy>Key</OrderBy>
@@ -17679,12 +17747,14 @@ group by ffrCodigoMedidaFinanciera&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandT
                 </Attribute>
                 <Attribute>
                   <AttributeID>aoMontoSaldoDolar</AttributeID>
+                  <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
                 </Attribute>
                 <Attribute>
                   <AttributeID>aoIdCuentaContable</AttributeID>
                 </Attribute>
                 <Attribute>
                   <AttributeID>aoIdProducto</AttributeID>
+                  <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
                 </Attribute>
                 <Attribute>
                   <AttributeID>aoidcliente</AttributeID>
@@ -17799,6 +17869,12 @@ group by ffrCodigoMedidaFinanciera&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandT
                 </Attribute>
                 <Attribute>
                   <AttributeID>poidcliente</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>poIntPromedioMensualFiscal</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>poSaldoPromedioMensualFiscal</AttributeID>
                 </Attribute>
               </Attributes>
             </Dimension>
@@ -19307,9 +19383,6 @@ declare
 ,@fecha15diasDate date
 ,@fechamax int
 ,@DiaAAnterior int
-,@DiciembreAnioAnt int
-,@Diciembre2AnioAnt int
-,@Diciembre3AnioAnt int
 
 if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end
 
@@ -19683,9 +19756,6 @@ declare
 ,@fecha15diasDate date
 ,@fechamax int
 ,@DiaAAnterior int
-,@DiciembreAnioAnt int
-,@Diciembre2AnioAnt int
-,@Diciembre3AnioAnt int
 
 if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end
 
@@ -27330,252 +27400,6 @@ if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end</Qu
                   </ProactiveCaching>
                   <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
-                <Partition>
-                  <ID>DWHActivoOperacion_cba96cad-7e9b-4fd0-bac6-eed82ab4b99c</ID>
-                  <Name>DWHActivoOperacionGeneraDatosPrueba</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
-
-declare @AnioMesHaceUnAnio int, @FechaActual int, @FechaHaceDosAnios int, @AnioActual int
-
-select 
- @AnioMesHaceUnAnio= ( ( (feCalAnio-1) * 100 ) + feCalMes ) 
-,@AnioActual=feCalAnio
-,@FechaActual=feIdFecha
-,@FechaHaceDosAnios=convert(varchar(8),dateadd(yy,-2,cast(feFecha as date)),112)
-from DWDFecha where feDiaActual=1
-
-/* -- Lista Fechas Activos -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct aoIdFecha 
-into #ListaFechas
-from DWHActivoOperacion
-where aoIdFecha&lt;=@FechaActual
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where left(feIdFecha,6)=@AnioMesHaceUnAnio
-and feFeriado=0
-and feFinSemana=0
-and feCierreMes&lt;&gt;1 -- No se toma el cierre de mes ya que esta fecha se almacena en la particion historica
-and feIdFecha not in (select aoIdFecha from #ListaFechas)
-union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where
-(
- (feIdFecha between @FechaHaceDosAnios and @FechaActual and feCierreMes=1) or left(feIdFecha,6)=left(@FechaActual,6)
-)
-and feIdFecha not in (select aoIdFecha from #ListaFechas)
-and feFeriado=0
-and feFinSemana=0
-Union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
---select fe1.feIdFecha,(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
- 
-/* ---- Cuenta Contable  ---- */
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct ccIdCuentaContable 
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador = cp.indicadorNivel3
-where cp.indicadorNivel1 = 1 -- Cartera
-
-/* ------------------ */
-/* DWHActivoOperacion */
-/* ------------------ */
-
-if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
-
-select 
- ao.aoidfecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,aoMontoSaldoDolar=sum(isnull(ao.aoMontoSaldoDolar,0))
-,ao.aoIdProducto
-
-into #DWHActivoOperacion
-
-from DWHActivoOperacion ao
-where ao.aoidfecha=@FechaActual
-group by ao.aoidfecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
-
-
-select
- aoIdFecha=fe.feIdFecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
-,aoMontoSaldoDolar=sum( (ao.aoMontoSaldoDolar * fe.feCalDia ) )
-from #DWHActivoOperacion ao
-inner join #DWDFecha fe on 1=1
-inner join #DWDCuentaContable cc on ao.aoIdCuentaContable = cc.ccIdCuentaContable
-where abs(ao.aoMontoSaldoDolar) &lt;&gt; 0
-group by fe.feIdFecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
-
-if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
-                  <Source xsi:type="QueryBinding">
-                    <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
-                    <QueryDefinition>SET NOCOUNT ON
-
-declare @AnioMesHaceUnAnio int, @FechaActual int, @FechaHaceDosAnios int, @AnioActual int
-
-select 
- @AnioMesHaceUnAnio= ( ( (feCalAnio-1) * 100 ) + feCalMes ) 
-,@AnioActual=feCalAnio
-,@FechaActual=feIdFecha
-,@FechaHaceDosAnios=convert(varchar(8),dateadd(yy,-2,cast(feFecha as date)),112)
-from DWDFecha where feDiaActual=1
-
-/* -- Lista Fechas Activos -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct aoIdFecha 
-into #ListaFechas
-from DWHActivoOperacion
-where aoIdFecha&lt;=@FechaActual
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where left(feIdFecha,6)=@AnioMesHaceUnAnio
-and feFeriado=0
-and feFinSemana=0
-and feCierreMes&lt;&gt;1 -- No se toma el cierre de mes ya que esta fecha se almacena en la particion historica
-and feIdFecha not in (select aoIdFecha from #ListaFechas)
-union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where
-(
- (feIdFecha between @FechaHaceDosAnios and @FechaActual and feCierreMes=1) or left(feIdFecha,6)=left(@FechaActual,6)
-)
-and feIdFecha not in (select aoIdFecha from #ListaFechas)
-and feFeriado=0
-and feFinSemana=0
-Union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
---select fe1.feIdFecha,(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
- 
-/* ---- Cuenta Contable  ---- */
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct ccIdCuentaContable 
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador = cp.indicadorNivel3
-where cp.indicadorNivel1 = 1 -- Cartera
-
-/* ------------------ */
-/* DWHActivoOperacion */
-/* ------------------ */
-
-if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
-
-select 
- ao.aoidfecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,aoMontoSaldoDolar=sum(isnull(ao.aoMontoSaldoDolar,0))
-,ao.aoIdProducto
-
-into #DWHActivoOperacion
-
-from DWHActivoOperacion ao
-where ao.aoidfecha=@FechaActual
-group by ao.aoidfecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
-
-
-select
- aoIdFecha=fe.feIdFecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
-,aoMontoSaldoDolar=sum( (ao.aoMontoSaldoDolar * fe.feCalDia ) )
-from #DWHActivoOperacion ao
-inner join #DWDFecha fe on 1=1
-inner join #DWDCuentaContable cc on ao.aoIdCuentaContable = cc.ccIdCuentaContable
-where abs(ao.aoMontoSaldoDolar) &lt;&gt; 0
-group by fe.feIdFecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
-
-if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
-                  </Source>
-                  <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-                  <ProcessingMode>Regular</ProcessingMode>
-                  <ProactiveCaching>
-                    <SilenceInterval>-PT1S</SilenceInterval>
-                    <Latency>-PT1S</Latency>
-                    <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
-                    <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
-                    <Source xsi:type="ProactiveCachingInheritedBinding" />
-                  </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
-                </Partition>
               </Partitions>
               <ProactiveCaching>
                 <SilenceInterval>-PT1S</SilenceInterval>
@@ -28033,6 +27857,36 @@ if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end</Qu
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
                             <ColumnID>poidcliente</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>poIntPromedioMensualFiscal</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Double</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
+                            <ColumnID>poIntPromedioMensualFiscal</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>poSaldoPromedioMensualFiscal</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Double</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b</TableID>
+                            <ColumnID>poSaldoPromedioMensualFiscal</ColumnID>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -30094,6 +29948,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -30124,6 +29980,8 @@ SELECT
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente
 ,poIdFecha
@@ -30137,7 +29995,6 @@ group by clidcliente
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
-
 
 if object_id('[tempdb]..#CTE_Pasivos') is not null
 begin
@@ -30251,6 +30108,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -30281,6 +30140,8 @@ SELECT
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente
 ,poIdFecha
@@ -30294,7 +30155,6 @@ group by clidcliente
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
-
 
 if object_id('[tempdb]..#CTE_Pasivos') is not null
 begin
@@ -30420,7 +30280,9 @@ select
 ,poIdEstadoCuentaCliente
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
-,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poInteres= poSaldoOperacionUSD * poTasaNominal/100
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal  
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -30450,6 +30312,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -30463,6 +30327,7 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 drop table #CTE_Pasivos
 
@@ -30578,7 +30443,9 @@ select
 ,poIdEstadoCuentaCliente
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
-,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poInteres= poSaldoOperacionUSD * poTasaNominal/100
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal  
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -30608,6 +30475,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -30621,6 +30490,7 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 drop table #CTE_Pasivos
 
@@ -30750,6 +30620,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -30779,6 +30651,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -30792,6 +30666,7 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 drop table #CTE_Pasivos
 
@@ -30908,6 +30783,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -30937,6 +30814,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -30950,6 +30829,7 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 drop table #CTE_Pasivos
 
@@ -31079,6 +30959,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -31108,6 +30990,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -31237,6 +31121,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -31266,6 +31152,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -31441,6 +31329,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -31470,6 +31360,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -31630,6 +31522,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -31659,6 +31553,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -31832,6 +31728,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -31861,6 +31759,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -32021,6 +31921,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -32050,6 +31952,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -32223,6 +32127,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -32252,6 +32158,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -32412,6 +32320,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -32441,6 +32351,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -32614,6 +32526,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -32643,6 +32557,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -32656,6 +32572,7 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 
 if object_id('[tempdb]..#CTE_Pasivos') is not null
@@ -32803,6 +32720,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -32832,6 +32751,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -32845,6 +32766,7 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 
 if object_id('[tempdb]..#CTE_Pasivos') is not null
@@ -33005,6 +32927,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -33034,6 +32958,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -33047,7 +32973,6 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
-
 
 if object_id('[tempdb]..#CTE_Pasivos') is not null
 begin
@@ -33194,6 +33119,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -33223,6 +33150,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -33236,7 +33165,6 @@ poIdFecha
 ,poCuentaAperturada
 ,poFechaVencimiento
 ,poIdFechaApertura
-
 
 if object_id('[tempdb]..#CTE_Pasivos') is not null
 begin
@@ -33396,6 +33324,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -33425,6 +33355,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -33585,6 +33517,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -33614,6 +33548,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -33787,6 +33723,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -33816,6 +33754,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -33976,6 +33916,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -34005,6 +33947,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -34178,6 +34122,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -34207,6 +34153,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -34367,6 +34315,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -34396,6 +34346,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -34569,6 +34521,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -34598,6 +34552,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -34758,6 +34714,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -34787,6 +34745,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -34960,6 +34920,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -34989,6 +34951,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -35149,6 +35113,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -35178,6 +35144,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -35351,6 +35319,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -35380,6 +35350,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -35540,6 +35512,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -35569,6 +35543,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -35694,6 +35670,8 @@ select poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poSaldoOperacionUSD * (isnull(poTasaNominal,0)/100) )
 ,poInteresMensual= SUM((isnull(poTasaNominal,0)/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
 inner join #DWDCliente cl on poidcliente = clIdCliente
@@ -35711,6 +35689,7 @@ poIdFecha
 ,case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 if object_id('[tempdb]..#DWDCliente') is not null
 begin
@@ -35801,6 +35780,8 @@ select poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poSaldoOperacionUSD * (isnull(poTasaNominal,0)/100) )
 ,poInteresMensual= SUM((isnull(poTasaNominal,0)/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
 inner join #DWDCliente cl on poidcliente = clIdCliente
@@ -35818,6 +35799,7 @@ poIdFecha
 ,case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poFechaVencimiento
 ,poIdFechaApertura
+
 
 if object_id('[tempdb]..#DWDCliente') is not null
 begin
@@ -35945,6 +35927,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -35970,6 +35954,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 from dwhcorporativohistorico..DWHPasivoOperacion
 inner join #DWDCliente cl on poidcliente = clIdCliente
 inner join #DWDCuentaContable on poIdCuentaContable = ccIdCuentaContable
@@ -35998,6 +35984,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -36134,6 +36122,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha on poIdFecha = feIdFecha
@@ -36159,6 +36149,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 from dwhcorporativohistorico..DWHPasivoOperacion
 inner join #DWDCliente cl on poidcliente = clIdCliente
 inner join #DWDCuentaContable on poIdCuentaContable = ccIdCuentaContable
@@ -36187,6 +36179,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -36283,7 +36277,7 @@ create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int, feNumeroAnioAn
 if (@aniomes = left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36292,7 +36286,7 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and left(feIdFecha,6) &lt;&gt; left(@feIdFechaDiaActual,6)
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha		
 		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
 
@@ -36301,7 +36295,7 @@ if (@aniomes = left(@fechaMesAnterior,6))
  if (@aniomes &lt;&gt; left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36311,7 +36305,7 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and feCierreMesTodosAnios = 1
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha		
 		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
  end
@@ -36359,6 +36353,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha fe on poIdFecha = feIdFecha
@@ -36384,6 +36380,8 @@ Select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 from DWHCORPORATIVOHISTORICO.dbo.DWHPasivoOperacion
 inner join #DWDFecha fe on poIdFecha = feIdFecha
 inner join #DWDCliente cl on poidcliente = clIdCliente
@@ -36413,6 +36411,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -36496,7 +36496,7 @@ create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int, feNumeroAnioAn
 if (@aniomes = left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36505,7 +36505,7 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and left(feIdFecha,6) &lt;&gt; left(@feIdFechaDiaActual,6)
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha		
 		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
 
@@ -36514,7 +36514,7 @@ if (@aniomes = left(@fechaMesAnterior,6))
  if (@aniomes &lt;&gt; left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36524,7 +36524,7 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and feCierreMesTodosAnios = 1
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio --Convert(int,left(@feIdFechaDiaActual,4)) - Convert(int,left(feIdFecha,4))  feNumeroAnioAnt
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
 		from DWDFecha		
 		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
  end
@@ -36572,6 +36572,8 @@ select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 into #CTE_Pasivos   
 from DWHPasivoOperacion
 inner join #DWDFecha fe on poIdFecha = feIdFecha
@@ -36597,6 +36599,8 @@ Select
 ,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 ,poNumeroDeOperaciones
 ,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
+,poIntPromedioMensualFiscal
+,poSaldoPromedioMensualFiscal
 from DWHCORPORATIVOHISTORICO.dbo.DWHPasivoOperacion
 inner join #DWDFecha fe on poIdFecha = feIdFecha
 inner join #DWDCliente cl on poidcliente = clIdCliente
@@ -36626,6 +36630,8 @@ SELECT clidcliente poidcliente,
 ,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
 ,poInteres= SUM(poInteres)
 ,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
+,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)
+,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)
 from  #CTE_Pasivos 
 group by clidcliente,
 poIdFecha
@@ -36672,352 +36678,6 @@ end</QueryDefinition>
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                </Partition>
-                <Partition>
-                  <ID>DWHPasivoOperacion_912635e8-989e-4afa-ae06-4c61dff3ea25</ID>
-                  <Name>GenerarDatosPruebaPasivoOperacion</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
-
-declare @AnioMesHaceUnAnio int, @FechaActual int, @FechaHaceDosAnios int, @AnioActual int
-
-select 
- @AnioMesHaceUnAnio= ( ( (feCalAnio-1) * 100 ) + feCalMes ) 
-,@AnioActual=feCalAnio
-,@FechaActual=feIdFecha
-,@FechaHaceDosAnios=convert(varchar(8),dateadd(yy,-2,cast(feFecha as date)),112)
-from DWDFecha where feDiaActual=1
-
-/* -- Lista Fechas Pasivos -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct poIdFecha 
-into #ListaFechas
-from DWHPasivoOperacion
-where poIdFecha&lt;=@FechaActual
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where left(feIdFecha,6)=@AnioMesHaceUnAnio
-and feFeriado=0
-and feFinSemana=0
-and feCierreMes&lt;&gt;1 -- No se toma el cierre de mes ya que esta fecha se almacena en la particion historica
-and feIdFecha not in (select poIdFecha from #ListaFechas)
-union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where
-(
- (feIdFecha between @FechaHaceDosAnios and @FechaActual and feCierreMes=1) or left(feIdFecha,6)=left(@FechaActual,6)
-)
-and feIdFecha not in (select poIdFecha from #ListaFechas)
-and feFeriado=0
-and feFinSemana=0
-Union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
---select fe1.feIdFecha,(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
- 
-/* ---- Cuenta Contable  ---- */
-
-if object_id('[tempdb]..#DWDCliente') is not null begin drop table #DWDCliente end 
-
-select cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente
-into   #DWDCliente
-from DWDCliente cl
-
-if object_id('[tempdb]..#tasa') is not null begin drop table #tasa end
-
---select indicadorNivel2 indicador ,avg(poTasaNominal) tasa 
---into #tasa
---from DWHPasivoOperacionMes
---inner join DWDCuentaContable on poidcuentacontable = ccidcuentacontable
---inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3
---where poIdFecha =@FechaActual
---and indicadorNivel1 = 2
---and indicadorNivel2 in (140,141,142)
---and poTasaNominal &gt; 0
---group by indicadorNivel2
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select ccidcuentacontable,indicadorNivel2,0 tasa
-into #DWDCuentaContable
-from DWDCuentaContable
-inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3
---left join #tasa on indicador = indicadorNivel2
-
-/* ------------------ */
-/* DWHPasivoOperacion */
-/* ------------------ */
-
-if object_id('tempdb..#DWHPasivoOperacion') is not null begin drop table #DWHPasivoOperacion end
-
-select
- cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente
-,poIdFecha
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoPromedioMensual
-,poSaldoPromedioDisponible
-,poSaldoTotal
-,poTasaEfectiva
-,poTasaNominal=0--case when isnull(poTasaNominal,0) = 0 then tasa else poTasaNominal end 
-,poFechaVencimiento
-,poIdCalificacionOperacionCliente
-,poIdFechaApertura
-,poIdEstadoCuentaCliente
-,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
-,poNumeroDeOperaciones
-,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
-Into #DWHPasivoOperacion
---into #CTE_Pasivos   
-from DWHPasivoOperacion
---inner join #DWDFecha on poIdFecha = feIdFecha
-inner join #DWDCliente cl on poidcliente = clIdCliente
-inner join #DWDCuentaContable on poIdCuentaContable = ccIdCuentaContable
-where isnull(abs(poSaldoOperacionUSD),0)+isnull(abs(poSaldoPromedioMensual),0)+isnull(abs(poSaldoPromedioDisponible),0)&gt; 0
-And poIdFecha = @FechaActual
-
-SELECT clidcliente poidcliente,
- poIdFecha = fe.feIdFecha
-,poIdCuentaContable
-,poIdCanal = clIdCanal
-,poIdAsesor = clIdAsesorPrincipal 
-,poIdAgencia = clIdAgencia
-,poIdSegmentacion = clIdSegmentacionCliente          
-,poIdVinculacion= clIdVinculacionCliente                                      
-,poIdEstadoCuentaCliente
-,poCuentaAperturada
-,poFechaVencimiento
-,poIdFechaApertura
-,poSaldoOperacionUSD = SUM(poSaldoOperacionUSD * fe.feCalDia)  
-,poSaldoPromedioDisponible = SUM(poSaldoPromedioDisponible) 
-,poSaldoPromedioMensual = SUM(poSaldoPromedioMensual)
-,poSaldoTotal = SUM(poSaldoTotal)              
-,poTasaEfectiva = SUM(poTasaEfectiva)     
-,poTasaNominal  = SUM(poTasaNominal)
-,poIdCalificacionOperacionCliente = SUM(poIdCalificacionOperacionCliente) 
-,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
-,poInteres= SUM(poInteres)
-,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
-from  #DWHPasivoOperacion 
-inner join #DWDFecha fe on 1=1 --and fe.feIdFecha = 20220629
-group by clidcliente,
-fe.feIdFecha
-,poIdCuentaContable
-,clIdCanal
-,clIdAsesorPrincipal  
-,clIdAgencia
-,clIdSegmentacionCliente          
-,clIdVinculacionCliente                                      
-,poIdEstadoCuentaCliente
-,poCuentaAperturada
-,poFechaVencimiento
-,poIdFechaApertura
-
-if object_id('tempdb..#DWHPasivoOperacion') is not null begin drop table #DWHPasivoOperacion end
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
-                  <Source xsi:type="QueryBinding">
-                    <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
-                    <QueryDefinition>SET NOCOUNT ON
-
-declare @AnioMesHaceUnAnio int, @FechaActual int, @FechaHaceDosAnios int, @AnioActual int
-
-select 
- @AnioMesHaceUnAnio= ( ( (feCalAnio-1) * 100 ) + feCalMes ) 
-,@AnioActual=feCalAnio
-,@FechaActual=feIdFecha
-,@FechaHaceDosAnios=convert(varchar(8),dateadd(yy,-2,cast(feFecha as date)),112)
-from DWDFecha where feDiaActual=1
-
-/* -- Lista Fechas Pasivos -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct poIdFecha 
-into #ListaFechas
-from DWHPasivoOperacion
-where poIdFecha&lt;=@FechaActual
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where left(feIdFecha,6)=@AnioMesHaceUnAnio
-and feFeriado=0
-and feFinSemana=0
-and feCierreMes&lt;&gt;1 -- No se toma el cierre de mes ya que esta fecha se almacena en la particion historica
-and feIdFecha not in (select poIdFecha from #ListaFechas)
-union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where
-(
- (feIdFecha between @FechaHaceDosAnios and @FechaActual and feCierreMes=1) or left(feIdFecha,6)=left(@FechaActual,6)
-)
-and feIdFecha not in (select poIdFecha from #ListaFechas)
-and feFeriado=0
-and feFinSemana=0
-Union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
---select fe1.feIdFecha,(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
- 
-/* ---- Cuenta Contable  ---- */
-
-if object_id('[tempdb]..#DWDCliente') is not null begin drop table #DWDCliente end 
-
-select cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente
-into   #DWDCliente
-from DWDCliente cl
-
-if object_id('[tempdb]..#tasa') is not null begin drop table #tasa end
-
---select indicadorNivel2 indicador ,avg(poTasaNominal) tasa 
---into #tasa
---from DWHPasivoOperacionMes
---inner join DWDCuentaContable on poidcuentacontable = ccidcuentacontable
---inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3
---where poIdFecha =@FechaActual
---and indicadorNivel1 = 2
---and indicadorNivel2 in (140,141,142)
---and poTasaNominal &gt; 0
---group by indicadorNivel2
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select ccidcuentacontable,indicadorNivel2,0 tasa
-into #DWDCuentaContable
-from DWDCuentaContable
-inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3
---left join #tasa on indicador = indicadorNivel2
-
-/* ------------------ */
-/* DWHPasivoOperacion */
-/* ------------------ */
-
-if object_id('tempdb..#DWHPasivoOperacion') is not null begin drop table #DWHPasivoOperacion end
-
-select
- cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente
-,poIdFecha
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoPromedioMensual
-,poSaldoPromedioDisponible
-,poSaldoTotal
-,poTasaEfectiva
-,poTasaNominal=0--case when isnull(poTasaNominal,0) = 0 then tasa else poTasaNominal end 
-,poFechaVencimiento
-,poIdCalificacionOperacionCliente
-,poIdFechaApertura
-,poIdEstadoCuentaCliente
-,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
-,poNumeroDeOperaciones
-,poInteres= poSaldoOperacionUSD * poTasaNominal/100  
-Into #DWHPasivoOperacion
---into #CTE_Pasivos   
-from DWHPasivoOperacion
---inner join #DWDFecha on poIdFecha = feIdFecha
-inner join #DWDCliente cl on poidcliente = clIdCliente
-inner join #DWDCuentaContable on poIdCuentaContable = ccIdCuentaContable
-where isnull(abs(poSaldoOperacionUSD),0)+isnull(abs(poSaldoPromedioMensual),0)+isnull(abs(poSaldoPromedioDisponible),0)&gt; 0
-And poIdFecha = @FechaActual
-
-SELECT clidcliente poidcliente,
- poIdFecha = fe.feIdFecha
-,poIdCuentaContable
-,poIdCanal = clIdCanal
-,poIdAsesor = clIdAsesorPrincipal 
-,poIdAgencia = clIdAgencia
-,poIdSegmentacion = clIdSegmentacionCliente          
-,poIdVinculacion= clIdVinculacionCliente                                      
-,poIdEstadoCuentaCliente
-,poCuentaAperturada
-,poFechaVencimiento
-,poIdFechaApertura
-,poSaldoOperacionUSD = SUM(poSaldoOperacionUSD * fe.feCalDia)  
-,poSaldoPromedioDisponible = SUM(poSaldoPromedioDisponible) 
-,poSaldoPromedioMensual = SUM(poSaldoPromedioMensual)
-,poSaldoTotal = SUM(poSaldoTotal)              
-,poTasaEfectiva = SUM(poTasaEfectiva)     
-,poTasaNominal  = SUM(poTasaNominal)
-,poIdCalificacionOperacionCliente = SUM(poIdCalificacionOperacionCliente) 
-,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) 
-,poInteres= SUM(poInteres)
-,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)
-from  #DWHPasivoOperacion 
-inner join #DWDFecha fe on 1=1 --and fe.feIdFecha = 20220629
-group by clidcliente,
-fe.feIdFecha
-,poIdCuentaContable
-,clIdCanal
-,clIdAsesorPrincipal  
-,clIdAgencia
-,clIdSegmentacionCliente          
-,clIdVinculacionCliente                                      
-,poIdEstadoCuentaCliente
-,poCuentaAperturada
-,poFechaVencimiento
-,poIdFechaApertura
-
-if object_id('tempdb..#DWHPasivoOperacion') is not null begin drop table #DWHPasivoOperacion end
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
-                  </Source>
-                  <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-                  <ProcessingMode>Regular</ProcessingMode>
-                  <ProactiveCaching>
-                    <SilenceInterval>-PT1S</SilenceInterval>
-                    <Latency>-PT1S</Latency>
-                    <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
-                    <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
-                    <Source xsi:type="ProactiveCachingInheritedBinding" />
-                  </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
               </Partitions>
               <ProactiveCaching>
@@ -39048,234 +38708,6 @@ if object_id('tempdb..#CTE_Fecha') is not null begin drop table #CTE_Fecha end</
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                </Partition>
-                <Partition>
-                  <ID>DWHPresupuestoNegocio_0e545857-45d9-4d56-a64b-81202eb3867f</ID>
-                  <Name>DWHPresupuestoNegocioGeneraDatosPrueba</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
-
-declare @feCierreAnioActual int
-,@feFecha26MesesAtras int
-,@feFechaMesActual int
-,@feFecha date
-,@feFecha30DiasAnt int
-,@feFecha15DiasFuturo int
-
-select @feFecha = feFecha from DWDFecha where feDiaActual = 1
-select @feFecha26MesesAtras = convert(varchar(8), dateadd(Month, -26, @feFecha), 112)
-select @feFecha15DiasFuturo = convert(varchar(8), dateadd(Day, 15, @feFecha), 112)
-select @feFecha30DiasAnt = convert(varchar(8), dateadd(Day, -29, @feFecha), 112)
-select @feCierreAnioActual=concat(year(@feFecha),'1231')
-
-/* -- Lista Fechas Presupuesto -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select pnIdFecha
-into #ListaFechas
-from DWHPresupuestoNegocio pn
-where pn.pnIdIndicadorMedidaFinanciera = -10
-
-
--- Resumen de Fechas --
-
-if object_id('tempdb..#Fecha') is not null begin drop table #Fecha end
-
-select feIdFecha, feConcentracion = 0,
-feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #Fecha
-from DWDFecha
-where feIdFecha &gt; @feFecha26MesesAtras
-and feIdFecha &lt;= @feCierreAnioActual
-and feCierreMesTodosAnios = 1
-and feIdFecha not in (select pnIdFecha from #ListaFechas)
-
-UNION
-
-select feIdFecha, feConcentracion = 0,
-feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-from DWDFecha
-where feIdFecha &gt;= @feFecha30DiasAnt
-and feIdFecha &lt;= @feFecha15DiasFuturo
-and feferiado = 0
-and fefinsemana =0
-and feIdFecha not in (select pnIdFecha from #ListaFechas)
-
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #Fecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #Fecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
-
-
-/* --- Presupuesto Negocio --- */
-
-if object_id('tempdb..#PresupuestoNegocio') is not null begin drop table #PresupuestoNegocio end
-
-select
- pn.pnIdFecha
-,pn.pnIdBanca
-,pn.pnIdCanal
-,pn.pnIdAgencia
-,pn.pnIdAsesor
-,pnIdCuentaContable
-,pn.pnIdProducto
-,pn.pnValorPresupuesto
-,pn.pnValorProyeccion
-,pn.pnIdIndicadorMedidaFinanciera
-,pn.pnValorPresupuestoAcum
-into #PresupuestoNegocio
-from DWHPresupuestoNegocio pn
-where pn.pnIdIndicadorMedidaFinanciera = -10
-and pn.pnIdFecha=convert(varchar(10),@feFecha,112)
-
-select
- pnIdFecha=fe.feIdFecha
-,pn.pnIdBanca
-,pn.pnIdCanal
-,pn.pnIdAgencia
-,pn.pnIdAsesor
-,pnIdCuentaContable
-,case when ccCodigoIndicador = 513 then 171 else pnIdProducto end pnIdProducto
-,pnValorPresupuesto=isnull(pn.pnValorPresupuesto,0)*isnull(fe.feCalDia,0)
-,pnValorProyeccion=isnull(pn.pnValorProyeccion,0)*isnull(fe.feCalDia,0)
-,pn.pnIdIndicadorMedidaFinanciera
-,pnValorPresupuestoAcum=isnull(pn.pnValorPresupuestoAcum,0)*isnull(fe.feCalDia,0)
-from #PresupuestoNegocio pn
-inner join #Fecha fe on 1=1
-inner join DWDCuentaContable on pnidcuentacontable = ccidcuentacontable
-where pn.pnIdIndicadorMedidaFinanciera = -10
-
-if object_id('tempdb..#PresupuestoNegocio') is not null begin drop table #PresupuestoNegocio end
-if object_id('tempdb..#Fecha') is not null begin drop table #Fecha end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
-                  <Source xsi:type="QueryBinding">
-                    <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
-                    <QueryDefinition>SET NOCOUNT ON
-
-declare @feCierreAnioActual int
-,@feFecha26MesesAtras int
-,@feFechaMesActual int
-,@feFecha date
-,@feFecha30DiasAnt int
-,@feFecha15DiasFuturo int
-
-select @feFecha = feFecha from DWDFecha where feDiaActual = 1
-select @feFecha26MesesAtras = convert(varchar(8), dateadd(Month, -26, @feFecha), 112)
-select @feFecha15DiasFuturo = convert(varchar(8), dateadd(Day, 15, @feFecha), 112)
-select @feFecha30DiasAnt = convert(varchar(8), dateadd(Day, -29, @feFecha), 112)
-select @feCierreAnioActual=concat(year(@feFecha),'1231')
-
-/* -- Lista Fechas Presupuesto -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select pnIdFecha
-into #ListaFechas
-from DWHPresupuestoNegocio pn
-where pn.pnIdIndicadorMedidaFinanciera = -10
-
-
--- Resumen de Fechas --
-
-if object_id('tempdb..#Fecha') is not null begin drop table #Fecha end
-
-select feIdFecha, feConcentracion = 0,
-feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #Fecha
-from DWDFecha
-where feIdFecha &gt; @feFecha26MesesAtras
-and feIdFecha &lt;= @feCierreAnioActual
-and feCierreMesTodosAnios = 1
-and feIdFecha not in (select pnIdFecha from #ListaFechas)
-
-UNION
-
-select feIdFecha, feConcentracion = 0,
-feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-from DWDFecha
-where feIdFecha &gt;= @feFecha30DiasAnt
-and feIdFecha &lt;= @feFecha15DiasFuturo
-and feferiado = 0
-and fefinsemana =0
-and feIdFecha not in (select pnIdFecha from #ListaFechas)
-
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #Fecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #Fecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
-
-
-/* --- Presupuesto Negocio --- */
-
-if object_id('tempdb..#PresupuestoNegocio') is not null begin drop table #PresupuestoNegocio end
-
-select
- pn.pnIdFecha
-,pn.pnIdBanca
-,pn.pnIdCanal
-,pn.pnIdAgencia
-,pn.pnIdAsesor
-,pnIdCuentaContable
-,pn.pnIdProducto
-,pn.pnValorPresupuesto
-,pn.pnValorProyeccion
-,pn.pnIdIndicadorMedidaFinanciera
-,pn.pnValorPresupuestoAcum
-into #PresupuestoNegocio
-from DWHPresupuestoNegocio pn
-where pn.pnIdIndicadorMedidaFinanciera = -10
-and pn.pnIdFecha=convert(varchar(10),@feFecha,112)
-
-select
- pnIdFecha=fe.feIdFecha
-,pn.pnIdBanca
-,pn.pnIdCanal
-,pn.pnIdAgencia
-,pn.pnIdAsesor
-,pnIdCuentaContable
-,case when ccCodigoIndicador = 513 then 171 else pnIdProducto end pnIdProducto
-,pnValorPresupuesto=isnull(pn.pnValorPresupuesto,0)*isnull(fe.feCalDia,0)
-,pnValorProyeccion=isnull(pn.pnValorProyeccion,0)*isnull(fe.feCalDia,0)
-,pn.pnIdIndicadorMedidaFinanciera
-,pnValorPresupuestoAcum=isnull(pn.pnValorPresupuestoAcum,0)*isnull(fe.feCalDia,0)
-from #PresupuestoNegocio pn
-inner join #Fecha fe on 1=1
-inner join DWDCuentaContable on pnidcuentacontable = ccidcuentacontable
-where pn.pnIdIndicadorMedidaFinanciera = -10
-
-if object_id('tempdb..#PresupuestoNegocio') is not null begin drop table #PresupuestoNegocio end
-if object_id('tempdb..#Fecha') is not null begin drop table #Fecha end</QueryDefinition>
-                  </Source>
-                  <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-                  <ProcessingMode>Regular</ProcessingMode>
-                  <ProactiveCaching>
-                    <SilenceInterval>-PT1S</SilenceInterval>
-                    <Latency>-PT1S</Latency>
-                    <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
-                    <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
-                    <Source xsi:type="ProactiveCachingInheritedBinding" />
-                  </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
               </Partitions>
               <ProactiveCaching>
@@ -45368,396 +44800,6 @@ if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop 
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                </Partition>
-                <Partition>
-                  <ID>DWHBalanceSistemaFinanciero_b9bb6d72-22c7-4b07-a5c1-c7062efcd352</ID>
-                  <Name>DWHBalanceSistemaFinancieroGeneraDatosPrueba</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @fechaHoy int
-declare @fechaHaceUnMes int
-declare @feIdFecha2AnioAnt int
-
-Select 
- @fechaHoy = feIdFecha 
-,@fechaHaceUnMes = feMesAntCierr
-,@feIdFecha2AnioAnt = convert(char(8),dateadd(mm,-25,feFecha),112)
-from DWDFecha  
-where feDiaActual=1 --feIdFecha=20220630
-
-/* ----- FormulaFinancieraRanking ----- */
- 
-if OBJECT_ID('tempdb..#DWPFormulaFinancieraRanking') is not null begin drop table #DWPFormulaFinancieraRanking end
-
-select 
- ffr.*
-,IdCuentaContable=case when ffr.ffrCodigoOperacion like '%N%R%' then ffr.ffrCodigoOperacion  -- Codigos Sub Totales 
-					   else cast(ccr.ccrIdCuentaContable as varchar(25)) end
-into #DWPFormulaFinancieraRanking
-from DWPFormulaFinancieraRanking ffr
-left outer join DWPCuentaCodigoRanking ccr on ffr.ffrCodigoOperacion=ccr.ccrCodigo
-where ffrCodigoMedidaFinanciera in (351,361)  -- 351:Captaciones; 361:CarteraBruta 
-
-/* Lista Fechas RankingInstitucionFinanciera */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct
-rif.rifIdFecha
-into #ListaFechas
-from DWHRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on cast(rif.rifIdCuentaContable as varchar(25))=ffr.IdCuentaContable
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @feIdFecha2AnioAnt and @fechaHoy
-and fecierremes=1
-and feIdFecha not in (select rifIdFecha from #ListaFechas)
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
-
-
-/* ----- RankingInstitucionFinanciera ----- */
-
-if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop table #tmpRankingInstitucionFinanciera end
-
--- Valores por Cuenta Contable --
-
-select 
- rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,rifIdCuentaContable=cast(rif.rifIdCuentaContable as varchar(25))
-,ffrNivelOperacion=cast(-1 as int)
-,rifSaldo=sum(rif.rifSaldo)
-into #tmpRankingInstitucionFinanciera
-from DWHRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on cast(rif.rifIdCuentaContable as varchar(25))=ffr.IdCuentaContable
-where rif.rifIdFecha=@fechaHoy
-group by rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,cast(rif.rifIdCuentaContable as varchar(25))
-
--- Nivel 2 --
-
-insert into #tmpRankingInstitucionFinanciera
-select 
- rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,rifIdCuentaContable=cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-,rifSaldo=
-  sum(
-          isnull( 
-		   case when ffr.ffrSimboloOperacion='/' and ffr.ffrOrdenOperacion=2 
-		        then 
-		             case when isnull((case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end),0)=0 then 0 else 
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) / (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         end
-		   end,0)
-		   		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='*' and ffr.ffrOrdenOperacion=2 
-		        then
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) * (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         
-		   end,0)
-		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='+' then rif.rifSaldo
-  			    when ffr.ffrSimboloOperacion='-' then rif.rifSaldo*-1
-  			    else 0 end
-  			,0)
-	)
-
-from #tmpRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on rif.rifIdCuentaContable=ffr.IdCuentaContable
-where ffr.ffrNivelOperacion=2
-group by rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-
--- Nivel 1 --
-
-insert into #tmpRankingInstitucionFinanciera
-select 
- rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,rifIdCuentaContable=cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-,rifSaldo=
-  sum(
-          isnull( 
-		   case when ffr.ffrSimboloOperacion='/' and ffr.ffrOrdenOperacion=2 
-		        then 
-		             case when isnull((case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end),0)=0 then 0 else 
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) / (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         end
-		   end,0)
-		   		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='*' and ffr.ffrOrdenOperacion=2 
-		        then
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) * (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         
-		   end,0)
-		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='+' then rif.rifSaldo
-  			    when ffr.ffrSimboloOperacion='-' then rif.rifSaldo*-1
-  			    else 0 end
-  			,0)
-	)
-
-from #tmpRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on rif.rifIdCuentaContable=ffr.IdCuentaContable
-where ffr.ffrNivelOperacion=1
-group by rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-
--- Nivel 0 --
-		
-select
- bsfIdFecha=fe.feIdFecha
-,bsfIdIndicadorMedidaFinanciera=ffr.ffrCodigoMedidaFinanciera
-,bsfValorReal=sum(rif.rifSaldo*feCalDia) -- Al nivel cero no se realiza la validacion del simbolo de la operacion porque este es el resultado final de cada medida financiera
-from #tmpRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on rif.rifIdCuentaContable=ffr.IdCuentaContable
-inner join #DWDFecha fe on 1=1
-where ffr.ffrNivelOperacion=0
-group by fe.feIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-
-
---Eliminar Tabla Temporales--
-if OBJECT_ID('tempdb..#DWPFormulaFinancieraRanking') is not null begin drop table #DWPFormulaFinancieraRanking end
-if OBJECT_ID('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop table #tmpRankingInstitucionFinanciera end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
-                  <Source xsi:type="QueryBinding">
-                    <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
-                    <QueryDefinition>set nocount on
-
-declare @fechaHoy int
-declare @fechaHaceUnMes int
-declare @feIdFecha2AnioAnt int
-
-Select 
- @fechaHoy = feIdFecha 
-,@fechaHaceUnMes = feMesAntCierr
-,@feIdFecha2AnioAnt = convert(char(8),dateadd(mm,-25,feFecha),112)
-from DWDFecha  
-where feDiaActual=1 --feIdFecha=20220630
-
-/* ----- FormulaFinancieraRanking ----- */
- 
-if OBJECT_ID('tempdb..#DWPFormulaFinancieraRanking') is not null begin drop table #DWPFormulaFinancieraRanking end
-
-select 
- ffr.*
-,IdCuentaContable=case when ffr.ffrCodigoOperacion like '%N%R%' then ffr.ffrCodigoOperacion  -- Codigos Sub Totales 
-					   else cast(ccr.ccrIdCuentaContable as varchar(25)) end
-into #DWPFormulaFinancieraRanking
-from DWPFormulaFinancieraRanking ffr
-left outer join DWPCuentaCodigoRanking ccr on ffr.ffrCodigoOperacion=ccr.ccrCodigo
-where ffrCodigoMedidaFinanciera in (351,361)  -- 351:Captaciones; 361:CarteraBruta 
-
-/* Lista Fechas RankingInstitucionFinanciera */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct
-rif.rifIdFecha
-into #ListaFechas
-from DWHRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on cast(rif.rifIdCuentaContable as varchar(25))=ffr.IdCuentaContable
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @feIdFecha2AnioAnt and @fechaHoy
-and fecierremes=1
-and feIdFecha not in (select rifIdFecha from #ListaFechas)
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
-
-
-/* ----- RankingInstitucionFinanciera ----- */
-
-if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop table #tmpRankingInstitucionFinanciera end
-
--- Valores por Cuenta Contable --
-
-select 
- rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,rifIdCuentaContable=cast(rif.rifIdCuentaContable as varchar(25))
-,ffrNivelOperacion=cast(-1 as int)
-,rifSaldo=sum(rif.rifSaldo)
-into #tmpRankingInstitucionFinanciera
-from DWHRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on cast(rif.rifIdCuentaContable as varchar(25))=ffr.IdCuentaContable
-where rif.rifIdFecha=@fechaHoy
-group by rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,cast(rif.rifIdCuentaContable as varchar(25))
-
--- Nivel 2 --
-
-insert into #tmpRankingInstitucionFinanciera
-select 
- rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,rifIdCuentaContable=cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-,rifSaldo=
-  sum(
-          isnull( 
-		   case when ffr.ffrSimboloOperacion='/' and ffr.ffrOrdenOperacion=2 
-		        then 
-		             case when isnull((case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end),0)=0 then 0 else 
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) / (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         end
-		   end,0)
-		   		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='*' and ffr.ffrOrdenOperacion=2 
-		        then
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) * (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         
-		   end,0)
-		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='+' then rif.rifSaldo
-  			    when ffr.ffrSimboloOperacion='-' then rif.rifSaldo*-1
-  			    else 0 end
-  			,0)
-	)
-
-from #tmpRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on rif.rifIdCuentaContable=ffr.IdCuentaContable
-where ffr.ffrNivelOperacion=2
-group by rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-
--- Nivel 1 --
-
-insert into #tmpRankingInstitucionFinanciera
-select 
- rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,rifIdCuentaContable=cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-,rifSaldo=
-  sum(
-          isnull( 
-		   case when ffr.ffrSimboloOperacion='/' and ffr.ffrOrdenOperacion=2 
-		        then 
-		             case when isnull((case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end),0)=0 then 0 else 
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) / (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         end
-		   end,0)
-		   		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='*' and ffr.ffrOrdenOperacion=2 
-		        then
-			           ( (case when ffr.ffrOrdenOperacion=1 then isnull(rif.rifSaldo,0) else 0 end) * (case when ffr.ffrOrdenOperacion=2 then isnull(rif.rifSaldo,0) else 0 end) )
-			         
-		   end,0)
-		   
-		   +
-		   isnull( 
-		   case when ffr.ffrSimboloOperacion='+' then rif.rifSaldo
-  			    when ffr.ffrSimboloOperacion='-' then rif.rifSaldo*-1
-  			    else 0 end
-  			,0)
-	)
-
-from #tmpRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on rif.rifIdCuentaContable=ffr.IdCuentaContable
-where ffr.ffrNivelOperacion=1
-group by rif.rifIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-,cast(ffr.ffrCodigoResultado as varchar(25))
-,ffr.ffrNivelOperacion
-
--- Nivel 0 --
-		
-select
- bsfIdFecha=fe.feIdFecha
-,bsfIdIndicadorMedidaFinanciera=ffr.ffrCodigoMedidaFinanciera
-,bsfValorReal=sum(rif.rifSaldo*feCalDia) -- Al nivel cero no se realiza la validacion del simbolo de la operacion porque este es el resultado final de cada medida financiera
-from #tmpRankingInstitucionFinanciera rif
-inner join #DWPFormulaFinancieraRanking ffr on rif.rifIdCuentaContable=ffr.IdCuentaContable
-inner join #DWDFecha fe on 1=1
-where ffr.ffrNivelOperacion=0
-group by fe.feIdFecha
-,ffr.ffrCodigoMedidaFinanciera
-
-
---Eliminar Tabla Temporales--
-if OBJECT_ID('tempdb..#DWPFormulaFinancieraRanking') is not null begin drop table #DWPFormulaFinancieraRanking end
-if OBJECT_ID('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop table #tmpRankingInstitucionFinanciera end</QueryDefinition>
-                  </Source>
-                  <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-                  <ProcessingMode>Regular</ProcessingMode>
-                  <ProactiveCaching>
-                    <SilenceInterval>-PT1S</SilenceInterval>
-                    <Latency>-PT1S</Latency>
-                    <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
-                    <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
-                    <Source xsi:type="ProactiveCachingInheritedBinding" />
-                  </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
               </Partitions>
               <ProactiveCaching>
@@ -52003,212 +51045,6 @@ group by tcoIdFecha
 ,tcoIdCuentaContable
 
 if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
-                  </Source>
-                  <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-                  <ProcessingMode>Regular</ProcessingMode>
-                  <ProactiveCaching>
-                    <SilenceInterval>-PT1S</SilenceInterval>
-                    <Latency>-PT1S</Latency>
-                    <SilenceOverrideInterval>-PT1S</SilenceOverrideInterval>
-                    <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
-                    <Source xsi:type="ProactiveCachingInheritedBinding" />
-                  </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
-                </Partition>
-                <Partition>
-                  <ID>DWHTarjetaCreditoOperacion_37c16930-4a00-4e88-9cc6-ce8ec6c9a3aa</ID>
-                  <Name>DWHTarjetaCreditoOperacionGeneraDatosPrueba</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
-
-declare @AnioMesHaceUnAnio int, @FechaActual int, @FechaHaceDosAnios int, @AnioActual int
-
-select 
- @AnioMesHaceUnAnio= ( ( (feCalAnio-1) * 100 ) + feCalMes ) 
-,@AnioActual=feCalAnio
-,@FechaActual=feIdFecha
-,@FechaHaceDosAnios=convert(varchar(8),dateadd(yy,-2,cast(feFecha as date)),112)
-from DWDFecha where feDiaActual=1
-
-/* -- Lista Fechas Activos -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct tcoIdFecha 
-into #ListaFechas
-from DWHTarjetaCreditoOperacion
-where tcoIdFecha&lt;=@FechaActual
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where left(feIdFecha,6)=@AnioMesHaceUnAnio
-and feFeriado=0
-and feFinSemana=0
-and feCierreMes&lt;&gt;1 -- No se toma el cierre de mes ya que esta fecha se almacena en la particion historica
-and feIdFecha not in (select tcoIdFecha from #ListaFechas)
-union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where
-(
- (feIdFecha between @FechaHaceDosAnios and @FechaActual and feCierreMes=1) or left(feIdFecha,6)=left(@FechaActual,6)
-)
-and feIdFecha not in (select tcoIdFecha from #ListaFechas)
-and feFeriado=0
-and feFinSemana=0
-Union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
-
-
-/* -- Tarjeta Credito -- */
-
-if object_id('tempdb..#TarjetaCreditoOperacion') is not null begin drop table #TarjetaCreditoOperacion end
-
-select
- tcoIdFecha
-,tcoIdCliente
-,tcoIdCuentaContable
-,tcoSaldo=sum(isnull(tcoSaldo,0))
-into #TarjetaCreditoOperacion
-from DWHTarjetaCreditoOperacion
-where tcoIdFecha=@FechaActual
-group by tcoIdFecha
-,tcoIdCliente
-,tcoIdCuentaContable
-
-select 
- tcoIdFecha=fe.feIdFecha
-,tco.tcoIdCliente
-,tco.tcoIdCuentaContable
-,tcoSaldo=sum(isnull(tco.tcoSaldo,0) *  fe.feCalDia  ) 
-from #TarjetaCreditoOperacion tco
-inner join #DWDFecha fe on 1=1
-where tco.tcoSaldo!=0
-group by fe.feIdFecha
-,tco.tcoIdCliente
-,tco.tcoIdCuentaContable
-
-if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
-if object_id('tempdb..#TarjetaCreditoOperacion') is not null begin drop table #TarjetaCreditoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
-                  <Source xsi:type="QueryBinding">
-                    <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
-                    <QueryDefinition>SET NOCOUNT ON
-
-declare @AnioMesHaceUnAnio int, @FechaActual int, @FechaHaceDosAnios int, @AnioActual int
-
-select 
- @AnioMesHaceUnAnio= ( ( (feCalAnio-1) * 100 ) + feCalMes ) 
-,@AnioActual=feCalAnio
-,@FechaActual=feIdFecha
-,@FechaHaceDosAnios=convert(varchar(8),dateadd(yy,-2,cast(feFecha as date)),112)
-from DWDFecha where feDiaActual=1
-
-/* -- Lista Fechas Activos -- */
-
-if object_id('tempdb..#ListaFechas') is not null begin drop table #ListaFechas end
-
-select distinct tcoIdFecha 
-into #ListaFechas
-from DWHTarjetaCreditoOperacion
-where tcoIdFecha&lt;=@FechaActual
-
-/* --  Fecha --- */
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
--- Se obtiene todas las fechas del mes de hace un anio con respecto a la fecha actual --
-
-select feIdFecha ,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float)/100 ) + 1
-into #DWDFecha
-from DWDFecha
-where left(feIdFecha,6)=@AnioMesHaceUnAnio
-and feFeriado=0
-and feFinSemana=0
-and feCierreMes&lt;&gt;1 -- No se toma el cierre de mes ya que esta fecha se almacena en la particion historica
-and feIdFecha not in (select tcoIdFecha from #ListaFechas)
-union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where
-(
- (feIdFecha between @FechaHaceDosAnios and @FechaActual and feCierreMes=1) or left(feIdFecha,6)=left(@FechaActual,6)
-)
-and feIdFecha not in (select tcoIdFecha from #ListaFechas)
-and feFeriado=0
-and feFinSemana=0
-Union
-select feIdFecha,feCalDia= (cast((right( (feCalDia+right(feCalAnio,1)), 1 ) + 1) as float) /100 ) + 1
-from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
-update fe1
-set fe1.feCalDia=(fe2.Orden+fe1.feCalDia)+(cast(right(left(fe1.feIdFecha,4),1) as float) /10)
-from #DWDFecha fe1
-inner join 
-(
- select
-  Orden=cast(row_number() over (partition by left(feIdFecha,4) order by feCalDia desc)+1 as float)/1000
- ,feIdFecha
- ,feCalDia
- from #DWDFecha
-) as fe2 on fe1.feIdFecha=fe2.feIdFecha
-
-
-/* -- Tarjeta Credito -- */
-
-if object_id('tempdb..#TarjetaCreditoOperacion') is not null begin drop table #TarjetaCreditoOperacion end
-
-select
- tcoIdFecha
-,tcoIdCliente
-,tcoIdCuentaContable
-,tcoSaldo=sum(isnull(tcoSaldo,0))
-into #TarjetaCreditoOperacion
-from DWHTarjetaCreditoOperacion
-where tcoIdFecha=@FechaActual
-group by tcoIdFecha
-,tcoIdCliente
-,tcoIdCuentaContable
-
-select 
- tcoIdFecha=fe.feIdFecha
-,tco.tcoIdCliente
-,tco.tcoIdCuentaContable
-,tcoSaldo=sum(isnull(tco.tcoSaldo,0) *  fe.feCalDia  ) 
-from #TarjetaCreditoOperacion tco
-inner join #DWDFecha fe on 1=1
-where tco.tcoSaldo!=0
-group by fe.feIdFecha
-,tco.tcoIdCliente
-,tco.tcoIdCuentaContable
-
-if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
-if object_id('tempdb..#TarjetaCreditoOperacion') is not null begin drop table #TarjetaCreditoOperacion end</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -60789,25 +59625,6 @@ CREATE MEASURE 'DWHTarjetaCreditoOperacion'[tcoValSaldoTarjeta]=(SUM(DWHTarjetaC
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValConsolidadoCartera]=CALCULATE([aoValSaldo] + [tcoValSaldoTarjeta] , FILTER(DWDCuentaContable,DWDCuentaContable[ccCalIndicadorNivel1]=1) ) +0;
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>aoValConsolidadoCartera</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHActivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
 CREATE MEASURE 'DWHPasivoOperacion'[poValSaldoMesAnteriorCal]=CALCULATE([poValSaldo],ALLEXCEPT(DWHPasivoOperacion,DWDCuentaContable[ccCalIndicadorNivel2]),DWDFecha[feMesAnterior]=1)+0;
 </Text>
                   <Annotations>
@@ -62152,6 +60969,44 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                     <Annotation>
                       <Name>Table</Name>
                       <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaPortafolio]=CALCULATE((DIVIDE(SUM(DWHPasivoOperacion[poIntPromedioMensualFiscal]),SUM(DWHPasivoOperacion[poSaldoPromedioMensualFiscal]),0)/100),DWDFecha[feDiaActual]=1)+0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poCalValTasaImplicitaPortafolio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((DIVIDE(SUM(DWHPasivoOperacion[poIntPromedioMensualFiscal]),SUM(DWHPasivoOperacion[poSaldoPromedioMensualFiscal]),0)/100),DWHPasivoOperacion[poCuentaAperturada]=1,DWDFecha[feDiaActual]=1)+0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poCalValTasaImplicitaAperturada</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
                     </Annotation>
                   </Annotations>
                 </Command>
@@ -70605,28 +69460,6 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                       </Value>
                     </Annotation>
                   </Annotations>
-                  <CalculationReference>[aoValConsolidadoCartera]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>suma de los saldos diarios de activos y  tarjeta de crédito para el cálculo del total de cartera</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
                   <CalculationReference>[poValSaldoMesAnteriorCal]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Description>Saldo de los productos de captaciones para el cierre del mes anterior a la fecha actual</Description>
@@ -72020,6 +70853,7 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                   </Annotations>
                   <CalculationReference>[feValCabMesAnt]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Descripción en fomrato Mes-Anio utilizado en la cabecera  de los reporte para el cierre del mes anterior respecto a la fecha actual</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -72041,6 +70875,7 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                   </Annotations>
                   <CalculationReference>[feValCabVarMensual]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Descripción en formato Mes(Anterior)-Anio Vs Mes(HaceUnAnio)-Anio, para la fecha de cierre del mes anterior respecto a la fecha actual</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -72062,6 +70897,7 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                   </Annotations>
                   <CalculationReference>[feValCabVarInteranual]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Descripción en formato Mes(Anterior)-Anio Vs Mes(HaceUnAnio)-Anio, para la fecha de hace un anio</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -72083,6 +70919,7 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                   </Annotations>
                   <CalculationReference>[feValCabVarInteranual2Anios]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Descripción en formato Mes(Anterior)-Anio Vs Mes(HaceUnAnio)-Anio, para la fecha de hace dos anios</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -72104,6 +70941,7 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                   </Annotations>
                   <CalculationReference>[feValCabHaceUnMes1AnioAtras]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Descripción en formato Mes-Anio utilizado en la cabecera  de los reporte para el cierre de hace un anio</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -72124,6 +70962,49 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                     </Annotation>
                   </Annotations>
                   <CalculationReference>[feValCabHaceUnMes2AnioAtras]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Descripción en formato Mes-Anio utilizado en la cabecera  de los reporte para el cierre de hace un anio</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poCalValTasaImplicitaPortafolio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poCalValTasaImplicitaAperturada]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
@@ -72174,7 +71055,7 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
               <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:Locale="es-EC">
                 <xs:complexType>
                   <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element name="DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWDFecha" msprop:DbSchemaName="dbo" msprop:DbTableName="DWDFecha" msprop:TableType="View" msprop:Description="DWDFecha" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;/*&#xD;&#xA; Script de generacion de dimension Fecha&#xD;&#xA;*/&#xD;&#xA;declare &#xD;&#xA; @fecha2AñosAtras int&#xD;&#xA;,@fecha2AñosUnMesAtras int&#xD;&#xA;,@fecha3AñosAtras int&#xD;&#xA;,@fecha3AñosUnMesAtras int&#xD;&#xA;,@fechaAñoMesAtras int&#xD;&#xA;,@fechaAñoMesAtrasFiscal int&#xD;&#xA;,@feIdFecha3mesesAdelante int&#xD;&#xA;,@moduloMes int&#xD;&#xA;,@fechaHoy int&#xD;&#xA;,@feCierreAnioActual int&#xD;&#xA;,@feCalAnioActual int&#xD;&#xA;,@feCalMesActual int&#xD;&#xA;,@feFechaCierreAnioAnt int&#xD;&#xA;,@fechaHaceUnMes int&#xD;&#xA;,@feIdFechaHaceUnAnioLab int&#xD;&#xA;,@fechaCierreAnioAntMesAct int&#xD;&#xA;,@feIdFecha1AnioAnt int&#xD;&#xA;,@feIdFecha2AnioAnt int&#xD;&#xA;,@feIdFecha3MesesFuturo int&#xD;&#xA;,@fechaHaceUnMes1AnioAtras int&#xD;&#xA;,@fechaHaceUnMes2AnioAtras int&#xD;&#xA;,@fechaCierreMesActual int&#xD;&#xA;,@fecha2MesAnterior int --RF2: Total Sistema Fiananciero&#xD;&#xA;,@fechaPptoMesActual int --RF6.2 Variacion Vs Presupuesto&#xD;&#xA;,@setmes int&#xD;&#xA;,@MesHoy int&#xD;&#xA;,@fechaDate date&#xD;&#xA;,@fechaFinSemestre int&#xD;&#xA;,@fechaMesAnioAnt int&#xD;&#xA;,@fecha15dias int&#xD;&#xA;,@fecha15diasDate date&#xD;&#xA;,@fechamax int&#xD;&#xA;,@DiaAAnterior int&#xD;&#xA;,@DiciembreAnioAnt int&#xD;&#xA;,@Diciembre2AnioAnt int&#xD;&#xA;,@Diciembre3AnioAnt int&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end&#xD;&#xA;&#xD;&#xA;select @fechaMesAnioAnt=feIdFechaAnioAnt  from dwdfecha where fediaactual = 1&#xD;&#xA;&#xD;&#xA;Select &#xD;&#xA; @fechaHoy = feIdFecha &#xD;&#xA;,@moduloMes = feCalMes%3&#xD;&#xA;,@feCalAnioActual = feCalAnio&#xD;&#xA;,@feCalMesActual = feCalMes&#xD;&#xA;,@feFechaCierreAnioAnt=feAnioAntCierr&#xD;&#xA;,@fechaHaceUnMes = feMesAntCierr&#xD;&#xA;,@feIdFecha1AnioAnt = convert(char(8),dateadd(mm,-11,feFecha),112)&#xD;&#xA;,@feIdFecha2AnioAnt = convert(char(8),dateadd(mm,-23,feFecha),112)&#xD;&#xA;,@feIdFecha3MesesFuturo = convert(char(8),dateadd(mm,3,feFecha),112)&#xD;&#xA;,@MesHoy = feCalMes&#xD;&#xA;,@fechaDate=fefecha&#xD;&#xA;from DWDFecha  &#xD;&#xA;where feDiaActual=1&#xD;&#xA;&#xD;&#xA;select @fecha15dias = max(feidfecha)&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha  between @fechaHoy and convert(char(8),dateadd(day,15,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @fecha15diasDate = feFecha&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha = @fecha15dias&#xD;&#xA;&#xD;&#xA;select @fechaCierreMesActual=max(feIdFecha)from DWDFecha&#xD;&#xA;Where fediaactual = 1 --feCalMes = @feCalMesActual and feCalAnio = @feCalAnioActual and feFinSemana = 0 and feFeriado=0&#xD;&#xA;&#xD;&#xA;select @setmes = @fechaHoy &#xD;&#xA;if right(left(@fechaHoy,6),2) = month(getdate()) begin set @setmes  =   @fechaHaceUnMes end&#xD;&#xA; &#xD;&#xA;select @fechaHaceUnMes1AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 1)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;select @fechaHaceUnMes2AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 2)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año atrás mismo mes&#xD;&#xA;select @fechaCierreAnioAntMesAct=feIdFechaCierreAnioAnt&#xD;&#xA;from DWDFecha &#xD;&#xA;where feDiaActual = 1&#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año un mes atrás&#xD;&#xA;Select @fechaAñoMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feMesAntCierr&#xD;&#xA;where f.feIdFecha=@fechaCierreAnioAntMesAct&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 anios atras&#xD;&#xA;Select @fecha2AñosAtras =  feidFecha&#xD;&#xA;from DWDFecha f &#xD;&#xA;where left(feidfecha,6) in (select convert(char(6),dateadd(month,-23,fefecha),112) from dwdfecha where feDiaActual=1)&#xD;&#xA;and feCierreMesTodosAnios = 1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 años un mes atras&#xD;&#xA;Select @fecha2AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años atras&#xD;&#xA;Select @fecha3AñosAtras = f3.feIdFechaCierreAnioAnt &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;inner join DWDFecha f3 on f3.feIdFecha = f2.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feDiaActual=1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años un mes atras&#xD;&#xA;Select @fecha3AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;-- Determina la fecha 3 meses hacia adelante&#xD;&#xA;select &#xD;&#xA;@feIdFecha3mesesAdelante = f.feIdFecha &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on &#xD;&#xA;f.feCalMes = MONTH(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;and f.feCalAnio = YEAR(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;where f.feCierreMesTodosAnios = 1&#xD;&#xA;and f2.feDiaActual = 1&#xD;&#xA;&#xD;&#xA;select @feCierreAnioActual=feIdFecha from DWDFecha where feCalMes=12 and feCalAnio=@feCalAnioActual and feCierreMesTodosAnios=1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Fechas SFIN 2MesAnt &#xD;&#xA;select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @fechaHaceUnMes&#xD;&#xA;&#xD;&#xA;select @fechaPptoMesActual =feIdFecha&#xD;&#xA;from DWDFecha&#xD;&#xA;where feCierreMesTodosAnios = 1&#xD;&#xA;and feCalAnio = left(@fechaHoy,4)&#xD;&#xA;and feCalMes = SUBSTRING(convert(char(8),@fechaHoy,112),5,2)&#xD;&#xA;&#xD;&#xA;select @fechaFinSemestre = feidfecha from dwdfecha &#xD;&#xA;where feidfecha between @feIdFecha1AnioAnt and concat(@feCalAnioActual,'1231') and fecalmes = 6 and feFinMes = 1 &#xD;&#xA;&#xD;&#xA;select @fechaAñoMesAtrasFiscal = concat(fecalanio,'0101') from dwdfecha &#xD;&#xA;where feAnioAnterior = 1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select @fechamax=  max(feidfecha)&#xD;&#xA;from DWDFecha&#xD;&#xA;where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @DiaAAnterior=isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax)&#xD;&#xA;from &#xD;&#xA;(&#xD;&#xA; select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA; and feIdFecha &lt;= @fechaHoy&#xD;&#xA;) hoy&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;where hoy.feIdFecha = @fechaHoy&#xD;&#xA;&#xD;&#xA;--select @DiaAAnterior=feidfechaAnt from #FechaAnterior where Bandera = 1&#xD;&#xA;&#xD;&#xA;SELECT f.feIdFecha&#xD;&#xA;,f.feFecha&#xD;&#xA;,f.feDescripcionFecha&#xD;&#xA;,f.feCalAnio&#xD;&#xA;,f.feCalMes&#xD;&#xA;,f.feCalDia&#xD;&#xA;,f.EsDiaAnterior&#xD;&#xA;,f.fecIdAnterior&#xD;&#xA;,f.feMesAntCierr&#xD;&#xA;,f.feMesAntAnioAnt&#xD;&#xA;,f.feAnioAntCierr&#xD;&#xA;,f.feIdFechaCierreAnioAnt&#xD;&#xA;,feIdFechaAnioAnt = case when left(f.feidfecha,6) = left(@fechaHoy,6) then feidfechaAnt else f.feIdFechaAnioAnt end&#xD;&#xA;,f.feFechaCierreAnio&#xD;&#xA;,f.feDiaActual&#xD;&#xA;,f.feDiaAnterior&#xD;&#xA;,f.feMesAnterior&#xD;&#xA;,fe2MesAnterior = case when f.feIdFecha = @fecha2MesAnterior then 1 else 0 end --TOTAL SISTEMA FINANCIERO Crecimiento 2MesAnterior&#xD;&#xA;,f.feAnioAnterior&#xD;&#xA;,f.feCierreSistemaFinanciero&#xD;&#xA;,feCierreMesAnterior =f.feMesAntCierr&#xD;&#xA;,f.feFechaMesAntCierr   &#xD;&#xA;,f.feCierrMesAnioAtras&#xD;&#xA;,f.feIdFechaDoceMesAtras&#xD;&#xA;,f.feCierreMes&#xD;&#xA;,f.feCierreMesTodosAnios&#xD;&#xA;,f.feNumDiasMesLab&#xD;&#xA;,feCalTrimestreDinamico =  case when f.feCalMes%3-@moduloMes=0 then 1 else 0 end&#xD;&#xA;,feCalBanderaFechaHaceUnAnio = case when  f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --Hace un año desde la fecha actual&#xD;&#xA;,feIdCalFechaCierre2AniosAntes = f2.feIdFechaCierreAnioAnt --Cierre 2 años antes de la feIdFecha&#xD;&#xA;,feCalBanderaHace2Anios = case when f.feIdFecha = @fecha2AñosAtras then 1 else 0 end --Identifica la fecha 2 años antes de la fecha actual&#xD;&#xA;,feCalBanderaHace3Anios = case when f.feIdFecha = @fecha3AñosAtras then 1 else 0 end --Identifica la fecha 3 años antes de la fecha actual&#xD;&#xA;,feCalBanderaAnioMesAtras = case when f.feIdFecha = @fechaAñoMesAtras then 1 else 0 end --Identifica la fecha de un año y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera2AniosMesAtras = case when f.feIdFecha = @fecha2AñosUnMesAtras then 1 else 0 end --Identifica la fecha de dos años y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera3AniosMesAtras = case when f.feIdFecha = @fecha3AñosUnMesAtras then 1 else 0 end --Identifica la fecha de tres años y un mes atrá de la fecha actual&#xD;&#xA;,feCalBanderaCostoFinanciero = case when frcf.feIdFecha is null then 0 else 1 end&#xD;&#xA;,feCalIdFecha3mesesAdelante =  @feIdFecha3mesesAdelante --fecha de 3 meses adelante desde la fecha actual&#xD;&#xA;,feCal30DiasAnt24MesesAnt    = case when (f.feIdFecha between @fechaHaceUnMes and @fechaHoy and f.feFinSemana=0 and f.feFeriado=0) &#xD;&#xA;                                          OR (f.feIdFecha between @fecha2AñosAtras and @fechaHoy and f.feCierreMes=1)  &#xD;&#xA;            then 1 else 0 end --Identifica la fecha 30 días antes y 24 meses antes de la fecha actual = feCalBanderaAnioMesAtras&#xD;&#xA;,feCalBanderaHace1AnioMesActual = case when f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --rr --Identifica la fecha de cierre un año atrás del mes actual&#xD;&#xA;&#xD;&#xA;,feCalBanderaEsHace1Anios= case when f.feIdFecha = fr1aa.feIdFecha then 1 --rr; Identifica las fechas del año anterior 12 meses atrás desde la fecha actual&#xD;&#xA;        when f.feIdFecha = @fechaCierreAnioAntMesAct then 3 -- Se identifica la fecha de cierre del mismo mes del año anterior respecto a la fecha actual&#xD;&#xA;        when left(f.feIdFecha,6)=left(@fechaHoy,6) and f.feIdFecha&lt;@fechaHoy and f.feFeriado=0 and f.feFinSemana=0 then 2 -- Identifica todos los dias habiles del mes fiscal de la fecha actual con exepcion de la fecha de corte&#xD;&#xA;        else 0 end &#xD;&#xA;,feCalBanderaEsHace2Anios= case when f.feIdFecha = fr2aa.feIdFecha then 1 when left(f.feIdFecha,6) = left(@fechaHoy,6) and f.feFeriado=0  and f.feFinSemana=0  then 2 else 0 end --rr; Identifica las fechas dos años anteriores 24 meses atrás desde la fechaactual&#xD;&#xA;,feCalBanderaEsMesActual = case when convert(int,left(f.feIdFecha,4)) = @feCalAnioActual and convert(int,SUBSTRING(convert(varchar(8),f.feIdFecha),5,2))= @feCalMesActual then 1 else 0 end --rr Fechas de los días para el mes actual &#xD;&#xA;,feCalBanderaEs2AnioContinuo = case when f.feIdFecha = fr2ac.feIdFecha then fr2ac.marcas else 0 end --rr; fechas continuas hace 2 años&#xD;&#xA;,feCalBanderaEs3MesesAdelante = case when f.feIdFecha = fr3ma.fecha then 1 else 0 end --rr; fechas 3 meses adelante&#xD;&#xA;,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde la fecha actual&#xD;&#xA;,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde la fecha actual&#xD;&#xA;,feCalBanderaCierreMesActual = case when f.feIdFecha = @fechaCierreMesActual then 1 else 0 end --Identifica la posible fecha del cierre del mes actual&#xD;&#xA;,feCalBanderaEsFechaConcentracion = case when f.feIdFecha = fr4cs.fecha then 1 else 0 end --rr; fechas para RF8&#xD;&#xA;,feCalBanderaEsFechaVolumen = isnull(marca,0)&#xD;&#xA;,feOrdenVolumen = isnull(orden,0)&#xD;&#xA;,feCalBanderaPptoMesActual = case when f.feIdFecha = @fechaPptoMesActual then 1 else 0 end&#xD;&#xA;,feCalBanderaBarraVolumen = case when f.feidfecha in (@fechaHoy,@feCierreAnioActual,@fecha15dias, @fechaHaceUnMes ,@fechaFinSemestre ,@feFechaCierreAnioAnt) then 1 else 0 end&#xD;&#xA;,feCalBanderaMesAnioAnt =  case when left(f.feidfecha,6) = left(@fechaMesAnioAnt,6) then 1 else 0 end&#xD;&#xA;,feHaceUnAnio=case when f.feidfecha = @DiaAAnterior then 1 else 0 end &#xD;&#xA;,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0)&#xD;&#xA;&#xD;&#xA;from DWDFecha f&#xD;&#xA;left join DWDFecha f2 on f.feIdFechaCierreAnioAnt = f2.feIdFecha and f2.feCierreMes=1&#xD;&#xA;left join DWDFecha f3 on f2.feIdFechaCierreAnioAnt = f3.feIdFecha and f3.feCierreMes=1&#xD;&#xA;left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 --rr; fechas del año anterior&#xD;&#xA;and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior&#xD;&#xA;left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 --rr; fechas de 2 año anterior&#xD;&#xA;and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidfecha    ,1 marcas&#xD;&#xA;  from DWDFecha fr2ac &#xD;&#xA;  where fr2ac.feIdFecha between @feIdFecha2AnioAnt and @fechaHoy&#xD;&#xA;  and fr2ac.feCierreMes = 1 &#xD;&#xA;  union&#xD;&#xA;  select feidfecha  ,2 marcas&#xD;&#xA;  from dwdfecha&#xD;&#xA;  where left(feidfecha,6) = left(@fechaHoy,6)&#xD;&#xA;  and feidfecha &lt; @fechaHoy&#xD;&#xA;  and feferiado &lt;&gt;1&#xD;&#xA;  and feFinSemana &lt;&gt; 1&#xD;&#xA;) fr2ac on f.feIdFecha = fr2ac.feIdFecha --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select max(feidFecha) fecha&#xD;&#xA;  from DWDFecha where feIdfecha between @fechaHoy and @feIdFecha3MesesFuturo&#xD;&#xA;  and feFeriado=0 and feFinSemana=0 and  feCalMes &lt;= (convert(int,SUBSTRING(convert(varchar(8),@feIdFecha3MesesFuturo),5,2))-1)&#xD;&#xA;  group by feCalMes&#xD;&#xA;) fr3ma on f.feIdFecha = fr3ma.fecha --rr; fechas de 3 meses adelante&#xD;&#xA;left join DWDFecha frcf on frcf.feIdFecha = f.feIdFecha and (frcf.feDiaActual=1 or frcf.feCierreMesAnterior=1 or (frcf.feCalMes%3 = 0 and frcf.feCalAnio in (@feCalAnioActual-1, @feCalAnioActual) and frcf.feCierreMes=1))&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidFecha fecha&#xD;&#xA;  from DWDFecha &#xD;&#xA;  WHERE (&#xD;&#xA;  feIdFecha in (select feIdFecha from DWDFecha Where feIdFecha between convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112)  and convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and feCierreMes=1)&#xD;&#xA;  )&#xD;&#xA;  or (feIdFecha &gt; @fecha3AñosAtras and feIdFecha &lt; convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112) and feCalMes = 12 and feCierreMes=1)&#xD;&#xA;  or (feIdFecha between convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and @fechaHoy)&#xD;&#xA;  and (feFeriado= 0 and feFinSemana=0)&#xD;&#xA;) fr4cs on f.feIdFecha = fr4cs.fecha  --rr; concentracion saldos RF8&#xD;&#xA;left join &#xD;&#xA;( -------&#xD;&#xA;  select feidfecha,min(marca) marca ,min(orden) orden&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;    select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from &#xD;&#xA; (&#xD;&#xA;     select &#xD;&#xA;     feidfecha,&#xD;&#xA;     case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,&#xD;&#xA;     convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden&#xD;&#xA;     from dwdfecha&#xD;&#xA;     where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')&#xD;&#xA;     and fecierremestodosanios = 1&#xD;&#xA;     and fediaactual &lt;&gt; 1 &#xD;&#xA; ) b&#xD;&#xA;    left join &#xD;&#xA; (&#xD;&#xA;      select &#xD;&#xA;      feidfecha  , &#xD;&#xA;      fecierremestodosanios, &#xD;&#xA;      (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;      convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;      from dwdfecha&#xD;&#xA;      where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;      and feferiado = 0&#xD;&#xA;      and fefinsemana = 0&#xD;&#xA;    ) a  on left(a.feidfecha,4) = left(b.feidfecha,4)+1 and right(left(a.feidfecha,6),2) = right(left(b.feidfecha,6),2) and a.fecierremestodosanios = 1&#xD;&#xA;    union&#xD;&#xA;    select &#xD;&#xA;    feidfecha  , &#xD;&#xA;    case when feDiaActual= 1 then 1 else 3 end marca, &#xD;&#xA;    (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;    convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;    from dwdfecha&#xD;&#xA;    where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;    and feferiado = 0&#xD;&#xA;    and fefinsemana = 0&#xD;&#xA;  ) a&#xD;&#xA;  group by feIdFecha&#xD;&#xA;) fv on f.feIdFecha = fv.feidfecha ---Fechas Volumen cierre mes y diarios&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select &#xD;&#xA;  hoy.feidfecha feidfechaAct, isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax) feidfechaAnt&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;   select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;   and feIdFecha &lt;= @fechaHoy&#xD;&#xA;  ) hoy&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;) fecdiaAniAnt on f.feIdFecha = feidfechaAct&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feIdFecha,feNumeroAnioAnt = Convert(int,left(@fechaHoy,4)) - Convert(int,left(feIdFecha,4))  &#xD;&#xA;  from DWDFecha&#xD;&#xA;  where feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and feCierreMes = 1 and feCalMes = 12 &#xD;&#xA;) aniosAnt on aniosAnt.feIdFecha = f.feidFecha&#xD;&#xA;&#xD;&#xA;where (f.feIdFecha between @fecha3AñosUnMesAtras and concat(@feCalAnioActual,'1231'))&#xD;&#xA;  or  (f.feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and f.feCierreMes = 1 and f.feCalMes = 12  ) &#xD;&#xA;&#xD;&#xA;order by 1">
+                    <xs:element name="DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWDFecha" msprop:DbSchemaName="dbo" msprop:DbTableName="DWDFecha" msprop:TableType="View" msprop:Description="DWDFecha" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;/*&#xD;&#xA; Script de generacion de dimension Fecha&#xD;&#xA;*/&#xD;&#xA;declare &#xD;&#xA; @fecha2AñosAtras int&#xD;&#xA;,@fecha2AñosUnMesAtras int&#xD;&#xA;,@fecha3AñosAtras int&#xD;&#xA;,@fecha3AñosUnMesAtras int&#xD;&#xA;,@fechaAñoMesAtras int&#xD;&#xA;,@fechaAñoMesAtrasFiscal int&#xD;&#xA;,@feIdFecha3mesesAdelante int&#xD;&#xA;,@moduloMes int&#xD;&#xA;,@fechaHoy int&#xD;&#xA;,@feCierreAnioActual int&#xD;&#xA;,@feCalAnioActual int&#xD;&#xA;,@feCalMesActual int&#xD;&#xA;,@feFechaCierreAnioAnt int&#xD;&#xA;,@fechaHaceUnMes int&#xD;&#xA;,@feIdFechaHaceUnAnioLab int&#xD;&#xA;,@fechaCierreAnioAntMesAct int&#xD;&#xA;,@feIdFecha1AnioAnt int&#xD;&#xA;,@feIdFecha2AnioAnt int&#xD;&#xA;,@feIdFecha3MesesFuturo int&#xD;&#xA;,@fechaHaceUnMes1AnioAtras int&#xD;&#xA;,@fechaHaceUnMes2AnioAtras int&#xD;&#xA;,@fechaCierreMesActual int&#xD;&#xA;,@fecha2MesAnterior int --RF2: Total Sistema Fiananciero&#xD;&#xA;,@fechaPptoMesActual int --RF6.2 Variacion Vs Presupuesto&#xD;&#xA;,@setmes int&#xD;&#xA;,@MesHoy int&#xD;&#xA;,@fechaDate date&#xD;&#xA;,@fechaFinSemestre int&#xD;&#xA;,@fechaMesAnioAnt int&#xD;&#xA;,@fecha15dias int&#xD;&#xA;,@fecha15diasDate date&#xD;&#xA;,@fechamax int&#xD;&#xA;,@DiaAAnterior int&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end&#xD;&#xA;&#xD;&#xA;select @fechaMesAnioAnt=feIdFechaAnioAnt  from dwdfecha where fediaactual = 1&#xD;&#xA;&#xD;&#xA;Select &#xD;&#xA; @fechaHoy = feIdFecha &#xD;&#xA;,@moduloMes = feCalMes%3&#xD;&#xA;,@feCalAnioActual = feCalAnio&#xD;&#xA;,@feCalMesActual = feCalMes&#xD;&#xA;,@feFechaCierreAnioAnt=feAnioAntCierr&#xD;&#xA;,@fechaHaceUnMes = feMesAntCierr&#xD;&#xA;,@feIdFecha1AnioAnt = convert(char(8),dateadd(mm,-11,feFecha),112)&#xD;&#xA;,@feIdFecha2AnioAnt = convert(char(8),dateadd(mm,-23,feFecha),112)&#xD;&#xA;,@feIdFecha3MesesFuturo = convert(char(8),dateadd(mm,3,feFecha),112)&#xD;&#xA;,@MesHoy = feCalMes&#xD;&#xA;,@fechaDate=fefecha&#xD;&#xA;from DWDFecha  &#xD;&#xA;where feDiaActual=1&#xD;&#xA;&#xD;&#xA;select @fecha15dias = max(feidfecha)&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha  between @fechaHoy and convert(char(8),dateadd(day,15,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @fecha15diasDate = feFecha&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha = @fecha15dias&#xD;&#xA;&#xD;&#xA;select @fechaCierreMesActual=max(feIdFecha)from DWDFecha&#xD;&#xA;Where fediaactual = 1 --feCalMes = @feCalMesActual and feCalAnio = @feCalAnioActual and feFinSemana = 0 and feFeriado=0&#xD;&#xA;&#xD;&#xA;select @setmes = @fechaHoy &#xD;&#xA;if right(left(@fechaHoy,6),2) = month(getdate()) begin set @setmes  =   @fechaHaceUnMes end&#xD;&#xA; &#xD;&#xA;select @fechaHaceUnMes1AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 1)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;select @fechaHaceUnMes2AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 2)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año atrás mismo mes&#xD;&#xA;select @fechaCierreAnioAntMesAct=feIdFechaCierreAnioAnt&#xD;&#xA;from DWDFecha &#xD;&#xA;where feDiaActual = 1&#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año un mes atrás&#xD;&#xA;Select @fechaAñoMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feMesAntCierr&#xD;&#xA;where f.feIdFecha=@fechaCierreAnioAntMesAct&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 anios atras&#xD;&#xA;Select @fecha2AñosAtras =  feidFecha&#xD;&#xA;from DWDFecha f &#xD;&#xA;where left(feidfecha,6) in (select convert(char(6),dateadd(month,-23,fefecha),112) from dwdfecha where feDiaActual=1)&#xD;&#xA;and feCierreMesTodosAnios = 1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 años un mes atras&#xD;&#xA;Select @fecha2AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años atras&#xD;&#xA;Select @fecha3AñosAtras = f3.feIdFechaCierreAnioAnt &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;inner join DWDFecha f3 on f3.feIdFecha = f2.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feDiaActual=1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años un mes atras&#xD;&#xA;Select @fecha3AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;-- Determina la fecha 3 meses hacia adelante&#xD;&#xA;select &#xD;&#xA;@feIdFecha3mesesAdelante = f.feIdFecha &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on &#xD;&#xA;f.feCalMes = MONTH(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;and f.feCalAnio = YEAR(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;where f.feCierreMesTodosAnios = 1&#xD;&#xA;and f2.feDiaActual = 1&#xD;&#xA;&#xD;&#xA;select @feCierreAnioActual=feIdFecha from DWDFecha where feCalMes=12 and feCalAnio=@feCalAnioActual and feCierreMesTodosAnios=1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Fechas SFIN 2MesAnt &#xD;&#xA;select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @fechaHaceUnMes&#xD;&#xA;&#xD;&#xA;select @fechaPptoMesActual =feIdFecha&#xD;&#xA;from DWDFecha&#xD;&#xA;where feCierreMesTodosAnios = 1&#xD;&#xA;and feCalAnio = left(@fechaHoy,4)&#xD;&#xA;and feCalMes = SUBSTRING(convert(char(8),@fechaHoy,112),5,2)&#xD;&#xA;&#xD;&#xA;select @fechaFinSemestre = feidfecha from dwdfecha &#xD;&#xA;where feidfecha between @feIdFecha1AnioAnt and concat(@feCalAnioActual,'1231') and fecalmes = 6 and feFinMes = 1 &#xD;&#xA;&#xD;&#xA;select @fechaAñoMesAtrasFiscal = concat(fecalanio,'0101') from dwdfecha &#xD;&#xA;where feAnioAnterior = 1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select @fechamax=  max(feidfecha)&#xD;&#xA;from DWDFecha&#xD;&#xA;where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @DiaAAnterior=isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax)&#xD;&#xA;from &#xD;&#xA;(&#xD;&#xA; select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA; and feIdFecha &lt;= @fechaHoy&#xD;&#xA;) hoy&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;where hoy.feIdFecha = @fechaHoy&#xD;&#xA;&#xD;&#xA;--select @DiaAAnterior=feidfechaAnt from #FechaAnterior where Bandera = 1&#xD;&#xA;&#xD;&#xA;SELECT f.feIdFecha&#xD;&#xA;,f.feFecha&#xD;&#xA;,f.feDescripcionFecha&#xD;&#xA;,f.feCalAnio&#xD;&#xA;,f.feCalMes&#xD;&#xA;,f.feCalDia&#xD;&#xA;,f.EsDiaAnterior&#xD;&#xA;,f.fecIdAnterior&#xD;&#xA;,f.feMesAntCierr&#xD;&#xA;,f.feMesAntAnioAnt&#xD;&#xA;,f.feAnioAntCierr&#xD;&#xA;,f.feIdFechaCierreAnioAnt&#xD;&#xA;,feIdFechaAnioAnt = case when left(f.feidfecha,6) = left(@fechaHoy,6) then feidfechaAnt else f.feIdFechaAnioAnt end&#xD;&#xA;,f.feFechaCierreAnio&#xD;&#xA;,f.feDiaActual&#xD;&#xA;,f.feDiaAnterior&#xD;&#xA;,f.feMesAnterior&#xD;&#xA;,fe2MesAnterior = case when f.feIdFecha = @fecha2MesAnterior then 1 else 0 end --TOTAL SISTEMA FINANCIERO Crecimiento 2MesAnterior&#xD;&#xA;,f.feAnioAnterior&#xD;&#xA;,f.feCierreSistemaFinanciero&#xD;&#xA;,feCierreMesAnterior =f.feMesAntCierr&#xD;&#xA;,f.feFechaMesAntCierr   &#xD;&#xA;,f.feCierrMesAnioAtras&#xD;&#xA;,f.feIdFechaDoceMesAtras&#xD;&#xA;,f.feCierreMes&#xD;&#xA;,f.feCierreMesTodosAnios&#xD;&#xA;,f.feNumDiasMesLab&#xD;&#xA;,feCalTrimestreDinamico =  case when f.feCalMes%3-@moduloMes=0 then 1 else 0 end&#xD;&#xA;,feCalBanderaFechaHaceUnAnio = case when  f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --Hace un año desde la fecha actual&#xD;&#xA;,feIdCalFechaCierre2AniosAntes = f2.feIdFechaCierreAnioAnt --Cierre 2 años antes de la feIdFecha&#xD;&#xA;,feCalBanderaHace2Anios = case when f.feIdFecha = @fecha2AñosAtras then 1 else 0 end --Identifica la fecha 2 años antes de la fecha actual&#xD;&#xA;,feCalBanderaHace3Anios = case when f.feIdFecha = @fecha3AñosAtras then 1 else 0 end --Identifica la fecha 3 años antes de la fecha actual&#xD;&#xA;,feCalBanderaAnioMesAtras = case when f.feIdFecha = @fechaAñoMesAtras then 1 else 0 end --Identifica la fecha de un año y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera2AniosMesAtras = case when f.feIdFecha = @fecha2AñosUnMesAtras then 1 else 0 end --Identifica la fecha de dos años y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera3AniosMesAtras = case when f.feIdFecha = @fecha3AñosUnMesAtras then 1 else 0 end --Identifica la fecha de tres años y un mes atrá de la fecha actual&#xD;&#xA;,feCalBanderaCostoFinanciero = case when frcf.feIdFecha is null then 0 else 1 end&#xD;&#xA;,feCalIdFecha3mesesAdelante =  @feIdFecha3mesesAdelante --fecha de 3 meses adelante desde la fecha actual&#xD;&#xA;,feCal30DiasAnt24MesesAnt    = case when (f.feIdFecha between @fechaHaceUnMes and @fechaHoy and f.feFinSemana=0 and f.feFeriado=0) &#xD;&#xA;                                          OR (f.feIdFecha between @fecha2AñosAtras and @fechaHoy and f.feCierreMes=1)  &#xD;&#xA;            then 1 else 0 end --Identifica la fecha 30 días antes y 24 meses antes de la fecha actual = feCalBanderaAnioMesAtras&#xD;&#xA;,feCalBanderaHace1AnioMesActual = case when f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --rr --Identifica la fecha de cierre un año atrás del mes actual&#xD;&#xA;&#xD;&#xA;,feCalBanderaEsHace1Anios= case when f.feIdFecha = fr1aa.feIdFecha then 1 --rr; Identifica las fechas del año anterior 12 meses atrás desde la fecha actual&#xD;&#xA;        when f.feIdFecha = @fechaCierreAnioAntMesAct then 3 -- Se identifica la fecha de cierre del mismo mes del año anterior respecto a la fecha actual&#xD;&#xA;        when left(f.feIdFecha,6)=left(@fechaHoy,6) and f.feIdFecha&lt;@fechaHoy and f.feFeriado=0 and f.feFinSemana=0 then 2 -- Identifica todos los dias habiles del mes fiscal de la fecha actual con exepcion de la fecha de corte&#xD;&#xA;        else 0 end &#xD;&#xA;,feCalBanderaEsHace2Anios= case when f.feIdFecha = fr2aa.feIdFecha then 1 when left(f.feIdFecha,6) = left(@fechaHoy,6) and f.feFeriado=0  and f.feFinSemana=0  then 2 else 0 end --rr; Identifica las fechas dos años anteriores 24 meses atrás desde la fechaactual&#xD;&#xA;,feCalBanderaEsMesActual = case when convert(int,left(f.feIdFecha,4)) = @feCalAnioActual and convert(int,SUBSTRING(convert(varchar(8),f.feIdFecha),5,2))= @feCalMesActual then 1 else 0 end --rr Fechas de los días para el mes actual &#xD;&#xA;,feCalBanderaEs2AnioContinuo = case when f.feIdFecha = fr2ac.feIdFecha then fr2ac.marcas else 0 end --rr; fechas continuas hace 2 años&#xD;&#xA;,feCalBanderaEs3MesesAdelante = case when f.feIdFecha = fr3ma.fecha then 1 else 0 end --rr; fechas 3 meses adelante&#xD;&#xA;,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde la fecha actual&#xD;&#xA;,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde la fecha actual&#xD;&#xA;,feCalBanderaCierreMesActual = case when f.feIdFecha = @fechaCierreMesActual then 1 else 0 end --Identifica la posible fecha del cierre del mes actual&#xD;&#xA;,feCalBanderaEsFechaConcentracion = case when f.feIdFecha = fr4cs.fecha then 1 else 0 end --rr; fechas para RF8&#xD;&#xA;,feCalBanderaEsFechaVolumen = isnull(marca,0)&#xD;&#xA;,feOrdenVolumen = isnull(orden,0)&#xD;&#xA;,feCalBanderaPptoMesActual = case when f.feIdFecha = @fechaPptoMesActual then 1 else 0 end&#xD;&#xA;,feCalBanderaBarraVolumen = case when f.feidfecha in (@fechaHoy,@feCierreAnioActual,@fecha15dias, @fechaHaceUnMes ,@fechaFinSemestre ,@feFechaCierreAnioAnt) then 1 else 0 end&#xD;&#xA;,feCalBanderaMesAnioAnt =  case when left(f.feidfecha,6) = left(@fechaMesAnioAnt,6) then 1 else 0 end&#xD;&#xA;,feHaceUnAnio=case when f.feidfecha = @DiaAAnterior then 1 else 0 end &#xD;&#xA;,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0)&#xD;&#xA;&#xD;&#xA;from DWDFecha f&#xD;&#xA;left join DWDFecha f2 on f.feIdFechaCierreAnioAnt = f2.feIdFecha and f2.feCierreMes=1&#xD;&#xA;left join DWDFecha f3 on f2.feIdFechaCierreAnioAnt = f3.feIdFecha and f3.feCierreMes=1&#xD;&#xA;left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 --rr; fechas del año anterior&#xD;&#xA;and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior&#xD;&#xA;left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 --rr; fechas de 2 año anterior&#xD;&#xA;and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidfecha    ,1 marcas&#xD;&#xA;  from DWDFecha fr2ac &#xD;&#xA;  where fr2ac.feIdFecha between @feIdFecha2AnioAnt and @fechaHoy&#xD;&#xA;  and fr2ac.feCierreMes = 1 &#xD;&#xA;  union&#xD;&#xA;  select feidfecha  ,2 marcas&#xD;&#xA;  from dwdfecha&#xD;&#xA;  where left(feidfecha,6) = left(@fechaHoy,6)&#xD;&#xA;  and feidfecha &lt; @fechaHoy&#xD;&#xA;  and feferiado &lt;&gt;1&#xD;&#xA;  and feFinSemana &lt;&gt; 1&#xD;&#xA;) fr2ac on f.feIdFecha = fr2ac.feIdFecha --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select max(feidFecha) fecha&#xD;&#xA;  from DWDFecha where feIdfecha between @fechaHoy and @feIdFecha3MesesFuturo&#xD;&#xA;  and feFeriado=0 and feFinSemana=0 and  feCalMes &lt;= (convert(int,SUBSTRING(convert(varchar(8),@feIdFecha3MesesFuturo),5,2))-1)&#xD;&#xA;  group by feCalMes&#xD;&#xA;) fr3ma on f.feIdFecha = fr3ma.fecha --rr; fechas de 3 meses adelante&#xD;&#xA;left join DWDFecha frcf on frcf.feIdFecha = f.feIdFecha and (frcf.feDiaActual=1 or frcf.feCierreMesAnterior=1 or (frcf.feCalMes%3 = 0 and frcf.feCalAnio in (@feCalAnioActual-1, @feCalAnioActual) and frcf.feCierreMes=1))&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidFecha fecha&#xD;&#xA;  from DWDFecha &#xD;&#xA;  WHERE (&#xD;&#xA;  feIdFecha in (select feIdFecha from DWDFecha Where feIdFecha between convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112)  and convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and feCierreMes=1)&#xD;&#xA;  )&#xD;&#xA;  or (feIdFecha &gt; @fecha3AñosAtras and feIdFecha &lt; convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112) and feCalMes = 12 and feCierreMes=1)&#xD;&#xA;  or (feIdFecha between convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and @fechaHoy)&#xD;&#xA;  and (feFeriado= 0 and feFinSemana=0)&#xD;&#xA;) fr4cs on f.feIdFecha = fr4cs.fecha  --rr; concentracion saldos RF8&#xD;&#xA;left join &#xD;&#xA;( -------&#xD;&#xA;  select feidfecha,min(marca) marca ,min(orden) orden&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;    select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from &#xD;&#xA; (&#xD;&#xA;     select &#xD;&#xA;     feidfecha,&#xD;&#xA;     case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,&#xD;&#xA;     convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden&#xD;&#xA;     from dwdfecha&#xD;&#xA;     where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')&#xD;&#xA;     and fecierremestodosanios = 1&#xD;&#xA;     and fediaactual &lt;&gt; 1 &#xD;&#xA; ) b&#xD;&#xA;    left join &#xD;&#xA; (&#xD;&#xA;      select &#xD;&#xA;      feidfecha  , &#xD;&#xA;      fecierremestodosanios, &#xD;&#xA;      (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;      convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;      from dwdfecha&#xD;&#xA;      where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;      and feferiado = 0&#xD;&#xA;      and fefinsemana = 0&#xD;&#xA;    ) a  on left(a.feidfecha,4) = left(b.feidfecha,4)+1 and right(left(a.feidfecha,6),2) = right(left(b.feidfecha,6),2) and a.fecierremestodosanios = 1&#xD;&#xA;    union&#xD;&#xA;    select &#xD;&#xA;    feidfecha  , &#xD;&#xA;    case when feDiaActual= 1 then 1 else 3 end marca, &#xD;&#xA;    (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;    convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;    from dwdfecha&#xD;&#xA;    where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;    and feferiado = 0&#xD;&#xA;    and fefinsemana = 0&#xD;&#xA;  ) a&#xD;&#xA;  group by feIdFecha&#xD;&#xA;) fv on f.feIdFecha = fv.feidfecha ---Fechas Volumen cierre mes y diarios&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select &#xD;&#xA;  hoy.feidfecha feidfechaAct, isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax) feidfechaAnt&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;   select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;   and feIdFecha &lt;= @fechaHoy&#xD;&#xA;  ) hoy&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;) fecdiaAniAnt on f.feIdFecha = feidfechaAct&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feIdFecha,feNumeroAnioAnt = Convert(int,left(@fechaHoy,4)) - Convert(int,left(feIdFecha,4))  &#xD;&#xA;  from DWDFecha&#xD;&#xA;  where feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and feCierreMes = 1 and feCalMes = 12 &#xD;&#xA;) aniosAnt on aniosAnt.feIdFecha = f.feidFecha&#xD;&#xA;&#xD;&#xA;where (f.feIdFecha between @fecha3AñosUnMesAtras and concat(@feCalAnioActual,'1231'))&#xD;&#xA;  or  (f.feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and f.feCierreMes = 1 and f.feCalMes = 12  ) &#xD;&#xA;&#xD;&#xA;order by 1">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="feIdFecha" msprop:DbColumnName="feIdFecha" msprop:FriendlyName="feIdFecha" type="xs:long" />
@@ -72529,7 +71410,7 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWHPasivoOperacion" msprop:DbSchemaName="dbo" msprop:DbTableName="DWHPasivoOperacion" msprop:TableType="View" msprop:Description="DWHPasivoOperacion" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;declare @fechaInicio int&#xD;&#xA;declare @fechaFin int&#xD;&#xA;declare @fechaHoy int&#xD;&#xA;declare @fechaAyer int&#xD;&#xA;declare @diaproceso int&#xD;&#xA;&#xD;&#xA;select &#xD;&#xA; @fechaInicio =STR(YEAR(fefecha)) + REPLACE(STR(MONTH(fefecha), 2), SPACE(1), '0')+'01'&#xD;&#xA;,@fechaFin =STR(YEAR(fefecha)) + REPLACE(STR(MONTH(fefecha), 2), SPACE(1), '0')+'07'&#xD;&#xA;,@fechaHoy= feIdFecha&#xD;&#xA;,@fechaAyer=fecIdAnterior&#xD;&#xA;,@diaproceso = day(fefecha)&#xD;&#xA;from DWDFecha &#xD;&#xA;where feIdFecha=1 --feDiaActual=100&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#CTE_Pasivos') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #CTE_Pasivos&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWDCliente') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCliente&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDFecha') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDFecha&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#tasa') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #tasa&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDCuentaContable') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCuentaContable&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;SELECT feidfecha into #DWDFecha &#xD;&#xA;from DWDFecha &#xD;&#xA;where  feidfecha between @fechaInicio and @fechaFin and feFinSemana &lt;&gt; 1 and feFeriado &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente&#xD;&#xA;into   #DWDCliente&#xD;&#xA;from DWDCliente cl&#xD;&#xA;&#xD;&#xA;select indicadorNivel2 indicador ,avg(poTasaNominal) tasa &#xD;&#xA;into #tasa&#xD;&#xA;from DWHPasivoOperacionMes&#xD;&#xA;inner join DWDCuentaContable on poidcuentacontable = ccidcuentacontable&#xD;&#xA;inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3&#xD;&#xA;where poIdFecha =@fechaHoy&#xD;&#xA;and indicadorNivel1 = 2&#xD;&#xA;and indicadorNivel2 in (140,141,142)&#xD;&#xA;and poTasaNominal &gt; 0&#xD;&#xA;group by indicadorNivel2&#xD;&#xA;&#xD;&#xA;select ccidcuentacontable,indicadorNivel2,tasa&#xD;&#xA;into #DWDCuentaContable&#xD;&#xA;from DWDCuentaContable&#xD;&#xA;inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3&#xD;&#xA;left join #tasa on indicador = indicadorNivel2&#xD;&#xA;&#xD;&#xA;/* ----------------- */&#xD;&#xA;/* DWHPasivoOperacion */&#xD;&#xA;/* ----------------- */&#xD;&#xA;&#xD;&#xA;select&#xD;&#xA; cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente&#xD;&#xA;,poIdFecha&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,poSaldoOperacionUSD&#xD;&#xA;,poSaldoPromedioMensual&#xD;&#xA;,poSaldoPromedioDisponible&#xD;&#xA;,poSaldoTotal&#xD;&#xA;,poTasaEfectiva&#xD;&#xA;,poTasaNominal=case when isnull(poTasaNominal,0) = 0 then tasa else poTasaNominal end &#xD;&#xA;,poFechaVencimiento&#xD;&#xA;,poIdCalificacionOperacionCliente&#xD;&#xA;,poIdFechaApertura&#xD;&#xA;,poIdEstadoCuentaCliente&#xD;&#xA;,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end &#xD;&#xA;,poNumeroDeOperaciones&#xD;&#xA;,poInteres= poSaldoOperacionUSD * poTasaNominal/100  &#xD;&#xA;into #CTE_Pasivos   &#xD;&#xA;from DWHPasivoOperacion&#xD;&#xA;inner join #DWDFecha on poIdFecha = feIdFecha&#xD;&#xA;inner join #DWDCliente cl on poidcliente = clIdCliente&#xD;&#xA;inner join #DWDCuentaContable on poIdCuentaContable = ccIdCuentaContable&#xD;&#xA;where isnull(abs(poSaldoOperacionUSD),0)+isnull(abs(poSaldoPromedioMensual),0)+isnull(abs(poSaldoPromedioDisponible),0)&gt; 0&#xD;&#xA;&#xD;&#xA;SELECT &#xD;&#xA; clidcliente poidcliente&#xD;&#xA;,poIdFecha&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,poIdCanal = clIdCanal&#xD;&#xA;,poIdAsesor = clIdAsesorPrincipal &#xD;&#xA;,poIdAgencia = clIdAgencia&#xD;&#xA;,poIdSegmentacion = clIdSegmentacionCliente          &#xD;&#xA;,poIdVinculacion= clIdVinculacionCliente                                      &#xD;&#xA;,poIdEstadoCuentaCliente&#xD;&#xA;,poCuentaAperturada&#xD;&#xA;,poFechaVencimiento&#xD;&#xA;,poIdFechaApertura&#xD;&#xA;,poSaldoOperacionUSD = SUM(poSaldoOperacionUSD)  &#xD;&#xA;,poSaldoPromedioDisponible = SUM(poSaldoPromedioDisponible) &#xD;&#xA;,poSaldoPromedioMensual = SUM(poSaldoPromedioMensual)&#xD;&#xA;,poSaldoTotal = SUM(poSaldoTotal)              &#xD;&#xA;,poTasaEfectiva = SUM(poTasaEfectiva)     &#xD;&#xA;,poTasaNominal  = SUM(poTasaNominal)&#xD;&#xA;,poIdCalificacionOperacionCliente = SUM(poIdCalificacionOperacionCliente) &#xD;&#xA;,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) &#xD;&#xA;,poInteres= SUM(poInteres)&#xD;&#xA;,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)&#xD;&#xA;from  #CTE_Pasivos &#xD;&#xA;group by clidcliente&#xD;&#xA;,poIdFecha&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,clIdCanal&#xD;&#xA;,clIdAsesorPrincipal  &#xD;&#xA;,clIdAgencia&#xD;&#xA;,clIdSegmentacionCliente          &#xD;&#xA;,clIdVinculacionCliente                                      &#xD;&#xA;,poIdEstadoCuentaCliente&#xD;&#xA;,poCuentaAperturada&#xD;&#xA;,poFechaVencimiento&#xD;&#xA;,poIdFechaApertura&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#CTE_Pasivos') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #CTE_Pasivos&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWDCliente') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCliente&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDFecha') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDFecha&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#tasa') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #tasa&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDCuentaContable') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCuentaContable&#xD;&#xA;end">
+                    <xs:element name="DWHPasivoOperacion_0217d3ac-9384-4b81-9d49-5092ca639f5b" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWHPasivoOperacion" msprop:DbSchemaName="dbo" msprop:DbTableName="DWHPasivoOperacion" msprop:TableType="View" msprop:Description="DWHPasivoOperacion" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;declare @fechaInicio int&#xD;&#xA;declare @fechaFin int&#xD;&#xA;declare @fechaHoy int&#xD;&#xA;declare @fechaAyer int&#xD;&#xA;declare @diaproceso int&#xD;&#xA;&#xD;&#xA;select &#xD;&#xA; @fechaInicio =STR(YEAR(fefecha)) + REPLACE(STR(MONTH(fefecha), 2), SPACE(1), '0')+'01'&#xD;&#xA;,@fechaFin =STR(YEAR(fefecha)) + REPLACE(STR(MONTH(fefecha), 2), SPACE(1), '0')+'07'&#xD;&#xA;,@fechaHoy= feIdFecha&#xD;&#xA;,@fechaAyer=fecIdAnterior&#xD;&#xA;,@diaproceso = day(fefecha)&#xD;&#xA;from DWDFecha &#xD;&#xA;where feIdFecha=1 --feDiaActual=100&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#CTE_Pasivos') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #CTE_Pasivos&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWDCliente') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCliente&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDFecha') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDFecha&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#tasa') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #tasa&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDCuentaContable') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCuentaContable&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;SELECT feidfecha into #DWDFecha &#xD;&#xA;from DWDFecha &#xD;&#xA;where  feidfecha between @fechaInicio and @fechaFin and feFinSemana &lt;&gt; 1 and feFeriado &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente&#xD;&#xA;into   #DWDCliente&#xD;&#xA;from DWDCliente cl&#xD;&#xA;&#xD;&#xA;select indicadorNivel2 indicador ,avg(poTasaNominal) tasa &#xD;&#xA;into #tasa&#xD;&#xA;from DWHPasivoOperacionMes&#xD;&#xA;inner join DWDCuentaContable on poidcuentacontable = ccidcuentacontable&#xD;&#xA;inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3&#xD;&#xA;where poIdFecha =@fechaHoy&#xD;&#xA;and indicadorNivel1 = 2&#xD;&#xA;and indicadorNivel2 in (140,141,142)&#xD;&#xA;and poTasaNominal &gt; 0&#xD;&#xA;group by indicadorNivel2&#xD;&#xA;&#xD;&#xA;select ccidcuentacontable,indicadorNivel2,tasa&#xD;&#xA;into #DWDCuentaContable&#xD;&#xA;from DWDCuentaContable&#xD;&#xA;inner join vuclasificacionproductos on cccodigoindicador = indicadornivel3&#xD;&#xA;left join #tasa on indicador = indicadorNivel2&#xD;&#xA;&#xD;&#xA;/* ----------------- */&#xD;&#xA;/* DWHPasivoOperacion */&#xD;&#xA;/* ----------------- */&#xD;&#xA;&#xD;&#xA;select&#xD;&#xA; cl.clidcliente,cl.clIdCanal,cl.clIdAsesorPrincipal ,cl.clIdAgencia,cl.clIdSegmentacionCliente,cl.clIdVinculacionCliente&#xD;&#xA;,poIdFecha&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,poSaldoOperacionUSD&#xD;&#xA;,poSaldoPromedioMensual&#xD;&#xA;,poSaldoPromedioDisponible&#xD;&#xA;,poSaldoTotal&#xD;&#xA;,poTasaEfectiva&#xD;&#xA;,poTasaNominal=case when isnull(poTasaNominal,0) = 0 then tasa else poTasaNominal end &#xD;&#xA;,poFechaVencimiento&#xD;&#xA;,poIdCalificacionOperacionCliente&#xD;&#xA;,poIdFechaApertura&#xD;&#xA;,poIdEstadoCuentaCliente&#xD;&#xA;,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end &#xD;&#xA;,poNumeroDeOperaciones&#xD;&#xA;,poInteres= poSaldoOperacionUSD * poTasaNominal/100  &#xD;&#xA;,poIntPromedioMensualFiscal&#xD;&#xA;,poSaldoPromedioMensualFiscal&#xD;&#xA;into #CTE_Pasivos   &#xD;&#xA;from DWHPasivoOperacion&#xD;&#xA;inner join #DWDFecha on poIdFecha = feIdFecha&#xD;&#xA;inner join #DWDCliente cl on poidcliente = clIdCliente&#xD;&#xA;inner join #DWDCuentaContable on poIdCuentaContable = ccIdCuentaContable&#xD;&#xA;where isnull(abs(poSaldoOperacionUSD),0)+isnull(abs(poSaldoPromedioMensual),0)+isnull(abs(poSaldoPromedioDisponible),0)&gt; 0&#xD;&#xA;&#xD;&#xA;SELECT &#xD;&#xA; clidcliente poidcliente&#xD;&#xA;,poIdFecha&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,poIdCanal = clIdCanal&#xD;&#xA;,poIdAsesor = clIdAsesorPrincipal &#xD;&#xA;,poIdAgencia = clIdAgencia&#xD;&#xA;,poIdSegmentacion = clIdSegmentacionCliente          &#xD;&#xA;,poIdVinculacion= clIdVinculacionCliente                                      &#xD;&#xA;,poIdEstadoCuentaCliente&#xD;&#xA;,poCuentaAperturada&#xD;&#xA;,poFechaVencimiento&#xD;&#xA;,poIdFechaApertura&#xD;&#xA;,poSaldoOperacionUSD = SUM(poSaldoOperacionUSD)  &#xD;&#xA;,poSaldoPromedioDisponible = SUM(poSaldoPromedioDisponible) &#xD;&#xA;,poSaldoPromedioMensual = SUM(poSaldoPromedioMensual)&#xD;&#xA;,poSaldoTotal = SUM(poSaldoTotal)              &#xD;&#xA;,poTasaEfectiva = SUM(poTasaEfectiva)     &#xD;&#xA;,poTasaNominal  = SUM(poTasaNominal)&#xD;&#xA;,poIdCalificacionOperacionCliente = SUM(poIdCalificacionOperacionCliente) &#xD;&#xA;,poNumeroDeOperaciones =  SUM(poNumeroDeOperaciones) &#xD;&#xA;,poInteres= SUM(poInteres)&#xD;&#xA;,poInteresMensual= SUM((poTasaNominal/100)*poSaldoPromedioMensual)&#xD;&#xA;,poIntPromedioMensualFiscal=SUM(poIntPromedioMensualFiscal)&#xD;&#xA;,poSaldoPromedioMensualFiscal=SUM(poSaldoPromedioMensualFiscal)&#xD;&#xA;from  #CTE_Pasivos &#xD;&#xA;group by clidcliente&#xD;&#xA;,poIdFecha&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,clIdCanal&#xD;&#xA;,clIdAsesorPrincipal  &#xD;&#xA;,clIdAgencia&#xD;&#xA;,clIdSegmentacionCliente          &#xD;&#xA;,clIdVinculacionCliente                                      &#xD;&#xA;,poIdEstadoCuentaCliente&#xD;&#xA;,poCuentaAperturada&#xD;&#xA;,poFechaVencimiento&#xD;&#xA;,poIdFechaApertura&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#CTE_Pasivos') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #CTE_Pasivos&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#DWDCliente') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCliente&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDFecha') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDFecha&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#tasa') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #tasa&#xD;&#xA;end&#xD;&#xA;if object_id('[tempdb]..#DWDCuentaContable') is not null&#xD;&#xA;begin&#xD;&#xA;             drop table #DWDCuentaContable&#xD;&#xA;end">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="poIdFecha" msprop:DbColumnName="poIdFecha" msprop:FriendlyName="poIdFecha" type="xs:long" minOccurs="0" />
@@ -72554,6 +71435,8 @@ CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(
                           <xs:element name="poIdVinculacion" msprop:DbColumnName="poIdVinculacion" msprop:FriendlyName="poIdVinculacion" type="xs:int" minOccurs="0" />
                           <xs:element name="poInteresMensual" msprop:DbColumnName="poInteresMensual" msprop:FriendlyName="poInteresMensual" type="xs:double" minOccurs="0" />
                           <xs:element name="poidcliente" msprop:DbColumnName="poidcliente" msprop:FriendlyName="poidcliente" type="xs:int" minOccurs="0" />
+                          <xs:element name="poIntPromedioMensualFiscal" msprop:DbColumnName="poIntPromedioMensualFiscal" msprop:FriendlyName="poIntPromedioMensualFiscal" type="xs:double" minOccurs="0" />
+                          <xs:element name="poSaldoPromedioMensualFiscal" msprop:DbColumnName="poSaldoPromedioMensualFiscal" msprop:FriendlyName="poSaldoPromedioMensualFiscal" type="xs:double" minOccurs="0" />
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
