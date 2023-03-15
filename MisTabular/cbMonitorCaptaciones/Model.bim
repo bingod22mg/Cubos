@@ -60941,7 +60941,7 @@ CREATE MEASURE 'DWHPronosticoProducto'[ppValPronosticoProductos]=CALCULATE(MAX(D
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiaActualCartera]=CALCULATE([aoValConsolidadoCartera],DWDFecha[feDiaActual]=1);
+CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiaActualCartera]=CALCULATE([aoValTotalCartera],DWDFecha[feDiaActual]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60960,7 +60960,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiaActualCartera]=CALCULATE([aoVal
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiaAnteriorCartera]=CALCULATE([aoValConsolidadoCartera],DWDFecha[feDiaAnterior]=1);
+CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiaAnteriorCartera]=CALCULATE([aoValTotalCartera],DWDFecha[feDiaAnterior]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60979,7 +60979,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoDiaAnteriorCartera]=CALCULATE([aoV
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoMesAnteriorCartera]=CALCULATE([aoValConsolidadoCartera],DWDFecha[feMesAnterior]=1);
+CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoMesAnteriorCartera]=CALCULATE([aoValTotalCartera],DWDFecha[feMesAnterior]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60998,7 +60998,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoMesAnteriorCartera]=CALCULATE([aoV
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoAnioAnteriorCartera]=CALCULATE([aoValConsolidadoCartera],DWDFecha[feAnioAnterior]=1);
+CREATE MEASURE 'DWHActivoOperacion'[aoValSaldoAnioAnteriorCartera]=CALCULATE([aoValTotalCartera],DWDFecha[feAnioAnterior]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61226,7 +61226,7 @@ CREATE MEASURE 'DWHPronosticoProducto'[ppValTendenciaProductosDiaActual]=CALCULA
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPrespuestoCartera]=CALCULATE([pnValorRealPresupuesto],FILTER(DWDCuentaContable,DWDCuentaContable[ccCalIndicadorNivel2Car]&gt;119 &amp;&amp; DWDCuentaContable[ccCalIndicadorNivel2Car]&lt;125),DWDFecha[feDiaActual]=1);
+CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPrespuestoCartera]=CALCULATE([pnValorRealPresupuestoMM],FILTER(DWDCuentaContable,DWDCuentaContable[ccCalIndicadorNivel2Car]&gt;119 &amp;&amp; DWDCuentaContable[ccCalIndicadorNivel2Car]&lt;125),DWDFecha[feDiaActual]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61420,7 +61420,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualMesFiscPorc]=IF(
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualAnioCorridoPorcSFC]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc],ALL(DWDCanal));
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualAnioCorridoPorcSFC]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc],ALL(DWDCanal),DWDFecha[feDiaActual]&lt;&gt;1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61478,9 +61478,9 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValSisFinVarAnioCorrido]=[bsfVal
 
 
 CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValSisFinVarAnualAnioCorridoPorc]=IF( 
- CALCULATE( DIVIDE( [bsfValSisFinVarAnioCorrido] , [bsfValSisFinHaceUnAnio] , 0)  ,DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3) = 0
+ CALCULATE( DIVIDE( [bsfValSisFinVarAnioCorrido] , [bsfValSisFinHaceUnAnio] , 0)  ,DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, DWDFecha[feDiaActual]&lt;&gt;1) = 0
 ,BLANK()
-,CALCULATE( DIVIDE( [bsfValSisFinVarAnioCorrido] , [bsfValSisFinHaceUnAnio] , 0)  ,DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3)
+,CALCULATE( DIVIDE( [bsfValSisFinVarAnioCorrido] , [bsfValSisFinHaceUnAnio] , 0)  ,DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, DWDFecha[feDiaActual]&lt;&gt;1)
 );
 </Text>
                   <Annotations>
@@ -61538,16 +61538,16 @@ CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoVarAnioCorrido]=[pnValorR
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoVarAnualAnioCorridoPorc]=IF( 
- CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3) = 0
+CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoVarAnualAnioCorridoPorcSFC]=IF( 
+ CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, ALL(DWDCanal)) = 0
 ,BLANK()
-,CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3) 
+,CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, ALL(DWDCanal)) 
 );
 </Text>
                   <Annotations>
                     <Annotation>
                       <Name>FullName</Name>
-                      <Value>pnValPresupuestoVarAnualAnioCorridoPorc</Value>
+                      <Value>pnValPresupuestoVarAnualAnioCorridoPorcSFC</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Table</Name>
@@ -61755,7 +61755,7 @@ CALCULATE( DIVIDE( ([aoValActivoVarAnioCorrido]+[tcoValTarjetaVarAnioCorrido]), 
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCrecHoyInterAnual]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc] , DWDFecha[feDiaActual]=1);
+CREATE MEASURE 'DWHActivoOperacion'[aoValCrecHoyInterAnual]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc] , DWDFecha[feDiaActual]=1) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61774,7 +61774,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCrecHoyInterAnual]=CALCULATE([aoValCart
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValTotalCartera]=[aoValSaldoDiarioMM]+[tcoValSaldoTarjetaMM];
+CREATE MEASURE 'DWHActivoOperacion'[aoValTotalCartera]=CALCULATE([aoValSaldoDiarioMM]+[tcoValSaldoTarjetaMM] , FILTER(DWDCuentaContable,DWDCuentaContable[ccCalIndicadorNivel1]=1) );
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61793,7 +61793,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValTotalCartera]=[aoValSaldoDiarioMM]+[tco
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCrecMensual]=DIVIDE((CALCULATE(([aoValTotalCartera]), DWDFecha[feMesAnterior]=1) - CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1)), CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1), 0 );
+CREATE MEASURE 'DWHActivoOperacion'[aoValCrecMensual]=DIVIDE((CALCULATE(([aoValTotalCartera]), DWDFecha[feMesAnterior]=1) - CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1)), CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1), 0 ) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61812,7 +61812,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCrecMensual]=DIVIDE((CALCULATE(([aoValT
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInterAnual]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc] , DWDFecha[feMesAnterior]=1);
+CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInterAnual]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc] , DWDFecha[feMesAnterior]=1)+0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61834,7 +61834,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInterAnual]=CALCULATE([aoValCartera
 CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInter2Anios]=DIVIDE(
   (CALCULATE(([aoValTotalCartera]), DWDFecha[feMesAnterior]=1) - CALCULATE(([aoValTotalCartera]), DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1))
 , CALCULATE(([aoValTotalCartera]), DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1),0
-);
+)+0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61853,12 +61853,12 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInter2Anios]=DIVIDE(
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCoutaCarteraMesAnterior]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feMesAnterior]=1), CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feMesAnterior]=1), 0 );
+CREATE MEASURE 'DWHActivoOperacion'[aoValCuotaCarteraMesAnterior]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feMesAnterior]=1), CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feMesAnterior]=1), 0 );
 </Text>
                   <Annotations>
                     <Annotation>
                       <Name>FullName</Name>
-                      <Value>aoValCoutaCarteraMesAnterior</Value>
+                      <Value>aoValCuotaCarteraMesAnterior</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Table</Name>
@@ -61872,12 +61872,12 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCoutaCarteraMesAnterior]=DIVIDE(CALCULA
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCoutaCarteraHaceUnMes1AnioAtras]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feCalBanderaEsHaceUnMes1AnioAtras]=1), CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feCalBanderaEsHaceUnMes1AnioAtras]=1), 0 );
+CREATE MEASURE 'DWHActivoOperacion'[aoValCuotaCarteraHaceUnMes1AnioAtras]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feCalBanderaEsHaceUnMes1AnioAtras]=1), CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feCalBanderaEsHaceUnMes1AnioAtras]=1), 0 );
 </Text>
                   <Annotations>
                     <Annotation>
                       <Name>FullName</Name>
-                      <Value>aoValCoutaCarteraHaceUnMes1AnioAtras</Value>
+                      <Value>aoValCuotaCarteraHaceUnMes1AnioAtras</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Table</Name>
@@ -61891,12 +61891,12 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCoutaCarteraHaceUnMes1AnioAtras]=DIVIDE
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCoutaCarteraHaceUnMes2AnioAtras]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1), CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1), 0 );
+CREATE MEASURE 'DWHActivoOperacion'[aoValCuotaCarteraHaceUnMes2AnioAtras]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1), CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1), 0 );
 </Text>
                   <Annotations>
                     <Annotation>
                       <Name>FullName</Name>
-                      <Value>aoValCoutaCarteraHaceUnMes2AnioAtras</Value>
+                      <Value>aoValCuotaCarteraHaceUnMes2AnioAtras</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Table</Name>
@@ -62019,6 +62019,139 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE(
                     <Annotation>
                       <Name>Table</Name>
                       <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValFormatoFecha]=FORMAT(MAX(DWDFecha[feFecha]),"dd/mm/yyyy");
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValFormatoFecha</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabMesAnt]=CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feMesAnterior]=1);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabMesAnt</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabVarMensual]=SUBSTITUTE( CONCATENATE("% Var. Mensual ",CONCATENATE([feValCabMesAnt], CONCATENATE(" VS. ",CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[fe2MesAnterior]=1)))),"-"," ");
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabVarMensual</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabVarInteranual]=CONCATENATE("% Var. Interanual ",CALCULATE(IFERROR(UPPER(VALUES(DWDFecha[feCalDescAnioMesActVsAnt])),"Mas de un valor"),DWDFecha[feMesAnterior]=1  ));
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabVarInteranual</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabVarInteranual2Anios]=SUBSTITUTE( CONCATENATE("% Var. Interanual ",CONCATENATE([feValCabMesAnt], CONCATENATE(" VS. ",CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1)))),"-"," ");
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabVarInteranual2Anios</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes1AnioAtras]=CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feCalBanderaEsHaceUnMes1AnioAtras]=1);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabHaceUnMes1AnioAtras</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabHaceUnMes2AnioAtras]=CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabHaceUnMes2AnioAtras</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
                     </Annotation>
                   </Annotations>
                 </Command>
@@ -71192,7 +71325,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE(
                   </Annotations>
                   <CalculationReference>[aoValCarteraVarAnualAnioCorridoPorcSFC]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de cartera para 13 fechas de cierres de mes desde el mes actual </Description>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de cartera para 13 fechas de cierres de mes desde el mes actual (Sin FiltroCanal)</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -71324,9 +71457,9 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE(
                       </Value>
                     </Annotation>
                   </Annotations>
-                  <CalculationReference>[pnValPresupuestoVarAnualAnioCorridoPorc]</CalculationReference>
+                  <CalculationReference>[pnValPresupuestoVarAnualAnioCorridoPorcSFC]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación del presupuesto para 13 fechas de cierres de mes desde el mes actual </Description>
+                  <Description>Cálculo del porcentaje de variación del presupuesto para 13 fechas de cierres de mes desde el mes actual ; Sin Filtro Canal (SFC)</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -71670,7 +71803,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE(
                       </Value>
                     </Annotation>
                   </Annotations>
-                  <CalculationReference>[aoValCoutaCarteraMesAnterior]</CalculationReference>
+                  <CalculationReference>[aoValCuotaCarteraMesAnterior]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Description>Metrica Cuota cartera del mes anterior</Description>
                   <FormatString>''</FormatString>
@@ -71692,7 +71825,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE(
                       </Value>
                     </Annotation>
                   </Annotations>
-                  <CalculationReference>[aoValCoutaCarteraHaceUnMes1AnioAtras]</CalculationReference>
+                  <CalculationReference>[aoValCuotaCarteraHaceUnMes1AnioAtras]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Description>Metrica Cuota cartera del mes anterior un anio atras      </Description>
                   <FormatString>''</FormatString>
@@ -71714,7 +71847,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE(
                       </Value>
                     </Annotation>
                   </Annotations>
-                  <CalculationReference>[aoValCoutaCarteraHaceUnMes2AnioAtras]</CalculationReference>
+                  <CalculationReference>[aoValCuotaCarteraHaceUnMes2AnioAtras]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Description>Metrica Cuota cartera del mes anterior dos anios atras</Description>
                   <FormatString>''</FormatString>
@@ -71843,6 +71976,154 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE(
                     </Annotation>
                   </Annotations>
                   <CalculationReference>[poValCaptacionesVarAnual]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValFormatoFecha]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Valor Fecha en Formato  "dd/mm/yyyy"</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabMesAnt]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabVarMensual]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabVarInteranual]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabVarInteranual2Anios]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabHaceUnMes1AnioAtras]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabHaceUnMes2AnioAtras]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
