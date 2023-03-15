@@ -3,7 +3,7 @@
     <DatabaseID>SemanticModel</DatabaseID>
   </Object>
   <ObjectDefinition>
-    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500">
+    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400">
       <ID>SemanticModel</ID>
       <Name>SemanticModel</Name>
       <Annotations>
@@ -247,14 +247,6 @@ drop table TempCarteraIndicadores&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandTy
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -796,14 +788,6 @@ from DWDCliente&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQ
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -1221,14 +1205,6 @@ from DWDCliente&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQ
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -1909,14 +1885,6 @@ from DWDCliente&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQ
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -2411,14 +2379,6 @@ select
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -2812,14 +2772,6 @@ select
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -3115,14 +3067,6 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -3682,14 +3626,6 @@ having (
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -4243,14 +4179,6 @@ aoidcuentacontable&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -4838,14 +4766,6 @@ having sum(abs(isnull(aomontosaldodolar,0)))+sum(abs(isnull(aoSaldoPromedioMensu
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -5433,14 +5353,6 @@ having sum(abs(isnull(tcoSaldo,0)))+sum(abs(isnull(tcoSaldoPromedioMensual,0)))+
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -5962,14 +5874,6 @@ having sum(abs(isnull(tcoSaldo,0)))+sum(abs(isnull(tcoSaldoPromedioMensual,0)))+
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -7060,14 +6964,6 @@ having sum(abs(isnull(tcoSaldo,0)))+sum(abs(isnull(tcoSaldoPromedioMensual,0)))+
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -9920,6 +9816,14 @@ having sum(abs(isnull(ioMontoIngreso,0))) + sum(abs(isnull(ioSaldoInteresRealFis
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+          <DimensionPermissions>
+            <DimensionPermission>
+              <ID>DimensionPermission</ID>
+              <Name>DimensionPermission</Name>
+              <RoleID>Role</RoleID>
+              <Read>Allowed</Read>
+            </DimensionPermission>
+          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -10399,6 +10303,14 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+          <DimensionPermissions>
+            <DimensionPermission>
+              <ID>DimensionPermission</ID>
+              <Name>DimensionPermission</Name>
+              <RoleID>Role</RoleID>
+              <Read>Allowed</Read>
+            </DimensionPermission>
+          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -10866,7 +10778,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
       <Cubes>
         <Cube>
           <ID>Model</ID>
-          <Name>Model</Name>
+          <Name>Modelo</Name>
           <Annotations>
             <Annotation>
               <Name>DefaultMeasure</Name>
@@ -30254,42 +30166,6 @@ order by 1</QueryDefinition>
                 <Partition>
                   <ID>DWHIngresoOperacion_368f0d89-1c37-4d83-9899-15367622a625</ID>
                   <Name>DWHIngresoOperacion</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;Set nocount on
-
-declare @FechaMesAntCierre int,@DiasLaborablesMes int
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct 
-ccIdCuentaContable,
-DescripcionPYG = vpg.ProductoNivel6
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductosPYG vpg on cc.ccCodigoIndicadorMargenPYG = vpg.indicadorNivel6
-where vpg.IndicadorNivel2=1603 -- Agrupacion PyG
-
-
-select @FechaMesAntCierre=feIdFecha from DWDFecha where feMesAnterior=1 
-
-select 
- ioIdFecha
-,ioIdCliente
-,ioIdCuentaContablePrincipal
-,ioMontoIngreso = sum(isnull(ioMontoIngreso,0))
-,ioSaldoInteresRealFiscal = sum(isnull(ioSaldoInteresRealFiscal,0))  --pyg
-from DWHIngresoOperacion iop
-inner join #DWDCuentaContable cc on iop.ioIdCuentaContablePrincipal = cc.ccIdCuentaContable
-where  ioIdFecha = @FechaMesAntCierre
-group by 
-ioIdFecha,
-ioIdCliente,
-ioIdCuentaContablePrincipal --idCta para todos los productos
-having sum(abs(isnull(ioMontoIngreso,0))) + sum(abs(isnull(ioSaldoInteresRealFiscal,0)))&gt;0&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>7d301af5-1511-4470-9864-774509261219</DataSourceID>
                     <QueryDefinition>Set nocount on
@@ -34018,11 +33894,11 @@ CREATE MEASURE 'DWHBalanceSaldo'[bsValInteres]=sum(DWHBalanceSaldo[bsPYGDiario])
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.172.161;Persist Security Info=True;User ID=dwh;Initial Catalog=DWHCORPORATIVO</ConnectionString>
+          <ConnectionString>Data Source=172.16.77.10,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=True;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
-            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\bingod22</Account>
+            <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
           </ImpersonationInfo>
+          <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>50</MaxActiveConnections>
         </DataSource>
@@ -34674,18 +34550,24 @@ CREATE MEASURE 'DWHBalanceSaldo'[bsValInteres]=sum(DWHBalanceSaldo[bsPYGDiario])
               <Sid>S-1-5-21-3084530191-2796110714-333732663-4933</Sid>
             </Member>
             <Member>
-              <Name>BANINTERN\binaguia</Name>
-              <Sid>S-1-5-21-3084530191-2796110714-333732663-4377</Sid>
-            </Member>
-            <Member>
               <Name>BANINTERN\binflorf</Name>
               <Sid>S-1-5-21-3084530191-2796110714-333732663-4497</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\bingod22</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-57840</Sid>
             </Member>
           </Members>
         </Role>
         <Role>
           <ID>Role 1</ID>
           <Name>Admin</Name>
+          <Members>
+            <Member>
+              <Name>BANINTERN\bingod22</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-57840</Sid>
+            </Member>
+          </Members>
         </Role>
       </Roles>
       <DatabasePermissions>

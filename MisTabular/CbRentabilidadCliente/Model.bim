@@ -3,7 +3,7 @@
     <DatabaseID>SemanticModel</DatabaseID>
   </Object>
   <ObjectDefinition>
-    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500">
+    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400">
       <ID>SemanticModel</ID>
       <Name>SemanticModel</Name>
       <Annotations>
@@ -30207,113 +30207,6 @@ group by poIdFecha
                 <Partition>
                   <ID>DWHPasivoOperacion_261f5411-a810-4e10-b528-95e89dab0708</ID>
                   <Name>DWHPasivoOperacion_Enero</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=1
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -30398,7 +30291,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30428,118 +30321,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_b14b5857-582a-4251-a503-42acee667913</ID>
                   <Name>DWHPasivoOperacion_Febrero</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=2
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -30549,14 +30334,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=2
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -30575,7 +30360,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -30583,10 +30368,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -30612,7 +30397,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -30624,7 +30409,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30641,7 +30426,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -30654,118 +30439,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_3dde25f6-87ab-4107-b31c-65d3e4c059f2</ID>
                   <Name>DWHPasivoOperacion_Marzo</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=3
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -30775,14 +30452,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=3
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -30801,7 +30478,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -30809,10 +30486,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -30838,7 +30515,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -30850,7 +30527,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30867,7 +30544,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -30880,118 +30557,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_3c74a121-aa5f-4d5f-a99c-c24e2da6bea3</ID>
                   <Name>DWHPasivoOperacion_Abril</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=4
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -31001,14 +30570,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=4
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -31027,7 +30596,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -31035,10 +30604,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -31064,7 +30633,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -31076,7 +30645,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31093,7 +30662,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -31106,118 +30675,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_0737b9e9-12e7-4c5a-b329-dd4959d2d63b</ID>
                   <Name>DWHPasivoOperacion_Mayo</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=5
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -31227,14 +30688,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=5
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -31253,7 +30714,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -31261,10 +30722,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -31290,7 +30751,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -31302,7 +30763,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31319,7 +30780,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -31332,118 +30793,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_efd8939b-a54d-4001-a8b4-e84a9cd07981</ID>
                   <Name>DWHPasivoOperacion_Junio</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=6
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -31453,14 +30806,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=6
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -31479,7 +30832,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -31487,10 +30840,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -31516,7 +30869,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -31528,7 +30881,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31545,7 +30898,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -31558,118 +30911,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_a4673ffb-13ca-44fe-b348-2f24fe88e51a</ID>
                   <Name>DWHPasivoOperacion_Julio</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=7
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -31679,14 +30924,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=7
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -31705,7 +30950,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -31713,10 +30958,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -31742,7 +30987,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -31754,7 +30999,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31771,7 +31016,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -31784,118 +31029,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_bf955d8b-9754-455c-ba1b-d906f5a59d5c</ID>
                   <Name>DWHPasivoOperacion_Agosto</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=8
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -31905,14 +31042,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=8
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -31931,7 +31068,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -31939,10 +31076,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -31968,7 +31105,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -31980,7 +31117,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31997,7 +31134,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -32010,118 +31147,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_63ebe218-2cd8-4dd8-bb38-78060f73be6b</ID>
                   <Name>DWHPasivoOperacion_Septiembre</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=9
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -32131,14 +31160,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=9
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -32157,7 +31186,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -32165,10 +31194,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -32194,7 +31223,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -32206,7 +31235,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32223,7 +31252,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -32236,118 +31265,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_30d12234-8226-43e1-8cc8-f494911eca29</ID>
                   <Name>DWHPasivoOperacion_Octubre</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=10
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -32357,14 +31278,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=10
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -32383,7 +31304,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -32391,10 +31312,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -32420,7 +31341,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -32432,7 +31353,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32449,7 +31370,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -32462,118 +31383,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_20d70fe9-1307-4fac-9f65-58c3cb6ef9ac</ID>
                   <Name>DWHPasivoOperacion_Noviembre</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=11
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -32583,14 +31396,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=11
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -32609,7 +31422,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -32617,10 +31430,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -32646,7 +31459,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -32658,7 +31471,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32675,7 +31488,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -32688,118 +31501,10 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHPasivoOperacion_b276b6ee-e4d7-4244-bb6e-e50e064b7083</ID>
                   <Name>DWHPasivoOperacion_Diciembre</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
-
-set @Mes=12
-
--- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
-
--- Fecha Mes Anterior --
-select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
-
-/*---- Fecha ----*/
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-
-select feIdFecha
-into #DWDFecha
-from DWDFecha
-where feIdFecha between @FechaHaceDosAnios and @FechaMesAnt
-and fecierremes=1
-and feCalMes=@Mes
-
-/*----- Cuenta Contable Ctas Ahorro y Credito -----*/
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
-where indicadorNivel1=2 -- Captaciones
-union 
-select distinct
-ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
-from DWDCuentaContable cc
-where cc.ccCodigoIndicador=699 -- Cuenta Servicios
-
-/*----- Pasivo Operacion -----*/
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-,poSaldoOperacionUSD
-,poSaldoAcumuladoAnual
-,poSaldoPromedioAnual
-,poValorActPondRiesgoPromAnual
-,poValorComision
-,poValorIngresoServicio
-,poNumeroTransaccionesAnual
-,poValorCostoOperativo
-,poValorOperacionFinanciera
-,poValorInteresRealAnual
-,poValorInteresTasaPool
-,poValorMargenFinanciero
-,poValorMargenBancarioBasico
-,poValorMargenOrdinario
-,poValorMargenExplotacion
-,poValorUtilidadOperativa
-,poSaldoAcumuladoMensualFiscal
-into #PasivoOperacion
-from DWHPasivoOperacion po
-inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
-
-
-select
- poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))
-,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))
-,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))
-,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))
-
-,poValorComision=sum(isnull(poValorComision,0))
-,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
-,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
-,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
-,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
-,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
-,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))
-,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))
-,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))
-,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
-,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
-,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
-from #PasivoOperacion po
-inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
-group by poIdFecha
-,poIdCliente
-,poIdCuentaContable
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
-if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -32809,14 +31514,14 @@ declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 set @Mes=12
 
 -- Fecha hace dos años corrido --
-select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
+select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1
 
 -- Fecha Mes Anterior --
 select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1
 
 /*---- Fecha ----*/
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 select feIdFecha
 into #DWDFecha
@@ -32835,7 +31540,7 @@ into #DWDCuentaContable
 from DWDCuentaContable cc
 inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3
 where indicadorNivel1=2 -- Captaciones
-union 
+union
 select distinct
 ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=0
 from DWDCuentaContable cc
@@ -32843,10 +31548,10 @@ where cc.ccCodigoIndicador=699 -- Cuenta Servicios
 
 /*----- Pasivo Operacion -----*/
 
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end 
+if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 ,poSaldoOperacionUSD
@@ -32872,7 +31577,7 @@ inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
 
 
 select
- poIdFecha
+poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
@@ -32884,7 +31589,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32901,7 +31606,7 @@ group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
 
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
+if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end</QueryDefinition>
                   </Source>
@@ -32914,7 +31619,6 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
               </Partitions>
               <ProactiveCaching>
@@ -81849,6 +80553,25 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                     </Annotation>
                   </Annotations>
                 </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHIngresoOperacion'[ValIngresoAcumuladoMesFiscal]=sum(DWHIngresoOperacion[ioSaldoAcumuladoMensualFiscal]);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>ValIngresoAcumuladoMesFiscal</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHIngresoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
               </Commands>
               <CalculationProperties>
                 <CalculationProperty>
@@ -86527,6 +85250,27 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                   <CalculationType>Member</CalculationType>
                 </CalculationProperty>
                 <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[ValIngresoAcumuladoMesFiscal]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
                   <CalculationReference>Measures.[__No measures defined]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Visible>false</Visible>
@@ -86554,11 +85298,12 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Integrated Security=SSPI;Persist Security Info=False;User ID=;Initial Catalog=DWHCORPORATIVO;Data Source=172.16.76.4;Initial File Name=;Server SPN=</ConnectionString>
+          <ConnectionString>Data Source=172.16.77.10,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=True;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\binxaste</Account>
+            <Account>banintern\usrbdd</Account>
           </ImpersonationInfo>
+          <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>50</MaxActiveConnections>
         </DataSource>
@@ -87816,6 +86561,10 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
               <Name>BANINTERN\BINXASTE</Name>
               <Sid>S-1-5-21-3084530191-2796110714-333732663-34271</Sid>
             </Member>
+            <Member>
+              <Name>BANINTERN\ggs_MIS_MonitorRentabilidad</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-52381</Sid>
+            </Member>
           </Members>
         </Role>
         <Role>
@@ -87829,6 +86578,14 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
             <Member>
               <Name>BANINTERN\BINXASTE</Name>
               <Sid>S-1-5-21-3084530191-2796110714-333732663-34271</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\usrbdd</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-8145</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\bingod22</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-57840</Sid>
             </Member>
           </Members>
         </Role>
