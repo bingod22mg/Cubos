@@ -1,39 +1,31 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Development</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6df0edcf-cef4-4f59-900c-1ede125e2530}</ProjectGuid>
+    <ProjectGuid>{3af0d7d7-95e3-49ca-9c6a-d713da28f6d0}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>MyRootNamespace</RootNamespace>
     <AssemblyName>MyAssemblyName</AssemblyName>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <OutputPath>bin\</OutputPath>
     <Name>cbInformacionHistoricaCaptacionesCartera</Name>
+    <DeploymentServerName>172.16.78.11</DeploymentServerName>
+    <DeploymentServerEdition>Developer</DeploymentServerEdition>
+    <DeploymentServerVersion>Version_11_0</DeploymentServerVersion>
+    <DeploymentServerDatabase>cbInformacionHistoricaCaptacionesCartera</DeploymentServerDatabase>
+    <DeploymentServerCubeName>Model</DeploymentServerCubeName>
+    <DeploymentOptionProcessing>Default</DeploymentOptionProcessing>
+    <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
+    <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
+    <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
     <OutputPath>bin\</OutputPath>
-    <DeploymentServerName>localhost</DeploymentServerName>
-    <DeploymentServerEdition>Developer</DeploymentServerEdition>
-    <DeploymentServerVersion>Unknown</DeploymentServerVersion>
-    <DeploymentServerDatabase>cbInformacionHistoricaCaptacionesCartera</DeploymentServerDatabase>
-    <DeploymentServerCubeName>Modelo</DeploymentServerCubeName>
-    <DeploymentOptionProcessing>Default</DeploymentOptionProcessing>
-    <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
     <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
-    <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
-    <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == '' ">
-    <DeploymentServerName>172.16.172.161</DeploymentServerName>
-    <DeploymentServerEdition>Developer</DeploymentServerEdition>
-    <DeploymentServerVersion>Unknown</DeploymentServerVersion>
-    <DeploymentServerDatabase>cbInformacionHistoricaCaptacionesCartera</DeploymentServerDatabase>
-    <DeploymentServerCubeName>Modelo</DeploymentServerCubeName>
-    <DeploymentOptionProcessing>Default</DeploymentOptionProcessing>
-    <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
     <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
-    <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
-    <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
