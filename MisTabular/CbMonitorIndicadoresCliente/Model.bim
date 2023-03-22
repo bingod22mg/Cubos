@@ -3,7 +3,7 @@
     <DatabaseID>SemanticModel</DatabaseID>
   </Object>
   <ObjectDefinition>
-    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500">
+    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400">
       <ID>SemanticModel</ID>
       <Name>SemanticModel</Name>
       <Annotations>
@@ -9369,32 +9369,6 @@ where cpcodigoindicador &gt; 1000&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandTy
                 <Partition>
                   <ID>DWDEntidadFinancieraRiesgo_70e0f8ba-51cc-46d8-8ed3-f0caec2eccff</ID>
                   <Name>DWDEntidadFinancieraRiesgo</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;select 
-ifIdInstitucionFinanciera,
-ifNombreInstitucionFinanciera efDescripcionEntidad,
-ifTipoInstitucionFinanciera efTipoEntidad,
-case ifIdInstitucionFinanciera
-when 1023 THEN '#FF8000' --INTERNACIONAL
-when 1029 THEN '#FFFF00' --PICHINCHA
-when 1028 THEN '#81DAF5' --PACIFICO
-when 1033 THEN '#86B404' --PRODUBANCO
-when 1006 THEN '#0080FF' --GUAYAQUIL
-when 1025 THEN '#01DF3A' --LOJA
-when 1002 THEN '#58ACFA' --AMAZONAS
-when 1004 THEN '#81DAF5' --AUSTRO
-when 4624 THEN '#2E64FE' --DINERS
-when 1026 THEN '#173B0B' --MACHALA
-when 1011 THEN '#0B610B' --MANABI
-when 1007 THEN '#088A85' --BOLIVARIANO
-when 1009 THEN '#FE2E2E' --CITIBANK
-when 1020 THEN '#8A0808' --RUMIÑAHUI
-else 'Automatic' end efColorEntidad
-from DWDInstitucionFinanciera&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>aa175e45-e970-475e-b30a-6f53b05b0304</DataSourceID>
                     <QueryDefinition>select 
@@ -9406,7 +9380,7 @@ when 1023 THEN '#FF8000' --INTERNACIONAL
 when 1029 THEN '#FFFF00' --PICHINCHA
 when 1028 THEN '#81DAF5' --PACIFICO
 when 1033 THEN '#86B404' --PRODUBANCO
-when 1006 THEN '#0080FF' --GUAYAQUIL
+when 1006 THEN '#ff35c2' --GUAYAQUIL	  #0080FF
 when 1025 THEN '#01DF3A' --LOJA
 when 1002 THEN '#58ACFA' --AMAZONAS
 when 1004 THEN '#81DAF5' --AUSTRO
@@ -33599,10 +33573,9 @@ FILTER(DWHRentabilidad,DWHRentabilidad[dfcIdCodigoIndicador]=1063)));
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.172.161;Persist Security Info=True;User ID=dwh;Initial Catalog=DWHCORPORATIVO</ConnectionString>
+          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.75.16,2433;Persist Security Info=True;User ID=dwh;Initial Catalog=DWHCORPORATIVO</ConnectionString>
           <ImpersonationInfo>
-            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\bincarro</Account>
+            <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
           </ImpersonationInfo>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>50</MaxActiveConnections>
