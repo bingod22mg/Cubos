@@ -47142,60 +47142,6 @@ if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop 
                 <Partition>
                   <ID>DWHReporteAnalisisVariaciones_f942d1d2-6f68-4783-a86f-e2d0b32ae16b</ID>
                   <Name>DWHReporteAnalisisVariaciones</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-
-declare @feFechaActual int
-declare @feFechaMesAnterior int
-declare @feFechaAnioAnterior int
-
-select 
-@feFechaActual=feIdFecha 
-,@feFechaMesAnterior=feAnioAntCierr
-, @feFechaAnioAnterior=feMesAntCierr
-from DWDFecha where feDiaActual=1
-
-select feidfecha
-into #dwdfecha3
-from dwdfecha 
-where feidfecha in (@feFechaAnioAnterior, @feFechaMesAnterior, @feFechaActual)
-
-select clIdCanal,clCodigoCanal,clIdCliente,clIdAgencia,
-case when cl.clCodigoCanal='COR' and ao.asCodigoCanal!='COR' then 1125 else cl.clIdAsesorPrincipal end as clIdAsesorPrincipal
-,clIdSegmentacionCliente,clIdVinculacionCliente
-into #dwdcliente3
-from dwdcliente cl 
-inner join DWDAsesorOperacion ao on ao.asIdAsesor=cl.clIdAsesorPrincipal
-
-
-SELECT 
- ravIdFecha = poIdFecha
-,ravIdCuentaContable = poIdCuentaContable
-,ravIdCanal= cl.clIdCanal
-,ravIdAsesor = cl.clIdAsesorPrincipal
-,ravIdAgencia = cl.clIdAgencia
-,ravIdSegmentacion = cl.clIdSegmentacionCliente          
-,ravIdVinculacion= cl.clIdVinculacionCliente                                      
-,ravSaldoOperacionUSD = SUM(poSaldoOperacionUSD)
-  from #dwdcliente3 cl
-inner join  DWHPasivoOperacionMes on poIdCliente=cl.clIdCliente
-inner join #dwdfecha3 on feidfecha = poIdFecha
-where abs(poSaldoOperacionUSD) &gt; 0
-group by 
-poIdFecha
-,poIdCuentaContable
-,cl.clIdCanal
-,cl.clIdAsesorPrincipal
-,cl.clIdAgencia
-,cl.clIdSegmentacionCliente          
-,cl.clIdVinculacionCliente
-
-drop table #dwdcliente3
-drop table #dwdfecha3&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -47215,24 +47161,21 @@ into #dwdfecha3
 from dwdfecha 
 where feidfecha in (@feFechaAnioAnterior, @feFechaMesAnterior, @feFechaActual)
 
-select clIdCanal,clCodigoCanal,clIdCliente,clIdAgencia,
-case when cl.clCodigoCanal='COR' and ao.asCodigoCanal!='COR' then 1125 else cl.clIdAsesorPrincipal end as clIdAsesorPrincipal
-,clIdSegmentacionCliente,clIdVinculacionCliente
-into #dwdcliente3
-from dwdcliente cl 
-inner join DWDAsesorOperacion ao on ao.asIdAsesor=cl.clIdAsesorPrincipal
 
+select clIdCanal,clIdCliente,clIdAgencia,clIdAsesorPrincipal,clIdSegmentacionCliente,clIdVinculacionCliente
+into #dwdcliente3
+from dwdcliente 
 
 SELECT 
  ravIdFecha = poIdFecha
 ,ravIdCuentaContable = poIdCuentaContable
 ,ravIdCanal= cl.clIdCanal
-,ravIdAsesor = cl.clIdAsesorPrincipal
+,ravIdAsesor = cl.clIdAsesorPrincipal 
 ,ravIdAgencia = cl.clIdAgencia
 ,ravIdSegmentacion = cl.clIdSegmentacionCliente          
 ,ravIdVinculacion= cl.clIdVinculacionCliente                                      
 ,ravSaldoOperacionUSD = SUM(poSaldoOperacionUSD)
-  from #dwdcliente3 cl
+from #dwdcliente3 cl
 inner join  DWHPasivoOperacionMes on poIdCliente=cl.clIdCliente
 inner join #dwdfecha3 on feidfecha = poIdFecha
 where abs(poSaldoOperacionUSD) &gt; 0
@@ -47240,7 +47183,7 @@ group by
 poIdFecha
 ,poIdCuentaContable
 ,cl.clIdCanal
-,cl.clIdAsesorPrincipal
+,cl.clIdAsesorPrincipal  
 ,cl.clIdAgencia
 ,cl.clIdSegmentacionCliente          
 ,cl.clIdVinculacionCliente
@@ -57722,7 +57665,7 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealAnioAnt]=CALCULATE([bsfVa
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldo]=(SUM([ravSaldoOperacionUSD])/1000);
+CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldo]=(SUM([ravSaldoOperacionUSD])/1000) ;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -57817,7 +57760,7 @@ CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldoMonetario]=CALCULATE([
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldoMonetarioQGI]=CALCULATE([ravValSaldoMonetario],DWDCuentaContable[ccSubGrupo]&lt;&gt;"Dep. QNGI");
+CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldoMonetarioQGI]=CALCULATE([ravValSaldoMonetario],DWDCuentaContable[ccSubGrupo]="Depositos QGI");
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61764,124 +61707,6 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValSisCarteraAct]=CALCULATE([bsf
                     <Annotation>
                       <Name>Table</Name>
                       <Value>DWHBalanceSistemaFinanciero</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
-CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoPorcSFC]=CALCULATE([poValCaptacionesVarAnualAnioCorridoPorc],ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" || DWDCanal[caCodigoAgrupacionCanal]="TES",DWDFecha[feDiaActual]&lt;&gt;1);
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>poValCaptacionesVarAnualAnioCorridoPorcSFC</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHPasivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
-CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoREDPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="RED") );
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>poValCaptacionesVarAnualAnioCorridoREDPorc</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHPasivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
-CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoCORPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="COR") );
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>poValCaptacionesVarAnualAnioCorridoCORPorc</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHPasivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
-CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoESPPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="ESP") );
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>poValCaptacionesVarAnualAnioCorridoESPPorc</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHPasivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
-CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoTESPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="TES") );
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>poValCaptacionesVarAnualAnioCorridoTESPorc</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHPasivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
-CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF( 
-  CALCULATE(DIVIDE( ([poValPasivoVarAnioCorrido]),  ([poValPasivoHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=2, DWDFecha[feCalBanderaEsHace2Anios]=2, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" || DWDCanal[caCodigoAgrupacionCanal]="TES") = 0
-, BLANK()
-, CALCULATE(DIVIDE( ([poValPasivoVarAnioCorrido]),  ([poValPasivoHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=2, DWDFecha[feCalBanderaEsHace2Anios]=2, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" || DWDCanal[caCodigoAgrupacionCanal]="TES") 
-);
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>poValCaptacionesVarAnualMesFiscPorcSFC</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHPasivoOperacion</Value>
                     </Annotation>
                   </Annotations>
                 </Command>
@@ -71622,7 +71447,6 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF(
                   </Annotations>
                   <CalculationReference>[poValPasivoVarAnioCorrido]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Monto de la variación del saldo de la fecha en curso menos el valor de hace un año</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -71644,7 +71468,6 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF(
                   </Annotations>
                   <CalculationReference>[poValCaptacionesVarAnualAnioCorridoPorc]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Cálculo de variación consolidado de los productos de captaciones para 13 fechas de cierres de mes desde el mes actual.</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -72244,138 +72067,6 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF(
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoPorcSFC]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13 fechas de cierres de mes desde el mes actual (Sin FiltroCanal)</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoREDPorc]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal comercial</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoCORPorc]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal corporativo.</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoESPPorc]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal especializada</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoTESPorc]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal tesoreria</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[poValCaptacionesVarAnualMesFiscPorcSFC]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones solo para las fechas del mes en curso o fiscal (Sin FiltroCanal)</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
                   <CalculationReference>Measures.[__No measures defined]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Visible>false</Visible>
@@ -72403,10 +72094,10 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF(
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.76.4;User ID=sa;Initial Catalog=DWHCORPORATIVO</ConnectionString>
+          <ConnectionString>Provider=SQLNCLI11.1;Integrated Security=SSPI;Persist Security Info=False;User ID=;Initial Catalog=DWHCORPORATIVO;Data Source=172.16.76.4;Initial File Name=;Server SPN=</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\bingod34</Account>
+            <Account>banintern\binxaste</Account>
           </ImpersonationInfo>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>80</MaxActiveConnections>
