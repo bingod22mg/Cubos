@@ -57,7 +57,6 @@ declare
 ,@feIdFecha3MesesFuturo int
 ,@fechaHaceUnMes1AnioAtras int
 ,@fechaHaceUnMes2AnioAtras int
-,@fechaCierreMesActual int
 ,@fecha2MesAnterior int --RF2: Total Sistema Fiananciero
 ,@fechaPptoMesActual int --RF6.2 Variacion Vs Presupuesto
 ,@setmes int
@@ -72,6 +71,7 @@ declare
 ,@DiciembreAnioAnt int
 ,@Diciembre2AnioAnt int
 ,@Diciembre3AnioAnt int
+,@UltimoCierreAnio int
 
 if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end
 
@@ -102,12 +102,20 @@ select @fecha15diasDate = feFecha
 from dwdfecha
 where feidfecha = @fecha15dias
 
-select @fechaCierreMesActual=max(feIdFecha)from DWDFecha
-Where fediaactual = 1 --feCalMes = @feCalMesActual and feCalAnio = @feCalAnioActual and feFinSemana = 0 and feFeriado=0
+-- Identificación del último cierre mes real --
+select @setmes = @fechaHaceUnMes
+if( @fechaHoy = (select max(feIdFecha) from DWDFecha where left(feIdFecha,6)=left(@fechaHoy,6) and feFeriado=0 and feFinSemana=0 )) -- se valida si la fecha de corte es un cierre de mes real
+begin
+ select @setmes=@fechaHoy
+end
 
-select @setmes = @fechaHoy 
-if right(left(@fechaHoy,6),2) = month(getdate()) begin set @setmes  =   @fechaHaceUnMes end
- 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@feCalAnioActual-1
+if( @fechaHoy = (select max(feIdFecha) from DWDFecha where feCalAnio=@feCalAnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@feCalAnioActual
+end
+
 select @fechaHaceUnMes1AnioAtras =feidFecha 
 from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 1)
 and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 
@@ -167,7 +175,7 @@ select @feCierreAnioActual=feIdFecha from DWDFecha where feCalMes=12 and feCalAn
 
 
 --Fechas SFIN 2MesAnt 
-select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @fechaHaceUnMes
+select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @setmes -- Cambie el filtro @fechaHaceUnMes del mes para identificar el cierre de mes real EA
 
 select @fechaPptoMesActual =feIdFecha
 from DWDFecha
@@ -268,9 +276,9 @@ SELECT f.feIdFecha
 ,feCalBanderaEsMesActual = case when convert(int,left(f.feIdFecha,4)) = @feCalAnioActual and convert(int,SUBSTRING(convert(varchar(8),f.feIdFecha),5,2))= @feCalMesActual then 1 else 0 end --rr Fechas de los días para el mes actual 
 ,feCalBanderaEs2AnioContinuo = case when f.feIdFecha = fr2ac.feIdFecha then fr2ac.marcas else 0 end --rr; fechas continuas hace 2 años
 ,feCalBanderaEs3MesesAdelante = case when f.feIdFecha = fr3ma.fecha then 1 else 0 end --rr; fechas 3 meses adelante
-,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde la fecha actual
-,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde la fecha actual
-,feCalBanderaCierreMesActual = case when f.feIdFecha = @fechaCierreMesActual then 1 else 0 end --Identifica la posible fecha del cierre del mes actual
+,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde el ultimo cierre de mes real
+,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde el ultimo cierre de mes real
+,feCalBanderaCierreMesActual = case when f.feIdFecha = @setmes then 1 else 0 end --Identifica la posible fecha del cierre del mes actual (Modifique EA  para identificar el ultimo cierre de mes real)
 ,feCalBanderaEsFechaConcentracion = case when f.feIdFecha = fr4cs.fecha then 1 else 0 end --rr; fechas para RF8
 ,feCalBanderaEsFechaVolumen = isnull(marca,0)
 ,feOrdenVolumen = isnull(orden,0)
@@ -278,15 +286,14 @@ SELECT f.feIdFecha
 ,feCalBanderaBarraVolumen = case when f.feidfecha in (@fechaHoy,@feCierreAnioActual,@fecha15dias, @fechaHaceUnMes ,@fechaFinSemestre ,@feFechaCierreAnioAnt) then 1 else 0 end
 ,feCalBanderaMesAnioAnt =  case when left(f.feidfecha,6) = left(@fechaMesAnioAnt,6) then 1 else 0 end
 ,feHaceUnAnio=case when f.feidfecha = @DiaAAnterior then 1 else 0 end 
-,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0)
+,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0) -- Se identifica los ultimos 5 cierres de anio
+,feCalFechaHaceDosAnios=case when f.feFeriado=0 and f.feFinSemana=0 then dosAnios.feIdFechaAnioAnt end -- Se identifica la fecha de hace dos anios
 
 from DWDFecha f
 left join DWDFecha f2 on f.feIdFechaCierreAnioAnt = f2.feIdFecha and f2.feCierreMes=1
 left join DWDFecha f3 on f2.feIdFechaCierreAnioAnt = f3.feIdFecha and f3.feCierreMes=1
-left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 --rr; fechas del año anterior
-and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior
-left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 --rr; fechas de 2 año anterior
-and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior
+left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior
+left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior
 left join 
 (
   select feidfecha    ,1 marcas
@@ -325,19 +332,19 @@ left join
   select feidfecha,min(marca) marca ,min(orden) orden
   from 
   (
-    select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from 
- (
-     select 
-     feidfecha,
-     case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,
-     convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden
-     from dwdfecha
-     where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')
-     and fecierremestodosanios = 1
-     and fediaactual &lt;&gt; 1 
- ) b
-    left join 
- (
+   select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from 
+   (
+       select 
+       feidfecha,
+       case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,
+       convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden
+       from dwdfecha
+       where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')
+       and fecierremestodosanios = 1
+       and fediaactual &lt;&gt; 1 
+   ) b
+   left join 
+   (
       select 
       feidfecha  , 
       fecierremestodosanios, 
@@ -393,13 +400,14 @@ left join
 ) fecdiaAniAnt on f.feIdFecha = feidfechaAct
 left join 
 (
-  select feIdFecha,feNumeroAnioAnt = Convert(int,left(@fechaHoy,4)) - Convert(int,left(feIdFecha,4))  
+  select feIdFecha,feNumeroAnioAnt = ( @UltimoCierreAnio - feCalAnio ) + 1  -- Se identifica 5 cierres de año
   from DWDFecha
-  where feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and feCierreMes = 1 and feCalMes = 12 
+  where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 
 ) aniosAnt on aniosAnt.feIdFecha = f.feidFecha
+left join DWDFecha dosAnios on f.feIdFechaAnioAnt=dosAnios.feIdFecha -- Se identifica la fecha de hace dos anios
 
 where (f.feIdFecha between @fecha3AñosUnMesAtras and concat(@feCalAnioActual,'1231'))
-  or  (f.feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and f.feCierreMes = 1 and f.feCalMes = 12  ) 
+  or  (f.feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and f.feCierreMes = 1 and f.feCalMes = 12  ) 
 
 order by 1&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
             </Annotation>
@@ -746,6 +754,16 @@ order by 1&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryC
                   <AttributeID>feCalAnioMes</AttributeID>
                   <OverrideBehavior>None</OverrideBehavior>
                   <Name>feCalDescAnioMesActVsAnt</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>feCalFechaHaceDosAnios</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>feCalDescAnioMesActVsDosAniosAnt</Name>
                 </AttributeRelationship>
               </AttributeRelationships>
               <OrderBy>Key</OrderBy>
@@ -2288,6 +2306,7 @@ Bandera 2 : Identifica todas las fechas de los dias del mes en curso de la fecha
             <Attribute>
               <ID>feCalBanderaCierreMesActual</ID>
               <Name>feCalBanderaCierreMesActual</Name>
+              <Description>Bandera para identificar el último cierre de mes real </Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -2628,10 +2647,10 @@ Bandera 2 : Identifica todas las fechas de los dias del mes en curso de la fecha
                 <KeyColumn>
                   <DataType>Empty</DataType>
                   <Source xsi:type="ddl200_200:ExpressionBinding">
-                    <Expression>SWITCH( DWDFecha[feCalMes], 1,"Ene", 2,"Feb", 3,"Mar", 4,"Abr", 5,"May", 6,"Jun",7,"Jul", 8,"Ago", 9,"Sep", 10,"Oct", 11,"Nov", 12,"Dic") &amp; " " 
+                    <Expression>SWITCH( DWDFecha[feCalMes], 1,"ENE", 2,"FEB", 3,"MAR", 4,"ABR", 5,"MAY", 6,"JUN",7,"JUL", 8,"AGO", 9,"SEP", 10,"OCT", 11,"NOV", 12,"DIC") &amp; " " 
 &amp; DWDFecha[feCalAnio] 
 &amp; " vs. " 
-&amp; SWITCH( RIGHT(LEFT(DWDFecha[feIdFechaAnioAnt],6),2) , "01","Ene", "02","Feb", "03","Mar", "04","Abr", "05","May", "06","Jun","07","Jul", "08","Ago", "09","Sep", "10","Oct", "11","Nov", "12","Dic")
+&amp; SWITCH( RIGHT(LEFT(DWDFecha[feIdFechaAnioAnt],6),2) , "01","ENE", "02","FEB", "03","MAR", "04","ABR", "05","MAY", "06","JUN","07","JUL", "08","AGO", "09","SEP", "10","OCT", "11","NOV", "12","DIC")
 &amp; " " &amp;LEFT(DWDFecha[feIdFechaAnioAnt],4)</Expression>
                   </Source>
                 </KeyColumn>
@@ -2639,11 +2658,74 @@ Bandera 2 : Identifica todas las fechas de los dias del mes en curso de la fecha
               <NameColumn>
                 <DataType>WChar</DataType>
                 <Source xsi:type="ddl200_200:ExpressionBinding">
-                  <Expression>SWITCH( DWDFecha[feCalMes], 1,"Ene", 2,"Feb", 3,"Mar", 4,"Abr", 5,"May", 6,"Jun",7,"Jul", 8,"Ago", 9,"Sep", 10,"Oct", 11,"Nov", 12,"Dic") &amp; " " 
+                  <Expression>SWITCH( DWDFecha[feCalMes], 1,"ENE", 2,"FEB", 3,"MAR", 4,"ABR", 5,"MAY", 6,"JUN",7,"JUL", 8,"AGO", 9,"SEP", 10,"OCT", 11,"NOV", 12,"DIC") &amp; " " 
 &amp; DWDFecha[feCalAnio] 
 &amp; " vs. " 
-&amp; SWITCH( RIGHT(LEFT(DWDFecha[feIdFechaAnioAnt],6),2) , "01","Ene", "02","Feb", "03","Mar", "04","Abr", "05","May", "06","Jun","07","Jul", "08","Ago", "09","Sep", "10","Oct", "11","Nov", "12","Dic")
+&amp; SWITCH( RIGHT(LEFT(DWDFecha[feIdFechaAnioAnt],6),2) , "01","ENE", "02","FEB", "03","MAR", "04","ABR", "05","MAY", "06","JUN","07","JUL", "08","AGO", "09","SEP", "10","OCT", "11","NOV", "12","DIC")
 &amp; " " &amp;LEFT(DWDFecha[feIdFechaAnioAnt],4)</Expression>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <ID>feCalFechaHaceDosAnios</ID>
+              <Name>feCalFechaHaceDosAnios</Name>
+              <Description>Campo que identifica la fecha laborable de hace dos años dentro del mismo mes</Description>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                    <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                  <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>feCalDescAnioMesActVsAnt2</ID>
+              <Name>feCalDescAnioMesActVsDosAniosAnt</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Empty</DataType>
+                  <Source xsi:type="ddl200_200:ExpressionBinding">
+                    <Expression>SWITCH( DWDFecha[feCalMes], 1,"ENE", 2,"FEB", 3,"MAR", 4,"ABR", 5,"MAY", 6,"JUN",7,"JUL", 8,"AGO", 9,"SEP", 10,"OCT", 11,"NOV", 12,"DIC") &amp; " " 
+&amp; DWDFecha[feCalAnio] 
+&amp; " VS. " 
+&amp; SWITCH( RIGHT(LEFT(DWDFecha[feCalFechaHaceDosAnios],6),2) , "01","ENE", "02","FEB", "03","MAR", "04","ABR", "05","MAY", "06","JUN","07","JUL", "08","AGO", "09","SEP", "10","OCT", "11","NOV", "12","DIC")
+&amp; " " &amp;LEFT(DWDFecha[feCalFechaHaceDosAnios],4)</Expression>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <Source xsi:type="ddl200_200:ExpressionBinding">
+                  <Expression>SWITCH( DWDFecha[feCalMes], 1,"ENE", 2,"FEB", 3,"MAR", 4,"ABR", 5,"MAY", 6,"JUN",7,"JUL", 8,"AGO", 9,"SEP", 10,"OCT", 11,"NOV", 12,"DIC") &amp; " " 
+&amp; DWDFecha[feCalAnio] 
+&amp; " VS. " 
+&amp; SWITCH( RIGHT(LEFT(DWDFecha[feCalFechaHaceDosAnios],6),2) , "01","ENE", "02","FEB", "03","MAR", "04","ABR", "05","MAY", "06","JUN","07","JUL", "08","AGO", "09","SEP", "10","OCT", "11","NOV", "12","DIC")
+&amp; " " &amp;LEFT(DWDFecha[feCalFechaHaceDosAnios],4)</Expression>
                 </Source>
               </NameColumn>
               <OrderBy>Key</OrderBy>
@@ -17475,6 +17557,12 @@ group by ffrCodigoMedidaFinanciera&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandT
                 <Attribute>
                   <AttributeID>feCalAnioMes</AttributeID>
                 </Attribute>
+                <Attribute>
+                  <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
+                </Attribute>
               </Attributes>
             </Dimension>
             <Dimension>
@@ -19336,6 +19424,32 @@ group by ffrCodigoMedidaFinanciera&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandT
                         </KeyColumn>
                       </KeyColumns>
                     </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
                   </Attributes>
                   <ddl200_200:ShareDimensionStorage>Shared</ddl200_200:ShareDimensionStorage>
                 </Dimension>
@@ -19374,7 +19488,6 @@ declare
 ,@feIdFecha3MesesFuturo int
 ,@fechaHaceUnMes1AnioAtras int
 ,@fechaHaceUnMes2AnioAtras int
-,@fechaCierreMesActual int
 ,@fecha2MesAnterior int --RF2: Total Sistema Fiananciero
 ,@fechaPptoMesActual int --RF6.2 Variacion Vs Presupuesto
 ,@setmes int
@@ -19389,6 +19502,7 @@ declare
 ,@DiciembreAnioAnt int
 ,@Diciembre2AnioAnt int
 ,@Diciembre3AnioAnt int
+,@UltimoCierreAnio int
 
 if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end
 
@@ -19419,12 +19533,20 @@ select @fecha15diasDate = feFecha
 from dwdfecha
 where feidfecha = @fecha15dias
 
-select @fechaCierreMesActual=max(feIdFecha)from DWDFecha
-Where fediaactual = 1 --feCalMes = @feCalMesActual and feCalAnio = @feCalAnioActual and feFinSemana = 0 and feFeriado=0
+-- Identificación del último cierre mes real --
+select @setmes = @fechaHaceUnMes
+if( @fechaHoy = (select max(feIdFecha) from DWDFecha where left(feIdFecha,6)=left(@fechaHoy,6) and feFeriado=0 and feFinSemana=0 )) -- se valida si la fecha de corte es un cierre de mes real
+begin
+ select @setmes=@fechaHoy
+end
 
-select @setmes = @fechaHoy 
-if right(left(@fechaHoy,6),2) = month(getdate()) begin set @setmes  =   @fechaHaceUnMes end
- 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@feCalAnioActual-1
+if( @fechaHoy = (select max(feIdFecha) from DWDFecha where feCalAnio=@feCalAnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@feCalAnioActual
+end
+
 select @fechaHaceUnMes1AnioAtras =feidFecha 
 from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 1)
 and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 
@@ -19484,7 +19606,7 @@ select @feCierreAnioActual=feIdFecha from DWDFecha where feCalMes=12 and feCalAn
 
 
 --Fechas SFIN 2MesAnt 
-select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @fechaHaceUnMes
+select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @setmes -- Cambie el filtro @fechaHaceUnMes del mes para identificar el cierre de mes real EA
 
 select @fechaPptoMesActual =feIdFecha
 from DWDFecha
@@ -19585,9 +19707,9 @@ SELECT f.feIdFecha
 ,feCalBanderaEsMesActual = case when convert(int,left(f.feIdFecha,4)) = @feCalAnioActual and convert(int,SUBSTRING(convert(varchar(8),f.feIdFecha),5,2))= @feCalMesActual then 1 else 0 end --rr Fechas de los días para el mes actual 
 ,feCalBanderaEs2AnioContinuo = case when f.feIdFecha = fr2ac.feIdFecha then fr2ac.marcas else 0 end --rr; fechas continuas hace 2 años
 ,feCalBanderaEs3MesesAdelante = case when f.feIdFecha = fr3ma.fecha then 1 else 0 end --rr; fechas 3 meses adelante
-,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde la fecha actual
-,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde la fecha actual
-,feCalBanderaCierreMesActual = case when f.feIdFecha = @fechaCierreMesActual then 1 else 0 end --Identifica la posible fecha del cierre del mes actual
+,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde el ultimo cierre de mes real
+,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde el ultimo cierre de mes real
+,feCalBanderaCierreMesActual = case when f.feIdFecha = @setmes then 1 else 0 end --Identifica la posible fecha del cierre del mes actual (Modifique EA  para identificar el ultimo cierre de mes real)
 ,feCalBanderaEsFechaConcentracion = case when f.feIdFecha = fr4cs.fecha then 1 else 0 end --rr; fechas para RF8
 ,feCalBanderaEsFechaVolumen = isnull(marca,0)
 ,feOrdenVolumen = isnull(orden,0)
@@ -19595,15 +19717,14 @@ SELECT f.feIdFecha
 ,feCalBanderaBarraVolumen = case when f.feidfecha in (@fechaHoy,@feCierreAnioActual,@fecha15dias, @fechaHaceUnMes ,@fechaFinSemestre ,@feFechaCierreAnioAnt) then 1 else 0 end
 ,feCalBanderaMesAnioAnt =  case when left(f.feidfecha,6) = left(@fechaMesAnioAnt,6) then 1 else 0 end
 ,feHaceUnAnio=case when f.feidfecha = @DiaAAnterior then 1 else 0 end 
-,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0)
+,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0) -- Se identifica los ultimos 5 cierres de anio
+,feCalFechaHaceDosAnios=case when f.feFeriado=0 and f.feFinSemana=0 then dosAnios.feIdFechaAnioAnt end -- Se identifica la fecha de hace dos anios
 
 from DWDFecha f
 left join DWDFecha f2 on f.feIdFechaCierreAnioAnt = f2.feIdFecha and f2.feCierreMes=1
 left join DWDFecha f3 on f2.feIdFechaCierreAnioAnt = f3.feIdFecha and f3.feCierreMes=1
-left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 --rr; fechas del año anterior
-and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior
-left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 --rr; fechas de 2 año anterior
-and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior
+left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior
+left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior
 left join 
 (
   select feidfecha    ,1 marcas
@@ -19642,19 +19763,19 @@ left join
   select feidfecha,min(marca) marca ,min(orden) orden
   from 
   (
-    select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from 
- (
-     select 
-     feidfecha,
-     case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,
-     convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden
-     from dwdfecha
-     where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')
-     and fecierremestodosanios = 1
-     and fediaactual &lt;&gt; 1 
- ) b
-    left join 
- (
+   select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from 
+   (
+       select 
+       feidfecha,
+       case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,
+       convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden
+       from dwdfecha
+       where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')
+       and fecierremestodosanios = 1
+       and fediaactual &lt;&gt; 1 
+   ) b
+   left join 
+   (
       select 
       feidfecha  , 
       fecierremestodosanios, 
@@ -19710,13 +19831,14 @@ left join
 ) fecdiaAniAnt on f.feIdFecha = feidfechaAct
 left join 
 (
-  select feIdFecha,feNumeroAnioAnt = Convert(int,left(@fechaHoy,4)) - Convert(int,left(feIdFecha,4))  
+  select feIdFecha,feNumeroAnioAnt = ( @UltimoCierreAnio - feCalAnio ) + 1  -- Se identifica 5 cierres de año
   from DWDFecha
-  where feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and feCierreMes = 1 and feCalMes = 12 
+  where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 
 ) aniosAnt on aniosAnt.feIdFecha = f.feidFecha
+left join DWDFecha dosAnios on f.feIdFechaAnioAnt=dosAnios.feIdFecha -- Se identifica la fecha de hace dos anios
 
 where (f.feIdFecha between @fecha3AñosUnMesAtras and concat(@feCalAnioActual,'1231'))
-  or  (f.feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and f.feCierreMes = 1 and f.feCalMes = 12  ) 
+  or  (f.feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and f.feCierreMes = 1 and f.feCalMes = 12  ) 
 
 order by 1&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
                     </Annotation>
@@ -19750,7 +19872,6 @@ declare
 ,@feIdFecha3MesesFuturo int
 ,@fechaHaceUnMes1AnioAtras int
 ,@fechaHaceUnMes2AnioAtras int
-,@fechaCierreMesActual int
 ,@fecha2MesAnterior int --RF2: Total Sistema Fiananciero
 ,@fechaPptoMesActual int --RF6.2 Variacion Vs Presupuesto
 ,@setmes int
@@ -19765,6 +19886,7 @@ declare
 ,@DiciembreAnioAnt int
 ,@Diciembre2AnioAnt int
 ,@Diciembre3AnioAnt int
+,@UltimoCierreAnio int
 
 if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end
 
@@ -19795,12 +19917,20 @@ select @fecha15diasDate = feFecha
 from dwdfecha
 where feidfecha = @fecha15dias
 
-select @fechaCierreMesActual=max(feIdFecha)from DWDFecha
-Where fediaactual = 1 --feCalMes = @feCalMesActual and feCalAnio = @feCalAnioActual and feFinSemana = 0 and feFeriado=0
+-- Identificación del último cierre mes real --
+select @setmes = @fechaHaceUnMes
+if( @fechaHoy = (select max(feIdFecha) from DWDFecha where left(feIdFecha,6)=left(@fechaHoy,6) and feFeriado=0 and feFinSemana=0 )) -- se valida si la fecha de corte es un cierre de mes real
+begin
+ select @setmes=@fechaHoy
+end
 
-select @setmes = @fechaHoy 
-if right(left(@fechaHoy,6),2) = month(getdate()) begin set @setmes  =   @fechaHaceUnMes end
- 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@feCalAnioActual-1
+if( @fechaHoy = (select max(feIdFecha) from DWDFecha where feCalAnio=@feCalAnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@feCalAnioActual
+end
+
 select @fechaHaceUnMes1AnioAtras =feidFecha 
 from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 1)
 and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 
@@ -19860,7 +19990,7 @@ select @feCierreAnioActual=feIdFecha from DWDFecha where feCalMes=12 and feCalAn
 
 
 --Fechas SFIN 2MesAnt 
-select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @fechaHaceUnMes
+select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @setmes -- Cambie el filtro @fechaHaceUnMes del mes para identificar el cierre de mes real EA
 
 select @fechaPptoMesActual =feIdFecha
 from DWDFecha
@@ -19961,9 +20091,9 @@ SELECT f.feIdFecha
 ,feCalBanderaEsMesActual = case when convert(int,left(f.feIdFecha,4)) = @feCalAnioActual and convert(int,SUBSTRING(convert(varchar(8),f.feIdFecha),5,2))= @feCalMesActual then 1 else 0 end --rr Fechas de los días para el mes actual 
 ,feCalBanderaEs2AnioContinuo = case when f.feIdFecha = fr2ac.feIdFecha then fr2ac.marcas else 0 end --rr; fechas continuas hace 2 años
 ,feCalBanderaEs3MesesAdelante = case when f.feIdFecha = fr3ma.fecha then 1 else 0 end --rr; fechas 3 meses adelante
-,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde la fecha actual
-,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde la fecha actual
-,feCalBanderaCierreMesActual = case when f.feIdFecha = @fechaCierreMesActual then 1 else 0 end --Identifica la posible fecha del cierre del mes actual
+,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde el ultimo cierre de mes real
+,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde el ultimo cierre de mes real
+,feCalBanderaCierreMesActual = case when f.feIdFecha = @setmes then 1 else 0 end --Identifica la posible fecha del cierre del mes actual (Modifique EA  para identificar el ultimo cierre de mes real)
 ,feCalBanderaEsFechaConcentracion = case when f.feIdFecha = fr4cs.fecha then 1 else 0 end --rr; fechas para RF8
 ,feCalBanderaEsFechaVolumen = isnull(marca,0)
 ,feOrdenVolumen = isnull(orden,0)
@@ -19971,15 +20101,14 @@ SELECT f.feIdFecha
 ,feCalBanderaBarraVolumen = case when f.feidfecha in (@fechaHoy,@feCierreAnioActual,@fecha15dias, @fechaHaceUnMes ,@fechaFinSemestre ,@feFechaCierreAnioAnt) then 1 else 0 end
 ,feCalBanderaMesAnioAnt =  case when left(f.feidfecha,6) = left(@fechaMesAnioAnt,6) then 1 else 0 end
 ,feHaceUnAnio=case when f.feidfecha = @DiaAAnterior then 1 else 0 end 
-,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0)
+,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0) -- Se identifica los ultimos 5 cierres de anio
+,feCalFechaHaceDosAnios=case when f.feFeriado=0 and f.feFinSemana=0 then dosAnios.feIdFechaAnioAnt end -- Se identifica la fecha de hace dos anios
 
 from DWDFecha f
 left join DWDFecha f2 on f.feIdFechaCierreAnioAnt = f2.feIdFecha and f2.feCierreMes=1
 left join DWDFecha f3 on f2.feIdFechaCierreAnioAnt = f3.feIdFecha and f3.feCierreMes=1
-left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 --rr; fechas del año anterior
-and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior
-left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 --rr; fechas de 2 año anterior
-and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior
+left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior
+left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior
 left join 
 (
   select feidfecha    ,1 marcas
@@ -20018,19 +20147,19 @@ left join
   select feidfecha,min(marca) marca ,min(orden) orden
   from 
   (
-    select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from 
- (
-     select 
-     feidfecha,
-     case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,
-     convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden
-     from dwdfecha
-     where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')
-     and fecierremestodosanios = 1
-     and fediaactual &lt;&gt; 1 
- ) b
-    left join 
- (
+   select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from 
+   (
+       select 
+       feidfecha,
+       case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,
+       convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden
+       from dwdfecha
+       where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')
+       and fecierremestodosanios = 1
+       and fediaactual &lt;&gt; 1 
+   ) b
+   left join 
+   (
       select 
       feidfecha  , 
       fecierremestodosanios, 
@@ -20086,13 +20215,14 @@ left join
 ) fecdiaAniAnt on f.feIdFecha = feidfechaAct
 left join 
 (
-  select feIdFecha,feNumeroAnioAnt = Convert(int,left(@fechaHoy,4)) - Convert(int,left(feIdFecha,4))  
+  select feIdFecha,feNumeroAnioAnt = ( @UltimoCierreAnio - feCalAnio ) + 1  -- Se identifica 5 cierres de año
   from DWDFecha
-  where feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and feCierreMes = 1 and feCalMes = 12 
+  where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 
 ) aniosAnt on aniosAnt.feIdFecha = f.feidFecha
+left join DWDFecha dosAnios on f.feIdFechaAnioAnt=dosAnios.feIdFecha -- Se identifica la fecha de hace dos anios
 
 where (f.feIdFecha between @fecha3AñosUnMesAtras and concat(@feCalAnioActual,'1231'))
-  or  (f.feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and f.feCierreMes = 1 and f.feCalMes = 12  ) 
+  or  (f.feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and f.feCierreMes = 1 and f.feCalMes = 12  ) 
 
 order by 1</QueryDefinition>
                   </Source>
@@ -22789,6 +22919,32 @@ from DWDVinculacionCliente vc</QueryDefinition>
                     </Attribute>
                     <Attribute>
                       <AttributeID>feCalAnioMes</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
                       <KeyColumns>
                         <KeyColumn>
                           <DataType>Empty</DataType>
@@ -26891,13 +27047,13 @@ if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuen
                       <Name>QueryEditorSerialization</Name>
                       <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
 
-declare @anio int, @mes int, @FechaActual int , @AnioActual int
+declare @anio int, @mes int, @FechaActual int, @UltimoCierreAnio int, @feCalAnioActual int
 
 set @mes = 12
 
 select 
  @anio = feCalAnio-1
-,@AnioActual=feCalAnio
+,@feCalAnioActual=feCalAnio
 ,@FechaActual = feIdFecha
 from DWDFecha 
 where  feDiaActual=1
@@ -26907,21 +27063,29 @@ if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 /* --  Fecha --- */ 
 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@feCalAnioActual-1
+if( @FechaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@feCalAnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@feCalAnioActual
+end
+
 create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int, feNumeroAnioAnt int)
 
 insert into #DWDFecha
-select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 from DWDFecha
 where feCalAnio = @anio
 and feCalMes = @mes
 and feFeriado &lt;&gt; 1
 and feFinSemana &lt;&gt; 1
 and feCierreMesTodosAnios = 1
+and feIdFecha&lt;@FechaActual
 Union
-select feIdFecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feIdFecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1 --- Se obtiene los cierres de  año
 from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
+where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 
+and feIdFecha&lt;@FechaActual
 
 /* ---- Cuenta Contable  ---- */
 
@@ -26995,13 +27159,13 @@ if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuen
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>set nocount on
 
-declare @anio int, @mes int, @FechaActual int , @AnioActual int
+declare @anio int, @mes int, @FechaActual int, @UltimoCierreAnio int, @feCalAnioActual int
 
 set @mes = 12
 
 select 
  @anio = feCalAnio-1
-,@AnioActual=feCalAnio
+,@feCalAnioActual=feCalAnio
 ,@FechaActual = feIdFecha
 from DWDFecha 
 where  feDiaActual=1
@@ -27011,21 +27175,29 @@ if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 
 /* --  Fecha --- */ 
 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@feCalAnioActual-1
+if( @FechaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@feCalAnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@feCalAnioActual
+end
+
 create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int, feNumeroAnioAnt int)
 
 insert into #DWDFecha
-select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 from DWDFecha
 where feCalAnio = @anio
 and feCalMes = @mes
 and feFeriado &lt;&gt; 1
 and feFinSemana &lt;&gt; 1
 and feCierreMesTodosAnios = 1
+and feIdFecha&lt;@FechaActual
 Union
-select feIdFecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feIdFecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1 --- Se obtiene los cierres de  año
 from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
+where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 
+and feIdFecha&lt;@FechaActual
 
 /* ---- Cuenta Contable  ---- */
 
@@ -28989,6 +29161,32 @@ if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end</Qu
                     </Attribute>
                     <Attribute>
                       <AttributeID>feCalAnioMes</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
                       <KeyColumns>
                         <KeyColumn>
                           <DataType>Empty</DataType>
@@ -36244,7 +36442,7 @@ end</QueryDefinition>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
                       <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
-declare @anio int, @mes int,@aniomes char(6), @AnioActual int
+declare @anio int, @mes int,@aniomes char(6), @AnioActual int, @UltimoCierreAnio int
 declare @feIdFechaDiaActual int
 declare @fechaMesAnterior int
 
@@ -36281,12 +36479,19 @@ begin
              drop table #DWDCuentaContable
 end
 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@AnioActual-1
+if( @feIdFechaDiaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@AnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@AnioActual
+end
+
 create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int, feNumeroAnioAnt int)
 
 if (@aniomes = left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36295,16 +36500,16 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and left(feIdFecha,6) &lt;&gt; left(@feIdFechaDiaActual,6)
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha		
-		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
+		where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 
+		and feidfecha &lt; @feIdFechaDiaActual
  end
 
  if (@aniomes &lt;&gt; left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36314,9 +36519,10 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and feCierreMesTodosAnios = 1
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha		
-		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
+		where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12  --- Se obtiene los cierres de  año
+		and feidfecha &lt; @feIdFechaDiaActual
  end
 
 
@@ -36463,7 +36669,7 @@ end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandT
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>set nocount on
-declare @anio int, @mes int,@aniomes char(6), @AnioActual int
+declare @anio int, @mes int,@aniomes char(6), @AnioActual int, @UltimoCierreAnio int
 declare @feIdFechaDiaActual int
 declare @fechaMesAnterior int
 
@@ -36500,12 +36706,19 @@ begin
              drop table #DWDCuentaContable
 end
 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@AnioActual-1
+if( @feIdFechaDiaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@AnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@AnioActual
+end
+
 create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int, feNumeroAnioAnt int)
 
 if (@aniomes = left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes,feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36514,16 +36727,16 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and left(feIdFecha,6) &lt;&gt; left(@feIdFechaDiaActual,6)
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha		
-		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
-
+		where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 
+		and feidfecha &lt; @feIdFechaDiaActual
  end
 
  if (@aniomes &lt;&gt; left(@fechaMesAnterior,6))
  begin
 		insert into #DWDFecha
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha
 		where feCalAnio = @anio
 		and feCalMes = @mes
@@ -36533,9 +36746,10 @@ if (@aniomes = left(@fechaMesAnterior,6))
 		and feCierreMesTodosAnios = 1
 		and feidfecha &lt; @feIdFechaDiaActual
 		Union
-		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=@AnioActual-feCalAnio
+		select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 		from DWDFecha		
-		where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12 
+		where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12  --- Se obtiene los cierres de  año
+		and feidfecha &lt; @feIdFechaDiaActual
  end
 
 
@@ -38568,6 +38782,32 @@ end</QueryDefinition>
                         </KeyColumn>
                       </KeyColumns>
                     </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
                   </Attributes>
                   <IntermediateCubeDimensionID>DWHPresupuestoNegocio_c8cc2431-3847-42b2-ba98-e25ae56e6763</IntermediateCubeDimensionID>
                   <IntermediateGranularityAttributeID>pnIdFecha</IntermediateGranularityAttributeID>
@@ -39808,6 +40048,32 @@ if object_id('tempdb..#CTE_Fecha') is not null begin drop table #CTE_Fecha end</
                     </Attribute>
                     <Attribute>
                       <AttributeID>feCalAnioMes</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
                       <KeyColumns>
                         <KeyColumn>
                           <DataType>Empty</DataType>
@@ -43175,6 +43441,32 @@ where copCodigoConstante = -2</QueryDefinition>
                         </KeyColumn>
                       </KeyColumns>
                     </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
                   </Attributes>
                   <IntermediateCubeDimensionID>DWHReporteGrupoCliente_fa30b243-66c7-4c86-a0c0-9a0ddac28d9c</IntermediateCubeDimensionID>
                   <IntermediateGranularityAttributeID>rgcIdFecha</IntermediateGranularityAttributeID>
@@ -44389,6 +44681,32 @@ group by
                     </Attribute>
                     <Attribute>
                       <AttributeID>feCalAnioMes</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
                       <KeyColumns>
                         <KeyColumn>
                           <DataType>Empty</DataType>
@@ -46550,6 +46868,32 @@ if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop 
                         </KeyColumn>
                       </KeyColumns>
                     </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
                   </Attributes>
                   <IntermediateCubeDimensionID>DWHReporteAnalisisVariaciones_f942d1d2-6f68-4783-a86f-e2d0b32ae16b</IntermediateCubeDimensionID>
                   <IntermediateGranularityAttributeID>ravIdFecha</IntermediateGranularityAttributeID>
@@ -46798,6 +47142,60 @@ if OBJECT_ID('tempdb..#tmpRankingInstitucionFinanciera') is not null begin drop 
                 <Partition>
                   <ID>DWHReporteAnalisisVariaciones_f942d1d2-6f68-4783-a86f-e2d0b32ae16b</ID>
                   <Name>DWHReporteAnalisisVariaciones</Name>
+                  <Annotations>
+                    <Annotation>
+                      <Name>QueryEditorSerialization</Name>
+                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
+
+declare @feFechaActual int
+declare @feFechaMesAnterior int
+declare @feFechaAnioAnterior int
+
+select 
+@feFechaActual=feIdFecha 
+,@feFechaMesAnterior=feAnioAntCierr
+, @feFechaAnioAnterior=feMesAntCierr
+from DWDFecha where feDiaActual=1
+
+select feidfecha
+into #dwdfecha3
+from dwdfecha 
+where feidfecha in (@feFechaAnioAnterior, @feFechaMesAnterior, @feFechaActual)
+
+select clIdCanal,clCodigoCanal,clIdCliente,clIdAgencia,
+case when cl.clCodigoCanal='COR' and ao.asCodigoCanal!='COR' then 1125 else cl.clIdAsesorPrincipal end as clIdAsesorPrincipal
+,clIdSegmentacionCliente,clIdVinculacionCliente
+into #dwdcliente3
+from dwdcliente cl 
+inner join DWDAsesorOperacion ao on ao.asIdAsesor=cl.clIdAsesorPrincipal
+
+
+SELECT 
+ ravIdFecha = poIdFecha
+,ravIdCuentaContable = poIdCuentaContable
+,ravIdCanal= cl.clIdCanal
+,ravIdAsesor = cl.clIdAsesorPrincipal
+,ravIdAgencia = cl.clIdAgencia
+,ravIdSegmentacion = cl.clIdSegmentacionCliente          
+,ravIdVinculacion= cl.clIdVinculacionCliente                                      
+,ravSaldoOperacionUSD = SUM(poSaldoOperacionUSD)
+  from #dwdcliente3 cl
+inner join  DWHPasivoOperacionMes on poIdCliente=cl.clIdCliente
+inner join #dwdfecha3 on feidfecha = poIdFecha
+where abs(poSaldoOperacionUSD) &gt; 0
+group by 
+poIdFecha
+,poIdCuentaContable
+,cl.clIdCanal
+,cl.clIdAsesorPrincipal
+,cl.clIdAgencia
+,cl.clIdSegmentacionCliente          
+,cl.clIdVinculacionCliente
+
+drop table #dwdcliente3
+drop table #dwdfecha3&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
+                    </Annotation>
+                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>set nocount on
@@ -46817,21 +47215,24 @@ into #dwdfecha3
 from dwdfecha 
 where feidfecha in (@feFechaAnioAnterior, @feFechaMesAnterior, @feFechaActual)
 
-
-select clIdCanal,clIdCliente,clIdAgencia,clIdAsesorPrincipal,clIdSegmentacionCliente,clIdVinculacionCliente
+select clIdCanal,clCodigoCanal,clIdCliente,clIdAgencia,
+case when cl.clCodigoCanal='COR' and ao.asCodigoCanal!='COR' then 1125 else cl.clIdAsesorPrincipal end as clIdAsesorPrincipal
+,clIdSegmentacionCliente,clIdVinculacionCliente
 into #dwdcliente3
-from dwdcliente 
+from dwdcliente cl 
+inner join DWDAsesorOperacion ao on ao.asIdAsesor=cl.clIdAsesorPrincipal
+
 
 SELECT 
  ravIdFecha = poIdFecha
 ,ravIdCuentaContable = poIdCuentaContable
 ,ravIdCanal= cl.clIdCanal
-,ravIdAsesor = cl.clIdAsesorPrincipal 
+,ravIdAsesor = cl.clIdAsesorPrincipal
 ,ravIdAgencia = cl.clIdAgencia
 ,ravIdSegmentacion = cl.clIdSegmentacionCliente          
 ,ravIdVinculacion= cl.clIdVinculacionCliente                                      
 ,ravSaldoOperacionUSD = SUM(poSaldoOperacionUSD)
-from #dwdcliente3 cl
+  from #dwdcliente3 cl
 inner join  DWHPasivoOperacionMes on poIdCliente=cl.clIdCliente
 inner join #dwdfecha3 on feidfecha = poIdFecha
 where abs(poSaldoOperacionUSD) &gt; 0
@@ -46839,7 +47240,7 @@ group by
 poIdFecha
 ,poIdCuentaContable
 ,cl.clIdCanal
-,cl.clIdAsesorPrincipal  
+,cl.clIdAsesorPrincipal
 ,cl.clIdAgencia
 ,cl.clIdSegmentacionCliente          
 ,cl.clIdVinculacionCliente
@@ -47894,6 +48295,32 @@ drop table #dwdfecha3</QueryDefinition>
                     </Attribute>
                     <Attribute>
                       <AttributeID>feCalAnioMes</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalFechaHaceDosAnios</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c</TableID>
+                            <ColumnID>feCalFechaHaceDosAnios</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>feCalDescAnioMesActVsAnt2</AttributeID>
                       <KeyColumns>
                         <KeyColumn>
                           <DataType>Empty</DataType>
@@ -50722,7 +51149,7 @@ if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end<
                       <Name>QueryEditorSerialization</Name>
                       <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
 
-declare @FechaActual int, @FechaMesAnt int, @AnioMes int, @Mes int, @AnioActual int
+declare @FechaActual int, @FechaMesAnt int, @AnioMes int, @Mes int, @AnioActual int, @UltimoCierreAnio int
 
 set @Mes=12
 
@@ -50738,19 +51165,29 @@ where feDiaActual=1
 
 if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@AnioActual-1
+if( @FechaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@AnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@AnioActual
+end
+
 create table #DWDFecha (feIdFecha int, feNumeroAnioAnt int)
 
 -- Se obtiene la fecha del cierre de mes --
 
 insert into #DWDFecha
-select feIdFecha, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 from DWDFecha
 where left(feIdFecha,6)=@AnioMes
 and feCierreMesTodosAnios = 1   
+and feIdFecha&lt;@FechaActual
 Union
-select feIdFecha, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12  -- Se obtiene los cierres de año de 5 periodos de fechas
+where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12  -- Se obtiene los cierres de año de 5 periodos de fechas
+and feIdFecha&lt;@FechaActual
+
 
 /* -- Tarjeta Credito -- */
 
@@ -50779,7 +51216,7 @@ if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end&
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>SET NOCOUNT ON
 
-declare @FechaActual int, @FechaMesAnt int, @AnioMes int, @Mes int, @AnioActual int
+declare @FechaActual int, @FechaMesAnt int, @AnioMes int, @Mes int, @AnioActual int, @UltimoCierreAnio int
 
 set @Mes=12
 
@@ -50795,19 +51232,29 @@ where feDiaActual=1
 
 if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
 
+-- Identificacion del año del último cierre anual real --
+select @UltimoCierreAnio=@AnioActual-1
+if( @FechaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@AnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+begin
+ select @UltimoCierreAnio=@AnioActual
+end
+
 create table #DWDFecha (feIdFecha int, feNumeroAnioAnt int)
 
 -- Se obtiene la fecha del cierre de mes --
 
 insert into #DWDFecha
-select feIdFecha, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 from DWDFecha
 where left(feIdFecha,6)=@AnioMes
 and feCierreMesTodosAnios = 1   
+and feIdFecha&lt;@FechaActual
 Union
-select feIdFecha, feNumeroAnioAnt=@AnioActual-feCalAnio
+select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
 from DWDFecha
-where feCalAnio between (@AnioActual-5) and (@AnioActual-2) and feCierreMes = 1 and feCalMes = 12  -- Se obtiene los cierres de año de 5 periodos de fechas
+where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12  -- Se obtiene los cierres de año de 5 periodos de fechas
+and feIdFecha&lt;@FechaActual
+
 
 /* -- Tarjeta Credito -- */
 
@@ -52416,7 +52863,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValVariacionDiaAnteriorRelativo]=IF([poVal
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPasivoOperacion'[poValSaldoMesAnterior]=CALCULATE([poValSaldo],DWDFecha[feMesAnterior]=1);
+CREATE MEASURE 'DWHPasivoOperacion'[poValSaldoMesAnterior]=CALCULATE([poValSaldo],DWDFecha[feCalBanderaCierreMesActual]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -54867,7 +55314,7 @@ CREATE MEASURE 'DWHPronosticoProducto'[ppValMeta]=CALCULATE(MAX(DWHPronosticoPro
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPronosticoProducto'[ppValMetaMesActual]=CALCULATE([ppValMeta],DWDFecha[feCalBanderaCierreMesActual]=1);
+CREATE MEASURE 'DWHPronosticoProducto'[ppValMetaMesActual]=CALCULATE([ppValMeta],DWDFecha[fediaactual]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -54886,7 +55333,7 @@ CREATE MEASURE 'DWHPronosticoProducto'[ppValMetaMesActual]=CALCULATE([ppValMeta]
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPronosticoProducto'[ppValTendenciaMesActual]=CALCULATE([ppValTendencia],DWDFecha[feCalBanderaCierreMesActual]=1);
+CREATE MEASURE 'DWHPronosticoProducto'[ppValTendenciaMesActual]=CALCULATE([ppValTendencia],DWDFecha[fediaactual]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -57104,7 +57551,7 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValReal]=SUM(DWHBalanceSistemaFi
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMesAnterior]=CALCULATE([bsfValReal],DWDFecha[feMesAnterior]=1);
+CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealMesAnterior]=CALCULATE([bsfValReal],DWDFecha[feCalBanderaCierreMesActual]=1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -57275,7 +57722,7 @@ CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValRealAnioAnt]=CALCULATE([bsfVa
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldo]=SUM([ravSaldoOperacionUSD])/1000;
+CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldo]=(SUM([ravSaldoOperacionUSD])/1000);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -57370,7 +57817,7 @@ CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldoMonetario]=CALCULATE([
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldoMonetarioQGI]=CALCULATE([ravValSaldoMonetario],DWDCuentaContable[ccSubGrupo]="Depositos QGI");
+CREATE MEASURE 'DWHReporteAnalisisVariaciones'[ravValSaldoMonetarioQGI]=CALCULATE([ravValSaldoMonetario],DWDCuentaContable[ccSubGrupo]&lt;&gt;"Dep. QNGI");
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60223,16 +60670,16 @@ CREATE MEASURE 'DWHTarjetaCreditoOperacion'[tcoValTarjetaVarAnioCorrido]=[tcoVal
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualMesFiscPorc]=IF( 
-  CALCULATE(DIVIDE( ([aoValActivoVarAnioCorrido]+[tcoValTarjetaVarAnioCorrido]),  ([aoValActivoHaceUnAnio]+[tcoValTarjetaHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=1, DWDFecha[feCalBanderaEsHace2Anios]=2) = 0
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualMesFiscPorcSFC]=IF( 
+  CALCULATE(DIVIDE( ([aoValActivoVarAnioCorrido]+[tcoValTarjetaVarAnioCorrido]),  ([aoValActivoHaceUnAnio]+[tcoValTarjetaHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=1, DWDFecha[feCalBanderaEsHace2Anios]=2, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" ) = 0
 , BLANK()
-, CALCULATE(DIVIDE( ([aoValActivoVarAnioCorrido]+[tcoValTarjetaVarAnioCorrido]),  ([aoValActivoHaceUnAnio]+[tcoValTarjetaHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=1, DWDFecha[feCalBanderaEsHace2Anios]=2) 
+, CALCULATE(DIVIDE( ([aoValActivoVarAnioCorrido]+[tcoValTarjetaVarAnioCorrido]),  ([aoValActivoHaceUnAnio]+[tcoValTarjetaHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=1, DWDFecha[feCalBanderaEsHace2Anios]=2, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" ) 
 );
 </Text>
                   <Annotations>
                     <Annotation>
                       <Name>FullName</Name>
-                      <Value>aoValCarteraVarAnualMesFiscPorc</Value>
+                      <Value>aoValCarteraVarAnualMesFiscPorcSFC</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Table</Name>
@@ -60246,7 +60693,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualMesFiscPorc]=IF(
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualAnioCorridoPorcSFC]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc],ALL(DWDCanal),DWDFecha[feDiaActual]&lt;&gt;1);
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnualAnioCorridoPorcSFC]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc],ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP",DWDFecha[feDiaActual]&lt;&gt;1);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60365,9 +60812,9 @@ CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoVarAnioCorrido]=[pnValorR
 
 
 CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoVarAnualAnioCorridoPorcSFC]=IF( 
- CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, ALL(DWDCanal)) = 0
+ CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP") = 0
 ,BLANK()
-,CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, ALL(DWDCanal)) 
+,CALCULATE( DIVIDE([pnValPresupuestoVarAnioCorrido] , [pnValPresupuestoHaceUnAnio], 0 ) , DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP") 
 );
 </Text>
                   <Annotations>
@@ -60619,7 +61066,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValTotalCartera]=CALCULATE([aoValSaldoDiar
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCrecMensual]=DIVIDE((CALCULATE(([aoValTotalCartera]), DWDFecha[feMesAnterior]=1) - CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1)), CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1), 0 ) + 0;
+CREATE MEASURE 'DWHActivoOperacion'[aoValCrecMensual]=DIVIDE((CALCULATE(([aoValTotalCartera]), DWDFecha[feCalBanderaCierreMesActual]=1) - CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1)), CALCULATE(([aoValTotalCartera]), DWDFecha[fe2MesAnterior]=1), 0 ) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60638,7 +61085,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCrecMensual]=DIVIDE((CALCULATE(([aoValT
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInterAnual]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc] , DWDFecha[feMesAnterior]=1)+0;
+CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInterAnual]=CALCULATE([aoValCarteraVarAnualAnioCorridoPorc] , DWDFecha[feCalBanderaCierreMesActual]=1)+0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60657,10 +61104,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInterAnual]=CALCULATE([aoValCartera
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInter2Anios]=DIVIDE(
-  (CALCULATE(([aoValTotalCartera]), DWDFecha[feMesAnterior]=1) - CALCULATE(([aoValTotalCartera]), DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1))
-, CALCULATE(([aoValTotalCartera]), DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1),0
-)+0;
+CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInter2Anios]=CALCULATE([aoValCarVarDosAniosCorridoPorc] , DWDFecha[feCalBanderaCierreMesActual]=1)+0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60679,12 +61123,12 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValCrecInter2Anios]=DIVIDE(
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCuotaCarteraMesAnterior]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feMesAnterior]=1), CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feMesAnterior]=1), 0 );
+CREATE MEASURE 'DWHActivoOperacion'[aoValCuotaCarteraCierreMesAct]=DIVIDE(CALCULATE([aoValTotalCartera], DWDFecha[feCalBanderaCierreMesActual]=1),[bsfValSisCarteraAct], 0 );
 </Text>
                   <Annotations>
                     <Annotation>
                       <Name>FullName</Name>
-                      <Value>aoValCuotaCarteraMesAnterior</Value>
+                      <Value>aoValCuotaCarteraCierreMesAct</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Table</Name>
@@ -60816,44 +61260,6 @@ CALCULATE( DIVIDE( ([poValPasivoVarAnioCorrido]),  ([poValPasivoHaceUnAnio]),0) 
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarAnual]=CALCULATE( DIVIDE( ([aoValActivoVarAnioCorrido]+[tcoValTarjetaVarAnioCorrido]),  ([aoValActivoHaceUnAnio]+[tcoValTarjetaHaceUnAnio]),0) , DWDCuentaContable[ccCalIndicadorNivel1]=1 , DWDFecha[feNumeroAnioAnt]=1 || DWDFecha[feNumeroAnioAnt]=2 || DWDFecha[feNumeroAnioAnt]= 3 || DWDFecha[feNumeroAnioAnt]=4) + 0;
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>aoValCarteraVarAnual</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHActivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
-CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnual]=CALCULATE( DIVIDE( ([poValPasivoVarAnioCorrido]),  ([poValPasivoHaceUnAnio]),0) , DWDCuentaContable[ccCalIndicadorNivel1]=2 , DWDFecha[feNumeroAnioAnt]=1 || DWDFecha[feNumeroAnioAnt]=2 || DWDFecha[feNumeroAnioAnt]=3 || DWDFecha[feNumeroAnioAnt]=4 );
-</Text>
-                  <Annotations>
-                    <Annotation>
-                      <Name>FullName</Name>
-                      <Value>poValCaptacionesVarAnual</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Table</Name>
-                      <Value>DWHPasivoOperacion</Value>
-                    </Annotation>
-                  </Annotations>
-                </Command>
-                <Command>
-                  <Text>----------------------------------------------------------
--- PowerPivot measures command (do not modify manually) --
-----------------------------------------------------------
-
-
 CREATE MEASURE 'DWDFecha'[feValFormatoFecha]=FORMAT(MAX(DWDFecha[feFecha]),"dd/mm/yyyy");
 </Text>
                   <Annotations>
@@ -60892,7 +61298,7 @@ CREATE MEASURE 'DWDFecha'[feValCabMesAnt]=CALCULATE(IFERROR(VALUES(DWDFecha[feMe
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWDFecha'[feValCabVarMensual]=SUBSTITUTE( CONCATENATE("% Var. Mensual ",CONCATENATE([feValCabMesAnt], CONCATENATE(" VS. ",CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[fe2MesAnterior]=1)))),"-"," ");
+CREATE MEASURE 'DWDFecha'[feValCabVarMensual]=SUBSTITUTE( CONCATENATE("% Var. Mensual ",CONCATENATE([feValCabMesAct], CONCATENATE(" VS. ",CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[fe2MesAnterior]=1)))),"-"," ");
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60911,7 +61317,7 @@ CREATE MEASURE 'DWDFecha'[feValCabVarMensual]=SUBSTITUTE( CONCATENATE("% Var. Me
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWDFecha'[feValCabVarInteranual]=CONCATENATE("% Var. Interanual ",CALCULATE(IFERROR(UPPER(VALUES(DWDFecha[feCalDescAnioMesActVsAnt])),"Mas de un valor"),DWDFecha[feMesAnterior]=1  ));
+CREATE MEASURE 'DWDFecha'[feValCabVarInteranual]=CONCATENATE("% Var. Interanual ",CALCULATE(IFERROR(UPPER(VALUES(DWDFecha[feCalDescAnioMesActVsAnt])),"Mas de un valor"),DWDFecha[feCalBanderaCierreMesActual]=1  ));
 </Text>
                   <Annotations>
                     <Annotation>
@@ -60930,7 +61336,7 @@ CREATE MEASURE 'DWDFecha'[feValCabVarInteranual]=CONCATENATE("% Var. Interanual 
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWDFecha'[feValCabVarInteranual2Anios]=SUBSTITUTE( CONCATENATE("% Var. Interanual ",CONCATENATE([feValCabMesAnt], CONCATENATE(" VS. ",CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feCalBanderaEsHaceUnMes2AnioAtras]=1)))),"-"," ");
+CREATE MEASURE 'DWDFecha'[feValCabVarInteranual2Anios]=CONCATENATE("% Var. Interanual ",CALCULATE(IFERROR(UPPER(VALUES(DWDFecha[feCalDescAnioMesActVsDosAniosAnt])),"Mas de un valor"),DWDFecha[feCalBanderaCierreMesActual]=1  ));
 </Text>
                   <Annotations>
                     <Annotation>
@@ -61012,6 +61418,466 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                     <Annotation>
                       <Name>FullName</Name>
                       <Value>poCalValTasaImplicitaAperturada</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVar1Anio]=DIVIDE( (CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=1) - CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=2)),CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=2),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>aoValCarteraVar1Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHActivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVar2Anio]=DIVIDE( (CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=2) - CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=3)),CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=3),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>aoValCarteraVar2Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHActivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVar3Anio]=DIVIDE( (CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=3) - CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=4)),CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=4),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>aoValCarteraVar3Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHActivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVar4Anio]=DIVIDE( (CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=4) - CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=5)),CALCULATE([aoValTotalCartera],DWDFecha[feNumeroAnioAnt]=5),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>aoValCarteraVar4Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHActivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVar1Anio]=DIVIDE( CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=1)-CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=2),CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=2),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVar1Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVar2Anio]=DIVIDE( CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=2)-CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=3),CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=3),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVar2Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVar3Anio]=DIVIDE( CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=3)-CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=4),CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=4),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVar3Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVar4Anio]=DIVIDE( CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=4)-CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=5),CALCULATE([poValSaldoDiarioMM],DWDFecha[feNumeroAnioAnt]=5),0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVar4Anio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabCierreAnio]=CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feNumeroAnioAnt]=1);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabCierreAnio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabVar1CierreAnio]=SUBSTITUTE( CONCATENATE( [feValCabCierreAnio] , CONCATENATE(" VS. ", CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feNumeroAnioAnt]=2)) ), "-"," ");
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabVar1CierreAnio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabVar2CierreAnio]=SUBSTITUTE( CONCATENATE( [feValCabCierreAnio] , CONCATENATE(" VS. ", CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feNumeroAnioAnt]=3)) ), "-"," ");
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabVar2CierreAnio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabVar3CierreAnio]=SUBSTITUTE( CONCATENATE( [feValCabCierreAnio] , CONCATENATE(" VS. ", CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feNumeroAnioAnt]=4)) ), "-"," ");
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabVar3CierreAnio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabVar4CierreAnio]=SUBSTITUTE( CONCATENATE( [feValCabCierreAnio] , CONCATENATE(" VS. ", CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feNumeroAnioAnt]=5)) ), "-"," ");
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabVar4CierreAnio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWDFecha'[feValCabMesAct]=CALCULATE(IFERROR(VALUES(DWDFecha[feMesAbreviadoAnio]),"Mas de un valor"),DWDFecha[feCalBanderaCierreMesActual]=1);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>feValCabMesAct</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWDFecha</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraHaceDosAnio]=CALCULATE([aoValTotalCartera],FILTER(ALL(DWDFecha),DWDFecha[feIdFecha]=max(DWDFecha[feCalFechaHaceDosAnios])) ) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>aoValCarteraHaceDosAnio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHActivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarteraVarDosAnioCorrido]=[aoValTotalCartera] - [aoValCarteraHaceDosAnio] + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>aoValCarteraVarDosAnioCorrido</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHActivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHActivoOperacion'[aoValCarVarDosAniosCorridoPorc]=DIVIDE( [aoValCarteraVarDosAnioCorrido],  [aoValCarteraHaceDosAnio] ,0) + 0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>aoValCarVarDosAniosCorridoPorc</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHActivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHBalanceSistemaFinanciero'[bsfValSisCarteraAct]=CALCULATE([bsfValRealMM], DWDIndicadorMedidaFinanciera[imfCodigoIndicadorMedidaFinanciera]=361, DWDFecha[feCalBanderaCierreMesActual]=1)+0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>bsfValSisCarteraAct</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHBalanceSistemaFinanciero</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoPorcSFC]=CALCULATE([poValCaptacionesVarAnualAnioCorridoPorc],ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" || DWDCanal[caCodigoAgrupacionCanal]="TES",DWDFecha[feDiaActual]&lt;&gt;1);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVarAnualAnioCorridoPorcSFC</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoREDPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="RED") );
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVarAnualAnioCorridoREDPorc</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoCORPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="COR") );
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVarAnualAnioCorridoCORPorc</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoESPPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="ESP") );
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVarAnualAnioCorridoESPPorc</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualAnioCorridoTESPorc]=CALCULATE( [poValCaptacionesVarAnualAnioCorridoPorc], FILTER(ALL(DWDCanal), DWDCanal[caCodigoAgrupacionCanal]="TES") );
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVarAnualAnioCorridoTESPorc</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF( 
+  CALCULATE(DIVIDE( ([poValPasivoVarAnioCorrido]),  ([poValPasivoHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=2, DWDFecha[feCalBanderaEsHace2Anios]=2, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" || DWDCanal[caCodigoAgrupacionCanal]="TES") = 0
+, BLANK()
+, CALCULATE(DIVIDE( ([poValPasivoVarAnioCorrido]),  ([poValPasivoHaceUnAnio]) , 0 ), DWDCuentaContable[ccCalIndicadorNivel1]=2, DWDFecha[feCalBanderaEsHace2Anios]=2, ALL(DWDCanal),DWDCanal[caEstado]=TRUE(),DWDCanal[caCodigoAgrupacionCanal]="RED" || DWDCanal[caCodigoAgrupacionCanal]="COR" || DWDCanal[caCodigoAgrupacionCanal]="ESP" || DWDCanal[caCodigoAgrupacionCanal]="TES") 
+);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>poValCaptacionesVarAnualMesFiscPorcSFC</Value>
                     </Annotation>
                     <Annotation>
                       <Name>Table</Name>
@@ -70143,9 +71009,9 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                       </Value>
                     </Annotation>
                   </Annotations>
-                  <CalculationReference>[aoValCarteraVarAnualMesFiscPorc]</CalculationReference>
+                  <CalculationReference>[aoValCarteraVarAnualMesFiscPorcSFC]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Cálculo del porcentaje de variación consolidado de los productos de cartera solo para las fechas del mes en curso o fiscal</Description>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de cartera solo para las fechas del mes en curso o fiscal (Sin FiltroCanal)</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70433,6 +71299,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[bsfValRealMM]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>saldo diario de los indicadores de las medidas manejadas en ranking financiero </Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70645,9 +71512,9 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                       </Value>
                     </Annotation>
                   </Annotations>
-                  <CalculationReference>[aoValCuotaCarteraMesAnterior]</CalculationReference>
+                  <CalculationReference>[aoValCuotaCarteraCierreMesAct]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Metrica Cuota cartera del mes anterior</Description>
+                  <Description>Total del producto de cartera para la fecha del último cierre de mes real</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70669,7 +71536,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[aoValCuotaCarteraHaceUnMes1AnioAtras]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Metrica Cuota cartera del mes anterior un anio atras      </Description>
+                  <Description>Total de cartera para la fecha de hace un anio con respecto a la ultima fecha de cierre de mes real</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70691,7 +71558,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[aoValCuotaCarteraHaceUnMes2AnioAtras]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Metrica Cuota cartera del mes anterior dos anios atras</Description>
+                  <Description>Total de cartera para la fecha de hace dos anios con respecto a la ultima fecha de cierre de mes real</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70755,6 +71622,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[poValPasivoVarAnioCorrido]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Monto de la variación del saldo de la fecha en curso menos el valor de hace un año</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70776,49 +71644,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[poValCaptacionesVarAnualAnioCorridoPorc]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[aoValCarteraVarAnual]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
-                  <Description>Metrica para obtener el volumen de cartera de los 4 ultimos anios de cada fin de año Ejem. Dic 2022, Dic 2021, Dic2020, etc</Description>
-                  <FormatString>''</FormatString>
-                </CalculationProperty>
-                <CalculationProperty>
-                  <Annotations>
-                    <Annotation>
-                      <Name>Type</Name>
-                      <Value>User</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>IsPrivate</Name>
-                      <Value>False</Value>
-                    </Annotation>
-                    <Annotation>
-                      <Name>Format</Name>
-                      <Value>
-                        <Format Format="General" xmlns="" />
-                      </Value>
-                    </Annotation>
-                  </Annotations>
-                  <CalculationReference>[poValCaptacionesVarAnual]</CalculationReference>
-                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo de variación consolidado de los productos de captaciones para 13 fechas de cierres de mes desde el mes actual.</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70884,7 +71710,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[feValCabVarMensual]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Descripción en formato Mes(Anterior)-Anio Vs Mes(HaceUnAnio)-Anio, para la fecha de cierre del mes anterior respecto a la fecha actual</Description>
+                  <Description>Descripción en formato Mes(Anterior)-Anio Vs Mes(HaceUnAnio)-Anio, para la fecha de cierre del último mes  respecto a la del mes anterior </Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70928,7 +71754,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[feValCabVarInteranual2Anios]</CalculationReference>
                   <CalculationType>Member</CalculationType>
-                  <Description>Descripción en formato Mes(Anterior)-Anio Vs Mes(HaceUnAnio)-Anio, para la fecha de hace dos anios</Description>
+                  <Description>Descripción en formato Mes(Anterior)-Anio Vs Mes(HaceUnAnio)-Anio, para la fecha de hace dos anios respeccto a la ultimo fecha de cierre de mes</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -70994,6 +71820,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[poCalValTasaImplicitaPortafolio]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Tasa Promedio Ponderada de cuentas de Portafolio</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -71015,6 +71842,537 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                   </Annotations>
                   <CalculationReference>[poCalValTasaImplicitaAperturada]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>Tasa Promedio Ponderada de cuentas Aperturadas</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[aoValCarteraVar1Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de cartera entre la fecha de corte versus la fecha de hace un anio</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[aoValCarteraVar2Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de cartera entre la fecha de corte versus la fecha de hace dos anio</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[aoValCarteraVar3Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de cartera entre la fecha de corte versus la fecha de hace tres anios</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[aoValCarteraVar4Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de cartera entre la fecha de corte versus la fecha de hace cuatro anios</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVar1Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de captaciones entre la fecha de corte versus la fecha de hace un anio</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVar2Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de captaciones entre la fecha de corte versus la fecha de hace dos anios</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVar3Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de captaciones entre la fecha de corte versus la fecha de hace tres anios</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVar4Anio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Porcentaje de variación de captaciones entre la fecha de corte versus la fecha de hace cuatro anios</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabCierreAnio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Descripción Mes-Anio de la fecha del último cierre de año</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabVar1CierreAnio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Descripción Mes-Anio de la fecha del último cierre de año versus la descripción Mes-Anio de hace un año </Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabVar2CierreAnio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Descripción Mes-Anio de la fecha del último cierre de año versus la descripción Mes-Anio de hace dos años</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabVar3CierreAnio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Descripción Mes-Anio de la fecha del último cierre de año versus la descripción Mes-Anio de hace tres años</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabVar4CierreAnio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Descripción Mes-Anio de la fecha del último cierre de año versus la descripción Mes-Anio de hace cuatro años</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[feValCabMesAct]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Descripción en formato Mes-Anio utilizado en la cabecera  de los reporte para el cierre real del último mes</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>True</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[aoValCarteraHaceDosAnio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Valor de cartera de hace dos anios con respecto a la fecha en curso</Description>
+                  <Visible>false</Visible>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>True</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[aoValCarteraVarDosAnioCorrido]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del monto de variacion de cartera entre la fecha en curso versus dos anios atras </Description>
+                  <Visible>false</Visible>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[aoValCarVarDosAniosCorridoPorc]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del porcentaje de variacion de cartera entre la fecha en curso versus dos anios atras </Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[bsfValSisCarteraAct]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Valor del Sistema Interanual para el producto de cartera para la fecha del último corte de mes real</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoPorcSFC]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13 fechas de cierres de mes desde el mes actual (Sin FiltroCanal)</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoREDPorc]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal comercial</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoCORPorc]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal corporativo.</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoESPPorc]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal especializada</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVarAnualAnioCorridoTESPorc]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones para 13  fechas de cierres de mes desde el mes actual para el canal tesoreria</Description>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[poValCaptacionesVarAnualMesFiscPorcSFC]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <Description>Cálculo del porcentaje de variación consolidado de los productos de captaciones solo para las fechas del mes en curso o fiscal (Sin FiltroCanal)</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -71045,10 +72403,10 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Integrated Security=SSPI;Persist Security Info=False;User ID=;Initial Catalog=DWHCORPORATIVO_15348;Data Source=172.16.172.161;Initial File Name=;Server SPN=</ConnectionString>
+          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.76.4;User ID=sa;Initial Catalog=DWHCORPORATIVO</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\binxaste</Account>
+            <Account>banintern\bingod34</Account>
           </ImpersonationInfo>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>80</MaxActiveConnections>
@@ -71064,7 +72422,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
               <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:Locale="es-EC">
                 <xs:complexType>
                   <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element name="DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWDFecha" msprop:DbSchemaName="dbo" msprop:DbTableName="DWDFecha" msprop:TableType="View" msprop:Description="DWDFecha" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;/*&#xD;&#xA; Script de generacion de dimension Fecha&#xD;&#xA;*/&#xD;&#xA;declare &#xD;&#xA; @fecha2AñosAtras int&#xD;&#xA;,@fecha2AñosUnMesAtras int&#xD;&#xA;,@fecha3AñosAtras int&#xD;&#xA;,@fecha3AñosUnMesAtras int&#xD;&#xA;,@fechaAñoMesAtras int&#xD;&#xA;,@fechaAñoMesAtrasFiscal int&#xD;&#xA;,@feIdFecha3mesesAdelante int&#xD;&#xA;,@moduloMes int&#xD;&#xA;,@fechaHoy int&#xD;&#xA;,@feCierreAnioActual int&#xD;&#xA;,@feCalAnioActual int&#xD;&#xA;,@feCalMesActual int&#xD;&#xA;,@feFechaCierreAnioAnt int&#xD;&#xA;,@fechaHaceUnMes int&#xD;&#xA;,@feIdFechaHaceUnAnioLab int&#xD;&#xA;,@fechaCierreAnioAntMesAct int&#xD;&#xA;,@feIdFecha1AnioAnt int&#xD;&#xA;,@feIdFecha2AnioAnt int&#xD;&#xA;,@feIdFecha3MesesFuturo int&#xD;&#xA;,@fechaHaceUnMes1AnioAtras int&#xD;&#xA;,@fechaHaceUnMes2AnioAtras int&#xD;&#xA;,@fechaCierreMesActual int&#xD;&#xA;,@fecha2MesAnterior int --RF2: Total Sistema Fiananciero&#xD;&#xA;,@fechaPptoMesActual int --RF6.2 Variacion Vs Presupuesto&#xD;&#xA;,@setmes int&#xD;&#xA;,@MesHoy int&#xD;&#xA;,@fechaDate date&#xD;&#xA;,@fechaFinSemestre int&#xD;&#xA;,@fechaMesAnioAnt int&#xD;&#xA;,@fecha15dias int&#xD;&#xA;,@fecha15diasDate date&#xD;&#xA;,@fechamax int&#xD;&#xA;,@DiaAAnterior int&#xD;&#xA;,@DiciembreAnioAnt int&#xD;&#xA;,@Diciembre2AnioAnt int&#xD;&#xA;,@Diciembre3AnioAnt int&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end&#xD;&#xA;&#xD;&#xA;select @fechaMesAnioAnt=feIdFechaAnioAnt  from dwdfecha where fediaactual = 1&#xD;&#xA;&#xD;&#xA;Select &#xD;&#xA; @fechaHoy = feIdFecha &#xD;&#xA;,@moduloMes = feCalMes%3&#xD;&#xA;,@feCalAnioActual = feCalAnio&#xD;&#xA;,@feCalMesActual = feCalMes&#xD;&#xA;,@feFechaCierreAnioAnt=feAnioAntCierr&#xD;&#xA;,@fechaHaceUnMes = feMesAntCierr&#xD;&#xA;,@feIdFecha1AnioAnt = convert(char(8),dateadd(mm,-11,feFecha),112)&#xD;&#xA;,@feIdFecha2AnioAnt = convert(char(8),dateadd(mm,-23,feFecha),112)&#xD;&#xA;,@feIdFecha3MesesFuturo = convert(char(8),dateadd(mm,3,feFecha),112)&#xD;&#xA;,@MesHoy = feCalMes&#xD;&#xA;,@fechaDate=fefecha&#xD;&#xA;from DWDFecha  &#xD;&#xA;where feDiaActual=1&#xD;&#xA;&#xD;&#xA;select @fecha15dias = max(feidfecha)&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha  between @fechaHoy and convert(char(8),dateadd(day,15,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @fecha15diasDate = feFecha&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha = @fecha15dias&#xD;&#xA;&#xD;&#xA;select @fechaCierreMesActual=max(feIdFecha)from DWDFecha&#xD;&#xA;Where fediaactual = 1 --feCalMes = @feCalMesActual and feCalAnio = @feCalAnioActual and feFinSemana = 0 and feFeriado=0&#xD;&#xA;&#xD;&#xA;select @setmes = @fechaHoy &#xD;&#xA;if right(left(@fechaHoy,6),2) = month(getdate()) begin set @setmes  =   @fechaHaceUnMes end&#xD;&#xA; &#xD;&#xA;select @fechaHaceUnMes1AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 1)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;select @fechaHaceUnMes2AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 2)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año atrás mismo mes&#xD;&#xA;select @fechaCierreAnioAntMesAct=feIdFechaCierreAnioAnt&#xD;&#xA;from DWDFecha &#xD;&#xA;where feDiaActual = 1&#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año un mes atrás&#xD;&#xA;Select @fechaAñoMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feMesAntCierr&#xD;&#xA;where f.feIdFecha=@fechaCierreAnioAntMesAct&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 anios atras&#xD;&#xA;Select @fecha2AñosAtras =  feidFecha&#xD;&#xA;from DWDFecha f &#xD;&#xA;where left(feidfecha,6) in (select convert(char(6),dateadd(month,-23,fefecha),112) from dwdfecha where feDiaActual=1)&#xD;&#xA;and feCierreMesTodosAnios = 1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 años un mes atras&#xD;&#xA;Select @fecha2AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años atras&#xD;&#xA;Select @fecha3AñosAtras = f3.feIdFechaCierreAnioAnt &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;inner join DWDFecha f3 on f3.feIdFecha = f2.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feDiaActual=1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años un mes atras&#xD;&#xA;Select @fecha3AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;-- Determina la fecha 3 meses hacia adelante&#xD;&#xA;select &#xD;&#xA;@feIdFecha3mesesAdelante = f.feIdFecha &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on &#xD;&#xA;f.feCalMes = MONTH(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;and f.feCalAnio = YEAR(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;where f.feCierreMesTodosAnios = 1&#xD;&#xA;and f2.feDiaActual = 1&#xD;&#xA;&#xD;&#xA;select @feCierreAnioActual=feIdFecha from DWDFecha where feCalMes=12 and feCalAnio=@feCalAnioActual and feCierreMesTodosAnios=1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Fechas SFIN 2MesAnt &#xD;&#xA;select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @fechaHaceUnMes&#xD;&#xA;&#xD;&#xA;select @fechaPptoMesActual =feIdFecha&#xD;&#xA;from DWDFecha&#xD;&#xA;where feCierreMesTodosAnios = 1&#xD;&#xA;and feCalAnio = left(@fechaHoy,4)&#xD;&#xA;and feCalMes = SUBSTRING(convert(char(8),@fechaHoy,112),5,2)&#xD;&#xA;&#xD;&#xA;select @fechaFinSemestre = feidfecha from dwdfecha &#xD;&#xA;where feidfecha between @feIdFecha1AnioAnt and concat(@feCalAnioActual,'1231') and fecalmes = 6 and feFinMes = 1 &#xD;&#xA;&#xD;&#xA;select @fechaAñoMesAtrasFiscal = concat(fecalanio,'0101') from dwdfecha &#xD;&#xA;where feAnioAnterior = 1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select @fechamax=  max(feidfecha)&#xD;&#xA;from DWDFecha&#xD;&#xA;where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @DiaAAnterior=isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax)&#xD;&#xA;from &#xD;&#xA;(&#xD;&#xA; select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA; and feIdFecha &lt;= @fechaHoy&#xD;&#xA;) hoy&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;where hoy.feIdFecha = @fechaHoy&#xD;&#xA;&#xD;&#xA;--select @DiaAAnterior=feidfechaAnt from #FechaAnterior where Bandera = 1&#xD;&#xA;&#xD;&#xA;SELECT f.feIdFecha&#xD;&#xA;,f.feFecha&#xD;&#xA;,f.feDescripcionFecha&#xD;&#xA;,f.feCalAnio&#xD;&#xA;,f.feCalMes&#xD;&#xA;,f.feCalDia&#xD;&#xA;,f.EsDiaAnterior&#xD;&#xA;,f.fecIdAnterior&#xD;&#xA;,f.feMesAntCierr&#xD;&#xA;,f.feMesAntAnioAnt&#xD;&#xA;,f.feAnioAntCierr&#xD;&#xA;,f.feIdFechaCierreAnioAnt&#xD;&#xA;,feIdFechaAnioAnt = case when left(f.feidfecha,6) = left(@fechaHoy,6) then feidfechaAnt else f.feIdFechaAnioAnt end&#xD;&#xA;,f.feFechaCierreAnio&#xD;&#xA;,f.feDiaActual&#xD;&#xA;,f.feDiaAnterior&#xD;&#xA;,f.feMesAnterior&#xD;&#xA;,fe2MesAnterior = case when f.feIdFecha = @fecha2MesAnterior then 1 else 0 end --TOTAL SISTEMA FINANCIERO Crecimiento 2MesAnterior&#xD;&#xA;,f.feAnioAnterior&#xD;&#xA;,f.feCierreSistemaFinanciero&#xD;&#xA;,feCierreMesAnterior =f.feMesAntCierr&#xD;&#xA;,f.feFechaMesAntCierr   &#xD;&#xA;,f.feCierrMesAnioAtras&#xD;&#xA;,f.feIdFechaDoceMesAtras&#xD;&#xA;,f.feCierreMes&#xD;&#xA;,f.feCierreMesTodosAnios&#xD;&#xA;,f.feNumDiasMesLab&#xD;&#xA;,feCalTrimestreDinamico =  case when f.feCalMes%3-@moduloMes=0 then 1 else 0 end&#xD;&#xA;,feCalBanderaFechaHaceUnAnio = case when  f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --Hace un año desde la fecha actual&#xD;&#xA;,feIdCalFechaCierre2AniosAntes = f2.feIdFechaCierreAnioAnt --Cierre 2 años antes de la feIdFecha&#xD;&#xA;,feCalBanderaHace2Anios = case when f.feIdFecha = @fecha2AñosAtras then 1 else 0 end --Identifica la fecha 2 años antes de la fecha actual&#xD;&#xA;,feCalBanderaHace3Anios = case when f.feIdFecha = @fecha3AñosAtras then 1 else 0 end --Identifica la fecha 3 años antes de la fecha actual&#xD;&#xA;,feCalBanderaAnioMesAtras = case when f.feIdFecha = @fechaAñoMesAtras then 1 else 0 end --Identifica la fecha de un año y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera2AniosMesAtras = case when f.feIdFecha = @fecha2AñosUnMesAtras then 1 else 0 end --Identifica la fecha de dos años y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera3AniosMesAtras = case when f.feIdFecha = @fecha3AñosUnMesAtras then 1 else 0 end --Identifica la fecha de tres años y un mes atrá de la fecha actual&#xD;&#xA;,feCalBanderaCostoFinanciero = case when frcf.feIdFecha is null then 0 else 1 end&#xD;&#xA;,feCalIdFecha3mesesAdelante =  @feIdFecha3mesesAdelante --fecha de 3 meses adelante desde la fecha actual&#xD;&#xA;,feCal30DiasAnt24MesesAnt    = case when (f.feIdFecha between @fechaHaceUnMes and @fechaHoy and f.feFinSemana=0 and f.feFeriado=0) &#xD;&#xA;                                          OR (f.feIdFecha between @fecha2AñosAtras and @fechaHoy and f.feCierreMes=1)  &#xD;&#xA;            then 1 else 0 end --Identifica la fecha 30 días antes y 24 meses antes de la fecha actual = feCalBanderaAnioMesAtras&#xD;&#xA;,feCalBanderaHace1AnioMesActual = case when f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --rr --Identifica la fecha de cierre un año atrás del mes actual&#xD;&#xA;&#xD;&#xA;,feCalBanderaEsHace1Anios= case when f.feIdFecha = fr1aa.feIdFecha then 1 --rr; Identifica las fechas del año anterior 12 meses atrás desde la fecha actual&#xD;&#xA;        when f.feIdFecha = @fechaCierreAnioAntMesAct then 3 -- Se identifica la fecha de cierre del mismo mes del año anterior respecto a la fecha actual&#xD;&#xA;        when left(f.feIdFecha,6)=left(@fechaHoy,6) and f.feIdFecha&lt;@fechaHoy and f.feFeriado=0 and f.feFinSemana=0 then 2 -- Identifica todos los dias habiles del mes fiscal de la fecha actual con exepcion de la fecha de corte&#xD;&#xA;        else 0 end &#xD;&#xA;,feCalBanderaEsHace2Anios= case when f.feIdFecha = fr2aa.feIdFecha then 1 when left(f.feIdFecha,6) = left(@fechaHoy,6) and f.feFeriado=0  and f.feFinSemana=0  then 2 else 0 end --rr; Identifica las fechas dos años anteriores 24 meses atrás desde la fechaactual&#xD;&#xA;,feCalBanderaEsMesActual = case when convert(int,left(f.feIdFecha,4)) = @feCalAnioActual and convert(int,SUBSTRING(convert(varchar(8),f.feIdFecha),5,2))= @feCalMesActual then 1 else 0 end --rr Fechas de los días para el mes actual &#xD;&#xA;,feCalBanderaEs2AnioContinuo = case when f.feIdFecha = fr2ac.feIdFecha then fr2ac.marcas else 0 end --rr; fechas continuas hace 2 años&#xD;&#xA;,feCalBanderaEs3MesesAdelante = case when f.feIdFecha = fr3ma.fecha then 1 else 0 end --rr; fechas 3 meses adelante&#xD;&#xA;,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde la fecha actual&#xD;&#xA;,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde la fecha actual&#xD;&#xA;,feCalBanderaCierreMesActual = case when f.feIdFecha = @fechaCierreMesActual then 1 else 0 end --Identifica la posible fecha del cierre del mes actual&#xD;&#xA;,feCalBanderaEsFechaConcentracion = case when f.feIdFecha = fr4cs.fecha then 1 else 0 end --rr; fechas para RF8&#xD;&#xA;,feCalBanderaEsFechaVolumen = isnull(marca,0)&#xD;&#xA;,feOrdenVolumen = isnull(orden,0)&#xD;&#xA;,feCalBanderaPptoMesActual = case when f.feIdFecha = @fechaPptoMesActual then 1 else 0 end&#xD;&#xA;,feCalBanderaBarraVolumen = case when f.feidfecha in (@fechaHoy,@feCierreAnioActual,@fecha15dias, @fechaHaceUnMes ,@fechaFinSemestre ,@feFechaCierreAnioAnt) then 1 else 0 end&#xD;&#xA;,feCalBanderaMesAnioAnt =  case when left(f.feidfecha,6) = left(@fechaMesAnioAnt,6) then 1 else 0 end&#xD;&#xA;,feHaceUnAnio=case when f.feidfecha = @DiaAAnterior then 1 else 0 end &#xD;&#xA;,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0)&#xD;&#xA;&#xD;&#xA;from DWDFecha f&#xD;&#xA;left join DWDFecha f2 on f.feIdFechaCierreAnioAnt = f2.feIdFecha and f2.feCierreMes=1&#xD;&#xA;left join DWDFecha f3 on f2.feIdFechaCierreAnioAnt = f3.feIdFecha and f3.feCierreMes=1&#xD;&#xA;left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 --rr; fechas del año anterior&#xD;&#xA;and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior&#xD;&#xA;left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 --rr; fechas de 2 año anterior&#xD;&#xA;and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidfecha    ,1 marcas&#xD;&#xA;  from DWDFecha fr2ac &#xD;&#xA;  where fr2ac.feIdFecha between @feIdFecha2AnioAnt and @fechaHoy&#xD;&#xA;  and fr2ac.feCierreMes = 1 &#xD;&#xA;  union&#xD;&#xA;  select feidfecha  ,2 marcas&#xD;&#xA;  from dwdfecha&#xD;&#xA;  where left(feidfecha,6) = left(@fechaHoy,6)&#xD;&#xA;  and feidfecha &lt; @fechaHoy&#xD;&#xA;  and feferiado &lt;&gt;1&#xD;&#xA;  and feFinSemana &lt;&gt; 1&#xD;&#xA;) fr2ac on f.feIdFecha = fr2ac.feIdFecha --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select max(feidFecha) fecha&#xD;&#xA;  from DWDFecha where feIdfecha between @fechaHoy and @feIdFecha3MesesFuturo&#xD;&#xA;  and feFeriado=0 and feFinSemana=0 and  feCalMes &lt;= (convert(int,SUBSTRING(convert(varchar(8),@feIdFecha3MesesFuturo),5,2))-1)&#xD;&#xA;  group by feCalMes&#xD;&#xA;) fr3ma on f.feIdFecha = fr3ma.fecha --rr; fechas de 3 meses adelante&#xD;&#xA;left join DWDFecha frcf on frcf.feIdFecha = f.feIdFecha and (frcf.feDiaActual=1 or frcf.feCierreMesAnterior=1 or (frcf.feCalMes%3 = 0 and frcf.feCalAnio in (@feCalAnioActual-1, @feCalAnioActual) and frcf.feCierreMes=1))&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidFecha fecha&#xD;&#xA;  from DWDFecha &#xD;&#xA;  WHERE (&#xD;&#xA;  feIdFecha in (select feIdFecha from DWDFecha Where feIdFecha between convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112)  and convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and feCierreMes=1)&#xD;&#xA;  )&#xD;&#xA;  or (feIdFecha &gt; @fecha3AñosAtras and feIdFecha &lt; convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112) and feCalMes = 12 and feCierreMes=1)&#xD;&#xA;  or (feIdFecha between convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and @fechaHoy)&#xD;&#xA;  and (feFeriado= 0 and feFinSemana=0)&#xD;&#xA;) fr4cs on f.feIdFecha = fr4cs.fecha  --rr; concentracion saldos RF8&#xD;&#xA;left join &#xD;&#xA;( -------&#xD;&#xA;  select feidfecha,min(marca) marca ,min(orden) orden&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;    select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from &#xD;&#xA; (&#xD;&#xA;     select &#xD;&#xA;     feidfecha,&#xD;&#xA;     case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,&#xD;&#xA;     convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden&#xD;&#xA;     from dwdfecha&#xD;&#xA;     where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')&#xD;&#xA;     and fecierremestodosanios = 1&#xD;&#xA;     and fediaactual &lt;&gt; 1 &#xD;&#xA; ) b&#xD;&#xA;    left join &#xD;&#xA; (&#xD;&#xA;      select &#xD;&#xA;      feidfecha  , &#xD;&#xA;      fecierremestodosanios, &#xD;&#xA;      (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;      convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;      from dwdfecha&#xD;&#xA;      where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;      and feferiado = 0&#xD;&#xA;      and fefinsemana = 0&#xD;&#xA;    ) a  on left(a.feidfecha,4) = left(b.feidfecha,4)+1 and right(left(a.feidfecha,6),2) = right(left(b.feidfecha,6),2) and a.fecierremestodosanios = 1&#xD;&#xA;    union&#xD;&#xA;    select &#xD;&#xA;    feidfecha  , &#xD;&#xA;    case when feDiaActual= 1 then 1 else 3 end marca, &#xD;&#xA;    (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;    convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;    from dwdfecha&#xD;&#xA;    where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;    and feferiado = 0&#xD;&#xA;    and fefinsemana = 0&#xD;&#xA;  ) a&#xD;&#xA;  group by feIdFecha&#xD;&#xA;) fv on f.feIdFecha = fv.feidfecha ---Fechas Volumen cierre mes y diarios&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select &#xD;&#xA;  hoy.feidfecha feidfechaAct, isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax) feidfechaAnt&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;   select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;   and feIdFecha &lt;= @fechaHoy&#xD;&#xA;  ) hoy&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;) fecdiaAniAnt on f.feIdFecha = feidfechaAct&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feIdFecha,feNumeroAnioAnt = Convert(int,left(@fechaHoy,4)) - Convert(int,left(feIdFecha,4))  &#xD;&#xA;  from DWDFecha&#xD;&#xA;  where feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and feCierreMes = 1 and feCalMes = 12 &#xD;&#xA;) aniosAnt on aniosAnt.feIdFecha = f.feidFecha&#xD;&#xA;&#xD;&#xA;where (f.feIdFecha between @fecha3AñosUnMesAtras and concat(@feCalAnioActual,'1231'))&#xD;&#xA;  or  (f.feCalAnio between (@feCalAnioActual-5) and (@feCalAnioActual-1) and f.feCierreMes = 1 and f.feCalMes = 12  ) &#xD;&#xA;&#xD;&#xA;order by 1">
+                    <xs:element name="DWDFecha_f4d73472-ec45-44c7-aa56-5a9bf1257f8c" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWDFecha" msprop:DbSchemaName="dbo" msprop:DbTableName="DWDFecha" msprop:TableType="View" msprop:Description="DWDFecha" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;/*&#xD;&#xA; Script de generacion de dimension Fecha&#xD;&#xA;*/&#xD;&#xA;declare &#xD;&#xA; @fecha2AñosAtras int&#xD;&#xA;,@fecha2AñosUnMesAtras int&#xD;&#xA;,@fecha3AñosAtras int&#xD;&#xA;,@fecha3AñosUnMesAtras int&#xD;&#xA;,@fechaAñoMesAtras int&#xD;&#xA;,@fechaAñoMesAtrasFiscal int&#xD;&#xA;,@feIdFecha3mesesAdelante int&#xD;&#xA;,@moduloMes int&#xD;&#xA;,@fechaHoy int&#xD;&#xA;,@feCierreAnioActual int&#xD;&#xA;,@feCalAnioActual int&#xD;&#xA;,@feCalMesActual int&#xD;&#xA;,@feFechaCierreAnioAnt int&#xD;&#xA;,@fechaHaceUnMes int&#xD;&#xA;,@feIdFechaHaceUnAnioLab int&#xD;&#xA;,@fechaCierreAnioAntMesAct int&#xD;&#xA;,@feIdFecha1AnioAnt int&#xD;&#xA;,@feIdFecha2AnioAnt int&#xD;&#xA;,@feIdFecha3MesesFuturo int&#xD;&#xA;,@fechaHaceUnMes1AnioAtras int&#xD;&#xA;,@fechaHaceUnMes2AnioAtras int&#xD;&#xA;,@fecha2MesAnterior int --RF2: Total Sistema Fiananciero&#xD;&#xA;,@fechaPptoMesActual int --RF6.2 Variacion Vs Presupuesto&#xD;&#xA;,@setmes int&#xD;&#xA;,@MesHoy int&#xD;&#xA;,@fechaDate date&#xD;&#xA;,@fechaFinSemestre int&#xD;&#xA;,@fechaMesAnioAnt int&#xD;&#xA;,@fecha15dias int&#xD;&#xA;,@fecha15diasDate date&#xD;&#xA;,@fechamax int&#xD;&#xA;,@DiaAAnterior int&#xD;&#xA;,@DiciembreAnioAnt int&#xD;&#xA;,@Diciembre2AnioAnt int&#xD;&#xA;,@Diciembre3AnioAnt int&#xD;&#xA;,@UltimoCierreAnio int&#xD;&#xA;&#xD;&#xA;if object_id('[tempdb]..#FechaAnterior') is not null begin drop table #FechaAnterior end&#xD;&#xA;&#xD;&#xA;select @fechaMesAnioAnt=feIdFechaAnioAnt  from dwdfecha where fediaactual = 1&#xD;&#xA;&#xD;&#xA;Select &#xD;&#xA; @fechaHoy = feIdFecha &#xD;&#xA;,@moduloMes = feCalMes%3&#xD;&#xA;,@feCalAnioActual = feCalAnio&#xD;&#xA;,@feCalMesActual = feCalMes&#xD;&#xA;,@feFechaCierreAnioAnt=feAnioAntCierr&#xD;&#xA;,@fechaHaceUnMes = feMesAntCierr&#xD;&#xA;,@feIdFecha1AnioAnt = convert(char(8),dateadd(mm,-11,feFecha),112)&#xD;&#xA;,@feIdFecha2AnioAnt = convert(char(8),dateadd(mm,-23,feFecha),112)&#xD;&#xA;,@feIdFecha3MesesFuturo = convert(char(8),dateadd(mm,3,feFecha),112)&#xD;&#xA;,@MesHoy = feCalMes&#xD;&#xA;,@fechaDate=fefecha&#xD;&#xA;from DWDFecha  &#xD;&#xA;where feDiaActual=1&#xD;&#xA;&#xD;&#xA;select @fecha15dias = max(feidfecha)&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha  between @fechaHoy and convert(char(8),dateadd(day,15,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @fecha15diasDate = feFecha&#xD;&#xA;from dwdfecha&#xD;&#xA;where feidfecha = @fecha15dias&#xD;&#xA;&#xD;&#xA;-- Identificación del último cierre mes real --&#xD;&#xA;select @setmes = @fechaHaceUnMes&#xD;&#xA;if( @fechaHoy = (select max(feIdFecha) from DWDFecha where left(feIdFecha,6)=left(@fechaHoy,6) and feFeriado=0 and feFinSemana=0 )) -- se valida si la fecha de corte es un cierre de mes real&#xD;&#xA;begin&#xD;&#xA; select @setmes=@fechaHoy&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;-- Identificacion del año del último cierre anual real --&#xD;&#xA;select @UltimoCierreAnio=@feCalAnioActual-1&#xD;&#xA;if( @fechaHoy = (select max(feIdFecha) from DWDFecha where feCalAnio=@feCalAnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real&#xD;&#xA;begin&#xD;&#xA; select @UltimoCierreAnio=@feCalAnioActual&#xD;&#xA;end&#xD;&#xA;&#xD;&#xA;select @fechaHaceUnMes1AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 1)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;select @fechaHaceUnMes2AnioAtras =feidFecha &#xD;&#xA;from DWDFecha where feCalAnio = (convert(int,left(convert(char(8),@setmes,112),4)) - 2)&#xD;&#xA;and feCalMes = convert(int,substring(convert(char(8),@setmes,112),5,2)) and feCierreMes=1 &#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año atrás mismo mes&#xD;&#xA;select @fechaCierreAnioAntMesAct=feIdFechaCierreAnioAnt&#xD;&#xA;from DWDFecha &#xD;&#xA;where feDiaActual = 1&#xD;&#xA;&#xD;&#xA;-- Calculo de Fecha un año un mes atrás&#xD;&#xA;Select @fechaAñoMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feMesAntCierr&#xD;&#xA;where f.feIdFecha=@fechaCierreAnioAntMesAct&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 anios atras&#xD;&#xA;Select @fecha2AñosAtras =  feidFecha&#xD;&#xA;from DWDFecha f &#xD;&#xA;where left(feidfecha,6) in (select convert(char(6),dateadd(month,-23,fefecha),112) from dwdfecha where feDiaActual=1)&#xD;&#xA;and feCierreMesTodosAnios = 1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 2 años un mes atras&#xD;&#xA;Select @fecha2AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años atras&#xD;&#xA;Select @fecha3AñosAtras = f3.feIdFechaCierreAnioAnt &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;inner join DWDFecha f3 on f3.feIdFecha = f2.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feDiaActual=1&#xD;&#xA;&#xD;&#xA;--Determina la fecha 3 años un mes atras&#xD;&#xA;Select @fecha3AñosUnMesAtras = f2.feMesAntCierr &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on f2.feIdFecha = f.feIdFechaCierreAnioAnt&#xD;&#xA;where f.feIdFecha=@fecha2AñosAtras&#xD;&#xA;&#xD;&#xA;-- Determina la fecha 3 meses hacia adelante&#xD;&#xA;select &#xD;&#xA;@feIdFecha3mesesAdelante = f.feIdFecha &#xD;&#xA;from DWDFecha f &#xD;&#xA;inner join DWDFecha f2 on &#xD;&#xA;f.feCalMes = MONTH(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;and f.feCalAnio = YEAR(DATEADD(MONTH, 3, f2.feFecha))&#xD;&#xA;where f.feCierreMesTodosAnios = 1&#xD;&#xA;and f2.feDiaActual = 1&#xD;&#xA;&#xD;&#xA;select @feCierreAnioActual=feIdFecha from DWDFecha where feCalMes=12 and feCalAnio=@feCalAnioActual and feCierreMesTodosAnios=1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;--Fechas SFIN 2MesAnt &#xD;&#xA;select @fecha2MesAnterior=feMesAntCierr from DWDFecha where feIdFecha = @setmes -- Cambie el filtro @fechaHaceUnMes del mes para identificar el cierre de mes real EA&#xD;&#xA;&#xD;&#xA;select @fechaPptoMesActual =feIdFecha&#xD;&#xA;from DWDFecha&#xD;&#xA;where feCierreMesTodosAnios = 1&#xD;&#xA;and feCalAnio = left(@fechaHoy,4)&#xD;&#xA;and feCalMes = SUBSTRING(convert(char(8),@fechaHoy,112),5,2)&#xD;&#xA;&#xD;&#xA;select @fechaFinSemestre = feidfecha from dwdfecha &#xD;&#xA;where feidfecha between @feIdFecha1AnioAnt and concat(@feCalAnioActual,'1231') and fecalmes = 6 and feFinMes = 1 &#xD;&#xA;&#xD;&#xA;select @fechaAñoMesAtrasFiscal = concat(fecalanio,'0101') from dwdfecha &#xD;&#xA;where feAnioAnterior = 1&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select @fechamax=  max(feidfecha)&#xD;&#xA;from DWDFecha&#xD;&#xA;where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;and feFeriado &lt;&gt; 1&#xD;&#xA;and feFinSemana &lt;&gt; 1&#xD;&#xA;&#xD;&#xA;select @DiaAAnterior=isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax)&#xD;&#xA;from &#xD;&#xA;(&#xD;&#xA; select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA; and feIdFecha &lt;= @fechaHoy&#xD;&#xA;) hoy&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA; select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA; from DWDFecha&#xD;&#xA; where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA; and feFeriado &lt;&gt; 1&#xD;&#xA; and feFinSemana &lt;&gt; 1&#xD;&#xA;) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;where hoy.feIdFecha = @fechaHoy&#xD;&#xA;&#xD;&#xA;--select @DiaAAnterior=feidfechaAnt from #FechaAnterior where Bandera = 1&#xD;&#xA;&#xD;&#xA;SELECT f.feIdFecha&#xD;&#xA;,f.feFecha&#xD;&#xA;,f.feDescripcionFecha&#xD;&#xA;,f.feCalAnio&#xD;&#xA;,f.feCalMes&#xD;&#xA;,f.feCalDia&#xD;&#xA;,f.EsDiaAnterior&#xD;&#xA;,f.fecIdAnterior&#xD;&#xA;,f.feMesAntCierr&#xD;&#xA;,f.feMesAntAnioAnt&#xD;&#xA;,f.feAnioAntCierr&#xD;&#xA;,f.feIdFechaCierreAnioAnt&#xD;&#xA;,feIdFechaAnioAnt = case when left(f.feidfecha,6) = left(@fechaHoy,6) then feidfechaAnt else f.feIdFechaAnioAnt end&#xD;&#xA;,f.feFechaCierreAnio&#xD;&#xA;,f.feDiaActual&#xD;&#xA;,f.feDiaAnterior&#xD;&#xA;,f.feMesAnterior&#xD;&#xA;,fe2MesAnterior = case when f.feIdFecha = @fecha2MesAnterior then 1 else 0 end --TOTAL SISTEMA FINANCIERO Crecimiento 2MesAnterior&#xD;&#xA;,f.feAnioAnterior&#xD;&#xA;,f.feCierreSistemaFinanciero&#xD;&#xA;,feCierreMesAnterior =f.feMesAntCierr&#xD;&#xA;,f.feFechaMesAntCierr   &#xD;&#xA;,f.feCierrMesAnioAtras&#xD;&#xA;,f.feIdFechaDoceMesAtras&#xD;&#xA;,f.feCierreMes&#xD;&#xA;,f.feCierreMesTodosAnios&#xD;&#xA;,f.feNumDiasMesLab&#xD;&#xA;,feCalTrimestreDinamico =  case when f.feCalMes%3-@moduloMes=0 then 1 else 0 end&#xD;&#xA;,feCalBanderaFechaHaceUnAnio = case when  f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --Hace un año desde la fecha actual&#xD;&#xA;,feIdCalFechaCierre2AniosAntes = f2.feIdFechaCierreAnioAnt --Cierre 2 años antes de la feIdFecha&#xD;&#xA;,feCalBanderaHace2Anios = case when f.feIdFecha = @fecha2AñosAtras then 1 else 0 end --Identifica la fecha 2 años antes de la fecha actual&#xD;&#xA;,feCalBanderaHace3Anios = case when f.feIdFecha = @fecha3AñosAtras then 1 else 0 end --Identifica la fecha 3 años antes de la fecha actual&#xD;&#xA;,feCalBanderaAnioMesAtras = case when f.feIdFecha = @fechaAñoMesAtras then 1 else 0 end --Identifica la fecha de un año y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera2AniosMesAtras = case when f.feIdFecha = @fecha2AñosUnMesAtras then 1 else 0 end --Identifica la fecha de dos años y un mes atrás de la fecha actual&#xD;&#xA;,feCalBandera3AniosMesAtras = case when f.feIdFecha = @fecha3AñosUnMesAtras then 1 else 0 end --Identifica la fecha de tres años y un mes atrá de la fecha actual&#xD;&#xA;,feCalBanderaCostoFinanciero = case when frcf.feIdFecha is null then 0 else 1 end&#xD;&#xA;,feCalIdFecha3mesesAdelante =  @feIdFecha3mesesAdelante --fecha de 3 meses adelante desde la fecha actual&#xD;&#xA;,feCal30DiasAnt24MesesAnt    = case when (f.feIdFecha between @fechaHaceUnMes and @fechaHoy and f.feFinSemana=0 and f.feFeriado=0) &#xD;&#xA;                                          OR (f.feIdFecha between @fecha2AñosAtras and @fechaHoy and f.feCierreMes=1)  &#xD;&#xA;            then 1 else 0 end --Identifica la fecha 30 días antes y 24 meses antes de la fecha actual = feCalBanderaAnioMesAtras&#xD;&#xA;,feCalBanderaHace1AnioMesActual = case when f.feIdFecha = @fechaCierreAnioAntMesAct then 1 else 0 end --rr --Identifica la fecha de cierre un año atrás del mes actual&#xD;&#xA;&#xD;&#xA;,feCalBanderaEsHace1Anios= case when f.feIdFecha = fr1aa.feIdFecha then 1 --rr; Identifica las fechas del año anterior 12 meses atrás desde la fecha actual&#xD;&#xA;        when f.feIdFecha = @fechaCierreAnioAntMesAct then 3 -- Se identifica la fecha de cierre del mismo mes del año anterior respecto a la fecha actual&#xD;&#xA;        when left(f.feIdFecha,6)=left(@fechaHoy,6) and f.feIdFecha&lt;@fechaHoy and f.feFeriado=0 and f.feFinSemana=0 then 2 -- Identifica todos los dias habiles del mes fiscal de la fecha actual con exepcion de la fecha de corte&#xD;&#xA;        else 0 end &#xD;&#xA;,feCalBanderaEsHace2Anios= case when f.feIdFecha = fr2aa.feIdFecha then 1 when left(f.feIdFecha,6) = left(@fechaHoy,6) and f.feFeriado=0  and f.feFinSemana=0  then 2 else 0 end --rr; Identifica las fechas dos años anteriores 24 meses atrás desde la fechaactual&#xD;&#xA;,feCalBanderaEsMesActual = case when convert(int,left(f.feIdFecha,4)) = @feCalAnioActual and convert(int,SUBSTRING(convert(varchar(8),f.feIdFecha),5,2))= @feCalMesActual then 1 else 0 end --rr Fechas de los días para el mes actual &#xD;&#xA;,feCalBanderaEs2AnioContinuo = case when f.feIdFecha = fr2ac.feIdFecha then fr2ac.marcas else 0 end --rr; fechas continuas hace 2 años&#xD;&#xA;,feCalBanderaEs3MesesAdelante = case when f.feIdFecha = fr3ma.fecha then 1 else 0 end --rr; fechas 3 meses adelante&#xD;&#xA;,feCalBanderaEsHaceUnMes1AnioAtras = case when f.feIdFecha = @fechaHaceUnMes1AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes un año atrás desde el ultimo cierre de mes real&#xD;&#xA;,feCalBanderaEsHaceUnMes2AnioAtras = case when f.feIdFecha = @fechaHaceUnMes2AnioAtras then 1 else 0 end --Identifica la fecha del cierre mes dos años atrás desde el ultimo cierre de mes real&#xD;&#xA;,feCalBanderaCierreMesActual = case when f.feIdFecha = @setmes then 1 else 0 end --Identifica la posible fecha del cierre del mes actual (Modifique EA  para identificar el ultimo cierre de mes real)&#xD;&#xA;,feCalBanderaEsFechaConcentracion = case when f.feIdFecha = fr4cs.fecha then 1 else 0 end --rr; fechas para RF8&#xD;&#xA;,feCalBanderaEsFechaVolumen = isnull(marca,0)&#xD;&#xA;,feOrdenVolumen = isnull(orden,0)&#xD;&#xA;,feCalBanderaPptoMesActual = case when f.feIdFecha = @fechaPptoMesActual then 1 else 0 end&#xD;&#xA;,feCalBanderaBarraVolumen = case when f.feidfecha in (@fechaHoy,@feCierreAnioActual,@fecha15dias, @fechaHaceUnMes ,@fechaFinSemestre ,@feFechaCierreAnioAnt) then 1 else 0 end&#xD;&#xA;,feCalBanderaMesAnioAnt =  case when left(f.feidfecha,6) = left(@fechaMesAnioAnt,6) then 1 else 0 end&#xD;&#xA;,feHaceUnAnio=case when f.feidfecha = @DiaAAnterior then 1 else 0 end &#xD;&#xA;,feNumeroAnioAnt= IsNull(aniosAnt.feNumeroAnioAnt,0) -- Se identifica los ultimos 5 cierres de anio&#xD;&#xA;,feCalFechaHaceDosAnios=case when f.feFeriado=0 and f.feFinSemana=0 then dosAnios.feIdFechaAnioAnt end -- Se identifica la fecha de hace dos anios&#xD;&#xA;&#xD;&#xA;from DWDFecha f&#xD;&#xA;left join DWDFecha f2 on f.feIdFechaCierreAnioAnt = f2.feIdFecha and f2.feCierreMes=1&#xD;&#xA;left join DWDFecha f3 on f2.feIdFechaCierreAnioAnt = f3.feIdFecha and f3.feCierreMes=1&#xD;&#xA;left join DWDFecha fr1aa on f.feIdFecha = fr1aa.feIdFecha and fr1aa.feCierreMes=1 and fr1aa.feIdFecha between @feIdFecha1AnioAnt and @fechaHoy --rr; fechas del año anterior&#xD;&#xA;left join DWDFecha fr2aa on f.feIdFecha = fr2aa.feIdFecha and fr2aa.feCierreMes=1 and fr2aa.feIdFecha &gt;= @feIdFecha2AnioAnt and fr2aa.feIdFecha &lt; @feIdFecha1AnioAnt --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidfecha    ,1 marcas&#xD;&#xA;  from DWDFecha fr2ac &#xD;&#xA;  where fr2ac.feIdFecha between @feIdFecha2AnioAnt and @fechaHoy&#xD;&#xA;  and fr2ac.feCierreMes = 1 &#xD;&#xA;  union&#xD;&#xA;  select feidfecha  ,2 marcas&#xD;&#xA;  from dwdfecha&#xD;&#xA;  where left(feidfecha,6) = left(@fechaHoy,6)&#xD;&#xA;  and feidfecha &lt; @fechaHoy&#xD;&#xA;  and feferiado &lt;&gt;1&#xD;&#xA;  and feFinSemana &lt;&gt; 1&#xD;&#xA;) fr2ac on f.feIdFecha = fr2ac.feIdFecha --rr; fechas de 2 año anterior&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select max(feidFecha) fecha&#xD;&#xA;  from DWDFecha where feIdfecha between @fechaHoy and @feIdFecha3MesesFuturo&#xD;&#xA;  and feFeriado=0 and feFinSemana=0 and  feCalMes &lt;= (convert(int,SUBSTRING(convert(varchar(8),@feIdFecha3MesesFuturo),5,2))-1)&#xD;&#xA;  group by feCalMes&#xD;&#xA;) fr3ma on f.feIdFecha = fr3ma.fecha --rr; fechas de 3 meses adelante&#xD;&#xA;left join DWDFecha frcf on frcf.feIdFecha = f.feIdFecha and (frcf.feDiaActual=1 or frcf.feCierreMesAnterior=1 or (frcf.feCalMes%3 = 0 and frcf.feCalAnio in (@feCalAnioActual-1, @feCalAnioActual) and frcf.feCierreMes=1))&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feidFecha fecha&#xD;&#xA;  from DWDFecha &#xD;&#xA;  WHERE (&#xD;&#xA;  feIdFecha in (select feIdFecha from DWDFecha Where feIdFecha between convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112)  and convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and feCierreMes=1)&#xD;&#xA;  )&#xD;&#xA;  or (feIdFecha &gt; @fecha3AñosAtras and feIdFecha &lt; convert(varchar(8),dateadd(mm,-12,convert(varchar(8),@feFechaCierreAnioAnt)),112) and feCalMes = 12 and feCierreMes=1)&#xD;&#xA;  or (feIdFecha between convert(varchar(8),dateadd(dd,-30,convert(varchar(8),@fechahoy)),112) and @fechaHoy)&#xD;&#xA;  and (feFeriado= 0 and feFinSemana=0)&#xD;&#xA;) fr4cs on f.feIdFecha = fr4cs.fecha  --rr; concentracion saldos RF8&#xD;&#xA;left join &#xD;&#xA;( -------&#xD;&#xA;  select feidfecha,min(marca) marca ,min(orden) orden&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;   select   b.feidfecha, b.marca,isnull(a.orden,b.orden) orden from &#xD;&#xA;   (&#xD;&#xA;       select &#xD;&#xA;       feidfecha,&#xD;&#xA;       case when feFecha &lt;= @fechaDate then 1 else 2 end marca   ,&#xD;&#xA;       convert(float,case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end)*100   orden&#xD;&#xA;       from dwdfecha&#xD;&#xA;       where feidfecha between @fechaAñoMesAtrasFiscal and concat(@feCalAnioActual,'1231')&#xD;&#xA;       and fecierremestodosanios = 1&#xD;&#xA;       and fediaactual &lt;&gt; 1 &#xD;&#xA;   ) b&#xD;&#xA;   left join &#xD;&#xA;   (&#xD;&#xA;      select &#xD;&#xA;      feidfecha  , &#xD;&#xA;      fecierremestodosanios, &#xD;&#xA;      (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;      convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;      from dwdfecha&#xD;&#xA;      where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;      and feferiado = 0&#xD;&#xA;      and fefinsemana = 0&#xD;&#xA;    ) a  on left(a.feidfecha,4) = left(b.feidfecha,4)+1 and right(left(a.feidfecha,6),2) = right(left(b.feidfecha,6),2) and a.fecierremestodosanios = 1&#xD;&#xA;    union&#xD;&#xA;    select &#xD;&#xA;    feidfecha  , &#xD;&#xA;    case when feDiaActual= 1 then 1 else 3 end marca, &#xD;&#xA;    (case when (fecalmes - @MesHoy )&lt;1 or fefecha &gt; @fechaDate then  (fecalmes - @MesHoy )+12 else  (fecalmes - @MesHoy ) end -1) *100 +&#xD;&#xA;    convert(float,ROW_NUMBER() OVER(PARTITION BY fecalmes ORDER BY feidfecha ASC) ) orden  &#xD;&#xA;    from dwdfecha&#xD;&#xA;    where fefecha between dateadd(day,-29,@fechaDate) and @fecha15diasDate&#xD;&#xA;    and feferiado = 0&#xD;&#xA;    and fefinsemana = 0&#xD;&#xA;  ) a&#xD;&#xA;  group by feIdFecha&#xD;&#xA;) fv on f.feIdFecha = fv.feidfecha ---Fechas Volumen cierre mes y diarios&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select &#xD;&#xA;  hoy.feidfecha feidfechaAct, isnull(isnull(ant2.feidfecha,ant.feidfecha), @fechamax) feidfechaAnt&#xD;&#xA;  from &#xD;&#xA;  (&#xD;&#xA;   select feidfecha ,ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecrucehoy&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = left(@fechaHoy,6)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;   and feIdFecha &lt;= @fechaHoy&#xD;&#xA;  ) hoy&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select ROW_NUMBER() OVER(ORDER BY feidfecha ASC) fecruceant,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant on hoy.fecrucehoy = ant.fecruceant&#xD;&#xA;  left join &#xD;&#xA;  (&#xD;&#xA;   select convert(char(8),dateadd(year,1,feFecha),112) fecruceant2,feidfecha&#xD;&#xA;   from DWDFecha&#xD;&#xA;   where left(feIdFecha,6) = convert(char(6),dateadd(year,-1,@fechaDate),112)&#xD;&#xA;   and feFeriado &lt;&gt; 1&#xD;&#xA;   and feFinSemana &lt;&gt; 1&#xD;&#xA;  ) ant2 on right(hoy.feidfecha,4) = right(ant2.fecruceant2,4)&#xD;&#xA;) fecdiaAniAnt on f.feIdFecha = feidfechaAct&#xD;&#xA;left join &#xD;&#xA;(&#xD;&#xA;  select feIdFecha,feNumeroAnioAnt = ( @UltimoCierreAnio - feCalAnio ) + 1  -- Se identifica 5 cierres de año&#xD;&#xA;  from DWDFecha&#xD;&#xA;  where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 &#xD;&#xA;) aniosAnt on aniosAnt.feIdFecha = f.feidFecha&#xD;&#xA;left join DWDFecha dosAnios on f.feIdFechaAnioAnt=dosAnios.feIdFecha -- Se identifica la fecha de hace dos anios&#xD;&#xA;&#xD;&#xA;where (f.feIdFecha between @fecha3AñosUnMesAtras and concat(@feCalAnioActual,'1231'))&#xD;&#xA;  or  (f.feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and f.feCierreMes = 1 and f.feCalMes = 12  ) &#xD;&#xA;&#xD;&#xA;order by 1">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="feIdFecha" msprop:DbColumnName="feIdFecha" msprop:FriendlyName="feIdFecha" type="xs:long" />
@@ -71128,6 +72486,7 @@ CREATE MEASURE 'DWHPasivoOperacion'[poCalValTasaImplicitaAperturada]=CALCULATE((
                           <xs:element name="feCalBanderaMesAnioAnt" msprop:DbColumnName="feCalBanderaMesAnioAnt" msprop:FriendlyName="feCalBanderaMesAnioAnt" type="xs:int" minOccurs="0" />
                           <xs:element name="feHaceUnAnio" msprop:DbColumnName="feHaceUnAnio" msprop:FriendlyName="feHaceUnAnio" type="xs:int" minOccurs="0" />
                           <xs:element name="feNumeroAnioAnt" msprop:DbColumnName="feNumeroAnioAnt" msprop:FriendlyName="feNumeroAnioAnt" type="xs:int" minOccurs="0" />
+                          <xs:element name="feCalFechaHaceDosAnios" msprop:DbColumnName="feCalFechaHaceDosAnios" msprop:FriendlyName="feCalFechaHaceDosAnios" type="xs:int" minOccurs="0" />
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>

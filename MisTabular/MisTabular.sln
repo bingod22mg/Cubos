@@ -5,27 +5,25 @@ VisualStudioVersion = 16.0.32126.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbIngresos", "CbIngresos\CbIngresos.smproj", "{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbHojaPosicion", "cbHojaPosicion\cbHojaPosicion.smproj", "{C6C3872E-5F67-4E34-A587-C73CF5F42BEA}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbHojaPosicion", "cbHojaPosicion\cbHojaPosicion.smproj", "{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbMonitorIndicadoresCliente", "CbMonitorIndicadoresCliente\CbMonitorIndicadoresCliente.smproj", "{663C17A7-F39F-462E-9F5A-AD8EF3CEDBD5}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbMonitorIndicadoresCliente", "CbMonitorIndicadoresCliente\CbMonitorIndicadoresCliente.smproj", "{34E436A9-3A15-49FC-8B16-02814252AB9D}"
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbProyectoPMS", "cbProyectoPMS\cbProyectoPMS.smproj", "{065E5329-8656-430A-813A-65E8FA986B69}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbRentabilidadCliente", "CbRentabilidadCliente\CbRentabilidadCliente.smproj", "{0D054492-292D-4321-A61C-79163FBB33FF}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbRentabilidadCliente", "CbRentabilidadCliente\CbRentabilidadCliente.smproj", "{23B15ADC-E7F7-45B7-A128-EEF4E45012F4}"
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbSDI", "CbSDI\CbSDI.smproj", "{3849EF47-00BD-43C8-B4DF-D96B030112AB}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbGestionEstrategica", "cbGestionEstrategica\cbGestionEstrategica.smproj", "{9DA33D30-DC1A-4C3A-B89E-401021A90C36}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbGestionEstrategica", "cbGestionEstrategica\cbGestionEstrategica.smproj", "{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbInformacionHistoricaCaptacionesCartera", "cbInformacionHistoricaCaptacionesCartera\cbInformacionHistoricaCaptacionesCartera.smproj", "{3AF0D7D7-95E3-49CA-9C6A-D713DA28F6D0}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbInformacionHistoricaCaptacionesCartera", "cbInformacionHistoricaCaptacionesCartera\cbInformacionHistoricaCaptacionesCartera.smproj", "{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}"
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbMonitorCanales", "CbMonitorCanales\CbMonitorCanales.smproj", "{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbMonitorCaptaciones", "cbMonitorCaptaciones\cbMonitorCaptaciones.smproj", "{3AF5DD54-3D29-4D19-AAAA-C390D3389F1A}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbMonitorCaptaciones", "cbMonitorCaptaciones\cbMonitorCaptaciones.smproj", "{E611F492-076D-4371-97F7-2EFE3ED4CE3F}"
 EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbBalance", "CbBalance\CbBalance.smproj", "{80BF058F-3764-4AD4-BCCD-B0ED26A827D3}"
-EndProject
-Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "cbInformacionRecursosHumanos", "cbInformacionRecursosHumanos\cbInformacionRecursosHumanos.smproj", "{BA4BF0EA-F346-423F-A5AD-70174DF92013}"
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "CbBalance", "CbBalance\CbBalance.smproj", "{8CE414BB-95B2-4C99-9E03-51BA72086E22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,39 +33,36 @@ Global
 		{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}.Development|x86.ActiveCfg = Development|x86
 		{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}.Development|x86.Build.0 = Development|x86
 		{3B7AA2A6-6CF5-42A2-8138-A5D01831A2B9}.Development|x86.Deploy.0 = Development|x86
-		{C6C3872E-5F67-4E34-A587-C73CF5F42BEA}.Development|x86.ActiveCfg = Development|x86
-		{C6C3872E-5F67-4E34-A587-C73CF5F42BEA}.Development|x86.Build.0 = Development|x86
-		{C6C3872E-5F67-4E34-A587-C73CF5F42BEA}.Development|x86.Deploy.0 = Development|x86
-		{663C17A7-F39F-462E-9F5A-AD8EF3CEDBD5}.Development|x86.ActiveCfg = Development|x86
-		{663C17A7-F39F-462E-9F5A-AD8EF3CEDBD5}.Development|x86.Build.0 = Development|x86
-		{663C17A7-F39F-462E-9F5A-AD8EF3CEDBD5}.Development|x86.Deploy.0 = Development|x86
+		{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}.Development|x86.ActiveCfg = Development|x86
+		{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}.Development|x86.Build.0 = Development|x86
+		{07962F7F-95EB-4EF3-A28A-DFAE9F0E8074}.Development|x86.Deploy.0 = Development|x86
+		{34E436A9-3A15-49FC-8B16-02814252AB9D}.Development|x86.ActiveCfg = Development|x86
+		{34E436A9-3A15-49FC-8B16-02814252AB9D}.Development|x86.Build.0 = Development|x86
+		{34E436A9-3A15-49FC-8B16-02814252AB9D}.Development|x86.Deploy.0 = Development|x86
 		{065E5329-8656-430A-813A-65E8FA986B69}.Development|x86.ActiveCfg = Development|x86
 		{065E5329-8656-430A-813A-65E8FA986B69}.Development|x86.Build.0 = Development|x86
 		{065E5329-8656-430A-813A-65E8FA986B69}.Development|x86.Deploy.0 = Development|x86
-		{0D054492-292D-4321-A61C-79163FBB33FF}.Development|x86.ActiveCfg = Development|x86
-		{0D054492-292D-4321-A61C-79163FBB33FF}.Development|x86.Build.0 = Development|x86
-		{0D054492-292D-4321-A61C-79163FBB33FF}.Development|x86.Deploy.0 = Development|x86
+		{23B15ADC-E7F7-45B7-A128-EEF4E45012F4}.Development|x86.ActiveCfg = Development|x86
+		{23B15ADC-E7F7-45B7-A128-EEF4E45012F4}.Development|x86.Build.0 = Development|x86
+		{23B15ADC-E7F7-45B7-A128-EEF4E45012F4}.Development|x86.Deploy.0 = Development|x86
 		{3849EF47-00BD-43C8-B4DF-D96B030112AB}.Development|x86.ActiveCfg = Development|x86
 		{3849EF47-00BD-43C8-B4DF-D96B030112AB}.Development|x86.Build.0 = Development|x86
 		{3849EF47-00BD-43C8-B4DF-D96B030112AB}.Development|x86.Deploy.0 = Development|x86
-		{9DA33D30-DC1A-4C3A-B89E-401021A90C36}.Development|x86.ActiveCfg = Development|x86
-		{9DA33D30-DC1A-4C3A-B89E-401021A90C36}.Development|x86.Build.0 = Development|x86
-		{9DA33D30-DC1A-4C3A-B89E-401021A90C36}.Development|x86.Deploy.0 = Development|x86
-		{3AF0D7D7-95E3-49CA-9C6A-D713DA28F6D0}.Development|x86.ActiveCfg = Development|x86
-		{3AF0D7D7-95E3-49CA-9C6A-D713DA28F6D0}.Development|x86.Build.0 = Development|x86
-		{3AF0D7D7-95E3-49CA-9C6A-D713DA28F6D0}.Development|x86.Deploy.0 = Development|x86
+		{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}.Development|x86.ActiveCfg = Development|x86
+		{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}.Development|x86.Build.0 = Development|x86
+		{6940225E-B0A1-44EB-88E7-B7EC82F80D6E}.Development|x86.Deploy.0 = Development|x86
+		{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}.Development|x86.ActiveCfg = Development|x86
+		{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}.Development|x86.Build.0 = Development|x86
+		{6DF0EDCF-CEF4-4F59-900C-1EDE125E2530}.Development|x86.Deploy.0 = Development|x86
 		{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}.Development|x86.ActiveCfg = Development|x86
 		{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}.Development|x86.Build.0 = Development|x86
 		{F055FF42-393A-4AC7-A3D2-C4DA3C4B53DA}.Development|x86.Deploy.0 = Development|x86
-		{3AF5DD54-3D29-4D19-AAAA-C390D3389F1A}.Development|x86.ActiveCfg = Development|x86
-		{3AF5DD54-3D29-4D19-AAAA-C390D3389F1A}.Development|x86.Build.0 = Development|x86
-		{3AF5DD54-3D29-4D19-AAAA-C390D3389F1A}.Development|x86.Deploy.0 = Development|x86
-		{80BF058F-3764-4AD4-BCCD-B0ED26A827D3}.Development|x86.ActiveCfg = Development|x86
-		{80BF058F-3764-4AD4-BCCD-B0ED26A827D3}.Development|x86.Build.0 = Development|x86
-		{80BF058F-3764-4AD4-BCCD-B0ED26A827D3}.Development|x86.Deploy.0 = Development|x86
-		{BA4BF0EA-F346-423F-A5AD-70174DF92013}.Development|x86.ActiveCfg = Development|x86
-		{BA4BF0EA-F346-423F-A5AD-70174DF92013}.Development|x86.Build.0 = Development|x86
-		{BA4BF0EA-F346-423F-A5AD-70174DF92013}.Development|x86.Deploy.0 = Development|x86
+		{E611F492-076D-4371-97F7-2EFE3ED4CE3F}.Development|x86.ActiveCfg = Development|x86
+		{E611F492-076D-4371-97F7-2EFE3ED4CE3F}.Development|x86.Build.0 = Development|x86
+		{E611F492-076D-4371-97F7-2EFE3ED4CE3F}.Development|x86.Deploy.0 = Development|x86
+		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Development|x86.ActiveCfg = Development|x86
+		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Development|x86.Build.0 = Development|x86
+		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Development|x86.Deploy.0 = Development|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
