@@ -15,7 +15,7 @@
     <OutputPath>bin\</OutputPath>
     <DeploymentServerName>172.16.172.161</DeploymentServerName>
     <DeploymentServerEdition>Enterprise</DeploymentServerEdition>
-    <DeploymentServerVersion>Unknown</DeploymentServerVersion>
+    <DeploymentServerVersion>Version_12_0</DeploymentServerVersion>
     <DeploymentServerDatabase>cbHojaPosicion</DeploymentServerDatabase>
     <DeploymentServerCubeName>Model</DeploymentServerCubeName>
     <DeploymentOptionProcessing>Full</DeploymentOptionProcessing>
