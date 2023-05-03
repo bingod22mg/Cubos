@@ -3,7 +3,7 @@
     <DatabaseID>SemanticModel</DatabaseID>
   </Object>
   <ObjectDefinition>
-    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500">
+    <Database xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400">
       <ID>SemanticModel</ID>
       <Name>SemanticModel</Name>
       <Annotations>
@@ -1748,6 +1748,16 @@ order by 1&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryC
                   <AttributeID>FechaMesAntRent</AttributeID>
                   <OverrideBehavior>None</OverrideBehavior>
                   <Name>FechaMesAntRent</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>F</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>FeCalMesAbreviado</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>Agregar columna2</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>FeMesAbreviadoAnio</Name>
                 </AttributeRelationship>
               </AttributeRelationships>
               <OrderBy>Key</OrderBy>
@@ -3538,6 +3548,84 @@ IF(DWDFecha[feCalMes]=11,"Nov","Dic")
                 <Source xsi:type="ColumnBinding">
                   <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                   <ColumnID>FechaMesAntRent</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>F</ID>
+              <Name>FeCalMesAbreviado</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Empty</DataType>
+                  <Source xsi:type="ddl200_200:ExpressionBinding">
+                    <Expression>SWITCH([feCalMes],
+1,"ENE",
+2,"FEB",
+3,"MAR",
+4,"ABR",
+5,"MAY",
+6,"JUN",
+7,"JUL",
+8,"AGO",
+9,"SEP",
+10,"OCT",
+11,"NOV",
+12,"DIC")</Expression>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <Source xsi:type="ddl200_200:ExpressionBinding">
+                  <Expression>SWITCH([feCalMes],
+1,"ENE",
+2,"FEB",
+3,"MAR",
+4,"ABR",
+5,"MAY",
+6,"JUN",
+7,"JUL",
+8,"AGO",
+9,"SEP",
+10,"OCT",
+11,"NOV",
+12,"DIC")</Expression>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
+            </Attribute>
+            <Attribute>
+              <Annotations>
+                <Annotation>
+                  <Name>Format</Name>
+                  <Value>
+                    <Format Format="Text" xmlns="" />
+                  </Value>
+                </Annotation>
+              </Annotations>
+              <ID>Agregar columna2</ID>
+              <Name>FeMesAbreviadoAnio</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Empty</DataType>
+                  <Source xsi:type="ddl200_200:ExpressionBinding">
+                    <Expression>DWDFecha[feCalMesAbreviado] &amp; "-" &amp; DWDFecha[feCalAnio]</Expression>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <Source xsi:type="ddl200_200:ExpressionBinding">
+                  <Expression>DWDFecha[feCalMesAbreviado] &amp; "-" &amp; DWDFecha[feCalAnio]</Expression>
                 </Source>
               </NameColumn>
               <OrderBy>Key</OrderBy>
@@ -7271,7 +7359,7 @@ from DWDCliente&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQ
 
 declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int
 
-set @Mes=1
+set @Mes=2
 
 -- Fecha hace dos años corrido --
 select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 
@@ -7327,6 +7415,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -7355,12 +7444,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -7503,6 +7593,11 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                   <AttributeID>poSaldoAcumuladoMensualFiscal</AttributeID>
                   <OverrideBehavior>None</OverrideBehavior>
                   <Name>poSaldoAcumuladoMensualFiscal</Name>
+                </AttributeRelationship>
+                <AttributeRelationship>
+                  <AttributeID>poCuentaAperturada</AttributeID>
+                  <OverrideBehavior>None</OverrideBehavior>
+                  <Name>poCuentaAperturada</Name>
                 </AttributeRelationship>
               </AttributeRelationships>
               <OrderBy>Key</OrderBy>
@@ -8218,6 +8313,33 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
               </NameColumn>
               <OrderBy>Key</OrderBy>
               <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+            </Attribute>
+            <Attribute>
+              <ID>poCuentaAperturada</ID>
+              <Name>poCuentaAperturada</Name>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <DataSize>-1</DataSize>
+                  <NullProcessing>Preserve</NullProcessing>
+                  <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>DWHPasivoOperacion_abbaa295-b462-49cf-8c65-034c7dc36f40</TableID>
+                    <ColumnID>poCuentaAperturada</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+              <NameColumn>
+                <DataType>WChar</DataType>
+                <DataSize>-1</DataSize>
+                <NullProcessing>ZeroOrBlank</NullProcessing>
+                <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                <Source xsi:type="ColumnBinding">
+                  <TableID>DWHPasivoOperacion_abbaa295-b462-49cf-8c65-034c7dc36f40</TableID>
+                  <ColumnID>poCuentaAperturada</ColumnID>
+                </Source>
+              </NameColumn>
+              <OrderBy>Key</OrderBy>
             </Attribute>
           </Attributes>
           <ProactiveCaching>
@@ -20101,6 +20223,12 @@ if OBJECT_ID ('tempdb..#Ranking') is not null begin drop table #Ranking end&lt;/
                 <Attribute>
                   <AttributeID>FechaMesAntRent</AttributeID>
                 </Attribute>
+                <Attribute>
+                  <AttributeID>F</AttributeID>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>Agregar columna2</AttributeID>
+                </Attribute>
               </Attributes>
             </Dimension>
             <Dimension>
@@ -20502,6 +20630,9 @@ if OBJECT_ID ('tempdb..#Ranking') is not null begin drop table #Ranking end&lt;/
                 <Attribute>
                   <AttributeID>poSaldoAcumuladoMensualFiscal</AttributeID>
                   <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
+                </Attribute>
+                <Attribute>
+                  <AttributeID>poCuentaAperturada</AttributeID>
                 </Attribute>
               </Attributes>
             </Dimension>
@@ -21606,6 +21737,35 @@ if OBJECT_ID ('tempdb..#Ranking') is not null begin drop table #Ranking end&lt;/
                   <Type>Member</Type>
                 </Calculation>
               </Calculations>
+              <Kpis>
+                <Kpi>
+                  <KpiID>F58884D6-41AB-4D55-AF24-DA2F46B22AEE</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>20F5D96E-87C9-49CD-9C75-4135DCEA8961</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>A45FFD6B-A360-4ED0-9556-D538BE46F2E3</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>F1B2C8B6-AD5C-4585-9C7F-4ACB30A08179</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>20D2890B-7547-4180-B98E-06D3898BA607</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>C0A13771-4196-4E81-9291-C7E7E2A48BFD</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>C5C5D5E9-E16C-475D-8B31-961B8E564FD4</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>117F4A00-4F1C-426C-B84A-6BEF5DD74A0B</KpiID>
+                </Kpi>
+                <Kpi>
+                  <KpiID>8A0BFA43-10F1-4924-BB6F-C753FF407959</KpiID>
+                </Kpi>
+              </Kpis>
             </Perspective>
             <Perspective>
               <ID>COBRANZA</ID>
@@ -23316,6 +23476,28 @@ CLOSE SYMMETRIC KEY ClaveMIS02</QueryDefinition>
                         </KeyColumn>
                       </KeyColumns>
                     </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
                   </Attributes>
                   <ddl200_200:ShareDimensionStorage>Shared</ddl200_200:ShareDimensionStorage>
                 </Dimension>
@@ -23327,7 +23509,11 @@ CLOSE SYMMETRIC KEY ClaveMIS02</QueryDefinition>
                   <Annotations>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;declare @FechaMesAntRent  int, @FechaInicio int, @FechaFin int
+                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;declare @FechaMesAntRent  int, @FechaInicio int, @fechaCierreAnioAntMesAct int, @FechaFin int
+
+select @fechaCierreAnioAntMesAct=feIdFechaCierreAnioAnt
+from DWDFecha 
+where feDiaActual = 1
 
 select @FechaMesAntRent = feMesAntCierr from dwdfecha where femesanterior = 1 
 
@@ -23384,7 +23570,9 @@ select
 ,feTrimestresAnteriores
 ,feCierrFechAnioActFut
 ,feMesAntAnioAnt
-,feCierrMesAnioAtras
+,case when feCierrMesAnioAtras=1 then 1
+when  feidfecha = @fechaCierreAnioAntMesAct then 2
+else 0 end as feCierrMesAnioAtras
 ,feIdFechaTresMesAtras
 ,feIdFechaSeisMesAtras
 ,feIdFechaDoceMesAtras
@@ -23397,7 +23585,11 @@ order by 1&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryC
                   </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
-                    <QueryDefinition>declare @FechaMesAntRent  int, @FechaInicio int, @FechaFin int
+                    <QueryDefinition>declare @FechaMesAntRent  int, @FechaInicio int, @fechaCierreAnioAntMesAct int, @FechaFin int
+
+select @fechaCierreAnioAntMesAct=feIdFechaCierreAnioAnt
+from DWDFecha 
+where feDiaActual = 1
 
 select @FechaMesAntRent = feMesAntCierr from dwdfecha where femesanterior = 1 
 
@@ -23454,7 +23646,9 @@ select
 ,feTrimestresAnteriores
 ,feCierrFechAnioActFut
 ,feMesAntAnioAnt
-,feCierrMesAnioAtras
+,case when feCierrMesAnioAtras=1 then 1
+when  feidfecha = @fechaCierreAnioAntMesAct then 2
+else 0 end as feCierrMesAnioAtras
 ,feIdFechaTresMesAtras
 ,feIdFechaSeisMesAtras
 ,feIdFechaDoceMesAtras
@@ -26958,6 +27152,21 @@ from DWDCliente</QueryDefinition>
                         </KeyColumn>
                       </KeyColumns>
                     </Attribute>
+                    <Attribute>
+                      <AttributeID>poCuentaAperturada</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Integer</DataType>
+                          <DataSize>-1</DataSize>
+                          <NullProcessing>Preserve</NullProcessing>
+                          <InvalidXmlCharacters>Remove</InvalidXmlCharacters>
+                          <Source xsi:type="ColumnBinding">
+                            <TableID>DWHPasivoOperacion_abbaa295-b462-49cf-8c65-034c7dc36f40</TableID>
+                            <ColumnID>poCuentaAperturada</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
                   </Attributes>
                   <ddl200_200:ShareDimensionStorage>Shared</ddl200_200:ShareDimensionStorage>
                 </Dimension>
@@ -27785,6 +27994,28 @@ from DWDCliente</QueryDefinition>
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                             <ColumnID>FechaMesAntRent</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -30083,7 +30314,9 @@ if(DWDCuentaContable[cpCalIndicadorNivel2]=140,11,
                   <Annotations>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;declare @FechaActual int
+                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;set nocount on
+
+declare @FechaActual int
 
 select @FechaActual=feIdFecha from DWDFecha where feDiaActual=1
 
@@ -30129,7 +30362,7 @@ select
 ,poValorUtilidadOperativa=0
 
 ,poSaldoAcumuladoMensualFiscal=0
-
+,poCuentaAperturada = 0
 from DWHPasivoOperacionMes po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 where poIdFecha=@FechaActual
@@ -30140,7 +30373,9 @@ group by poIdFecha
                   </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>fd0cb57e-3079-4c98-91e5-536ca2283c35</DataSourceID>
-                    <QueryDefinition>declare @FechaActual int
+                    <QueryDefinition>set nocount on
+
+declare @FechaActual int
 
 select @FechaActual=feIdFecha from DWDFecha where feDiaActual=1
 
@@ -30186,7 +30421,7 @@ select
 ,poValorUtilidadOperativa=0
 
 ,poSaldoAcumuladoMensualFiscal=0
-
+,poCuentaAperturada = 0
 from DWHPasivoOperacionMes po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 where poIdFecha=@FechaActual
@@ -30274,6 +30509,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -30292,7 +30528,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30302,12 +30538,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -30380,6 +30617,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -30398,7 +30636,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) ) 
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30408,12 +30646,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -30500,6 +30739,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -30518,7 +30758,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30528,12 +30768,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -30606,6 +30847,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -30624,7 +30866,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30634,12 +30876,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -30726,6 +30969,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -30744,7 +30988,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30754,12 +30998,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -30832,6 +31077,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -30850,7 +31096,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30860,12 +31106,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -30952,6 +31199,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -30970,7 +31218,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -30980,12 +31228,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31058,6 +31307,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31076,7 +31326,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31086,12 +31336,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31178,6 +31429,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31196,7 +31448,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31206,12 +31458,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31284,6 +31537,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31302,7 +31556,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31312,12 +31566,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31404,6 +31659,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31422,7 +31678,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31432,12 +31688,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31510,6 +31767,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31528,7 +31786,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31538,12 +31796,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31630,6 +31889,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31648,7 +31908,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31658,12 +31918,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31736,6 +31997,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31754,7 +32016,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31764,12 +32026,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31856,6 +32119,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31874,7 +32138,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31884,12 +32148,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -31962,6 +32227,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -31980,7 +32246,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -31990,12 +32256,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32082,6 +32349,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32100,7 +32368,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32110,12 +32378,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32188,6 +32457,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32206,7 +32476,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32216,12 +32486,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32308,6 +32579,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32326,7 +32598,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32336,12 +32608,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32414,6 +32687,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32432,7 +32706,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32442,12 +32716,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32534,6 +32809,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32552,7 +32828,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32562,12 +32838,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32640,6 +32917,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32658,7 +32936,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32668,12 +32946,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32760,6 +33039,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32778,7 +33058,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32788,12 +33068,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -32866,6 +33147,7 @@ select
 ,poValorMargenExplotacion
 ,poValorUtilidadOperativa
 ,poSaldoAcumuladoMensualFiscal
+,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end 
 into #PasivoOperacion
 from DWHPasivoOperacion po
 inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha
@@ -32884,7 +33166,7 @@ select
 ,poValorComision=sum(isnull(poValorComision,0))
 ,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))
 ,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))
-,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) 
+,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) + (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  
 ,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))
 ,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))
 ,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))
@@ -32894,12 +33176,13 @@ select
 ,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo
 ,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada
 ,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))
-
+,poCuentaAperturada
 from #PasivoOperacion po
 inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable
 group by poIdFecha
 ,poIdCliente
 ,poIdCuentaContable
+,poCuentaAperturada
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end 
 if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end
@@ -34200,6 +34483,28 @@ if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOpe
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                             <ColumnID>FechaMesAntRent</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -42201,6 +42506,28 @@ if(DWDCuentaContable[cpCalIndicadorNivel2]=140,11,
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                             <ColumnID>FechaMesAntRent</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -50534,6 +50861,28 @@ IF(DWDFecha[feCalMes]=11,"Nov","Dic")
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                             <ColumnID>FechaMesAntRent</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -63206,6 +63555,28 @@ IF(DWDFecha[feCalMes]=11,"Nov","Dic")
                         </KeyColumn>
                       </KeyColumns>
                     </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
                   </Attributes>
                   <IntermediateCubeDimensionID>DWHPerdidaEsperadaPortafolioGlobal_1f156d0f-8f98-4d03-96bb-d254ce7134fa</IntermediateCubeDimensionID>
                   <IntermediateGranularityAttributeID>peIdFecha</IntermediateGranularityAttributeID>
@@ -66342,6 +66713,28 @@ IF(DWDFecha[feCalMes]=11,"Nov","Dic")
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                             <ColumnID>FechaMesAntRent</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -70084,6 +70477,28 @@ IF(DWDFecha[feCalMes]=11,"Nov","Dic")
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                             <ColumnID>FechaMesAntRent</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -74567,6 +74982,28 @@ IF(DWDFecha[feCalMes]=11,"Nov","Dic")
                           <Source xsi:type="ColumnBinding">
                             <TableID>DWDFecha_3ee73abf-d2b6-4e5e-82d9-20a581444b0e</TableID>
                             <ColumnID>FechaMesAntRent</ColumnID>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>F</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
+                          </Source>
+                        </KeyColumn>
+                      </KeyColumns>
+                    </Attribute>
+                    <Attribute>
+                      <AttributeID>Agregar columna2</AttributeID>
+                      <KeyColumns>
+                        <KeyColumn>
+                          <DataType>Empty</DataType>
+                          <Source xsi:type="ddl200_200:ExpressionBinding">
+                            <Expression></Expression>
                           </Source>
                         </KeyColumn>
                       </KeyColumns>
@@ -81828,6 +82265,44 @@ CREATE MEASURE 'DWHPasivoOperacion'[ValPasivoCostoOperativo]=SUM(DWHPasivoOperac
 ----------------------------------------------------------
 
 
+CREATE MEASURE 'DWHIngresoOperacion'[ValIngresoAcumuladoMesFiscal]=sum(DWHIngresoOperacion[ioSaldoAcumuladoMensualFiscal]);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>ValIngresoAcumuladoMesFiscal</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHIngresoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[ValCalTasaImplicitaPortafolio]=DIVIDE([ValInteresCaptacionesMensual],[ValPasivoSaldoDia],0);
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>ValCalTasaImplicitaPortafolio</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
 CREATE MEASURE 'DWDCliente'[ValClienteTotalVinculacion]=AVERAGE(DWDCliente[clVinculacionValor]);
 CREATE MEASURE 'DWDCliente'[_ValClienteTotalVinculacion Goal] = 10; 
 CREATE MEASURE 'DWDCliente'[_ValClienteTotalVinculacion Status] = if(ISBLANK('DWDCliente'[ValClienteTotalVinculacion]),BLANK(),
@@ -81846,6 +82321,25 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                     <Annotation>
                       <Name>Table</Name>
                       <Value>DWDCliente</Value>
+                    </Annotation>
+                  </Annotations>
+                </Command>
+                <Command>
+                  <Text>----------------------------------------------------------
+-- PowerPivot measures command (do not modify manually) --
+----------------------------------------------------------
+
+
+CREATE MEASURE 'DWHPasivoOperacion'[ValCalTasaImplicitaAperturada]=CALCULATE(DIVIDE([ValInteresCaptacionesMensual],[ValPasivoSaldoDia],0),DWHPasivoOperacion[poCuentaAperturada]=1)+0;
+</Text>
+                  <Annotations>
+                    <Annotation>
+                      <Name>FullName</Name>
+                      <Value>ValCalTasaImplicitaAperturada</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Table</Name>
+                      <Value>DWHPasivoOperacion</Value>
                     </Annotation>
                   </Annotations>
                 </Command>
@@ -86409,6 +86903,48 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                   <Annotations>
                     <Annotation>
                       <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[ValIngresoAcumuladoMesFiscal]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[ValCalTasaImplicitaPortafolio]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
                       <Value>Kpi</Value>
                     </Annotation>
                     <Annotation>
@@ -86527,6 +87063,27 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                   <CalculationType>Member</CalculationType>
                 </CalculationProperty>
                 <CalculationProperty>
+                  <Annotations>
+                    <Annotation>
+                      <Name>Type</Name>
+                      <Value>User</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>IsPrivate</Name>
+                      <Value>False</Value>
+                    </Annotation>
+                    <Annotation>
+                      <Name>Format</Name>
+                      <Value>
+                        <Format Format="General" xmlns="" />
+                      </Value>
+                    </Annotation>
+                  </Annotations>
+                  <CalculationReference>[ValCalTasaImplicitaAperturada]</CalculationReference>
+                  <CalculationType>Member</CalculationType>
+                  <FormatString>''</FormatString>
+                </CalculationProperty>
+                <CalculationProperty>
                   <CalculationReference>Measures.[__No measures defined]</CalculationReference>
                   <CalculationType>Member</CalculationType>
                   <Visible>false</Visible>
@@ -86554,11 +87111,11 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Integrated Security=SSPI;Persist Security Info=False;User ID=;Initial Catalog=DWHCORPORATIVO;Data Source=172.16.76.4;Initial File Name=;Server SPN=</ConnectionString>
+          <ConnectionString>Data Source=172.16.77.10,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=True;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
-            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\binxaste</Account>
+            <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
           </ImpersonationInfo>
+          <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>50</MaxActiveConnections>
         </DataSource>
@@ -87063,7 +87620,7 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="DWHPasivoOperacion_abbaa295-b462-49cf-8c65-034c7dc36f40" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWHPasivoOperacion" msprop:DbTableName="DWHPasivoOperacion" msprop:TableType="View" msprop:Description="DWHPasivoOperacion" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int&#xD;&#xA;&#xD;&#xA;set @Mes=1&#xD;&#xA;&#xD;&#xA;-- Fecha hace dos años corrido --&#xD;&#xA;select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 &#xD;&#xA;&#xD;&#xA;-- Fecha Mes Anterior --&#xD;&#xA;select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1&#xD;&#xA;&#xD;&#xA;/*---- Fecha ----*/&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end &#xD;&#xA;&#xD;&#xA;select feIdFecha&#xD;&#xA;into #DWDFecha&#xD;&#xA;from DWDFecha&#xD;&#xA;where feIdFecha=19000101 --between @FechaHaceDosAnios and @FechaMesAnt&#xD;&#xA;and fecierremes=1&#xD;&#xA;and feCalMes=@Mes&#xD;&#xA;&#xD;&#xA;/*----- Cuenta Contable Ctas Ahorro y Credito -----*/&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end&#xD;&#xA;&#xD;&#xA;select distinct&#xD;&#xA;ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)&#xD;&#xA;into #DWDCuentaContable&#xD;&#xA;from DWDCuentaContable cc&#xD;&#xA;inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3&#xD;&#xA;where indicadorNivel1=2 -- Captaciones&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;/*----- Pasivo Operacion -----*/&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end &#xD;&#xA;&#xD;&#xA;select&#xD;&#xA; poIdFecha&#xD;&#xA;,poIdCliente&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,poSaldoOperacionUSD&#xD;&#xA;,poSaldoAcumuladoAnual&#xD;&#xA;,poSaldoPromedioAnual&#xD;&#xA;,poValorActPondRiesgoPromAnual&#xD;&#xA;,poValorComision&#xD;&#xA;,poValorIngresoServicio&#xD;&#xA;,poNumeroTransaccionesAnual&#xD;&#xA;,poValorCostoOperativo&#xD;&#xA;,poValorOperacionFinanciera&#xD;&#xA;,poValorInteresRealAnual&#xD;&#xA;,poValorInteresTasaPool&#xD;&#xA;,poValorMargenFinanciero&#xD;&#xA;,poValorMargenBancarioBasico&#xD;&#xA;,poValorMargenOrdinario&#xD;&#xA;,poValorMargenExplotacion&#xD;&#xA;,poValorUtilidadOperativa&#xD;&#xA;,poSaldoAcumuladoMensualFiscal&#xD;&#xA;into #PasivoOperacion&#xD;&#xA;from DWHPasivoOperacion po&#xD;&#xA;inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select&#xD;&#xA; poIdFecha&#xD;&#xA;,poIdCliente&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;&#xD;&#xA;,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))&#xD;&#xA;,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))&#xD;&#xA;,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))&#xD;&#xA;,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))&#xD;&#xA;&#xD;&#xA;,poValorComision=sum(isnull(poValorComision,0))&#xD;&#xA;,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))&#xD;&#xA;,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))&#xD;&#xA;,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) &#xD;&#xA;,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))&#xD;&#xA;,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))&#xD;&#xA;,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))&#xD;&#xA;,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))&#xD;&#xA;,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))&#xD;&#xA;,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))&#xD;&#xA;,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo&#xD;&#xA;,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada&#xD;&#xA;,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))&#xD;&#xA;&#xD;&#xA;from #PasivoOperacion po&#xD;&#xA;inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable&#xD;&#xA;group by poIdFecha&#xD;&#xA;,poIdCliente&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end &#xD;&#xA;if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end&#xD;&#xA;if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end">
+                    <xs:element name="DWHPasivoOperacion_abbaa295-b462-49cf-8c65-034c7dc36f40" msdata:Locale="" msprop:IsLogical="True" msprop:FriendlyName="DWHPasivoOperacion" msprop:DbTableName="DWHPasivoOperacion" msprop:TableType="View" msprop:Description="DWHPasivoOperacion" msprop:QueryDefinition="set nocount on&#xD;&#xA;&#xD;&#xA;declare @Mes int, @FechaMesAnt int, @FechaHaceDosAnios int&#xD;&#xA;&#xD;&#xA;set @Mes=2&#xD;&#xA;&#xD;&#xA;-- Fecha hace dos años corrido --&#xD;&#xA;select @FechaHaceDosAnios=feIdFechaCierreAnioAnt from DWDFecha where feHaceUnAnio=1 &#xD;&#xA;&#xD;&#xA;-- Fecha Mes Anterior --&#xD;&#xA;select @FechaMesAnt=feIdFecha from DWDFecha where feMesAnterior=1&#xD;&#xA;&#xD;&#xA;/*---- Fecha ----*/&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end &#xD;&#xA;&#xD;&#xA;select feIdFecha&#xD;&#xA;into #DWDFecha&#xD;&#xA;from DWDFecha&#xD;&#xA;where feIdFecha=19000101 --between @FechaHaceDosAnios and @FechaMesAnt&#xD;&#xA;and fecierremes=1&#xD;&#xA;and feCalMes=@Mes&#xD;&#xA;&#xD;&#xA;/*----- Cuenta Contable Ctas Ahorro y Credito -----*/&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end&#xD;&#xA;&#xD;&#xA;select distinct&#xD;&#xA;ccIdCuentaContable,ccCostoOperativo=isnull(ccCostoOperativo,0),CtasAhoCorr=case when ccCodigoIndicadorRentabilidad in (60,61) then 1 else 0 end --60 (MantenimientoCuentaAhorro) ; 61 (MantenimientoCuentaCorriente)&#xD;&#xA;into #DWDCuentaContable&#xD;&#xA;from DWDCuentaContable cc&#xD;&#xA;inner join vuClasificacionProductos cp on cc.ccCodigoIndicador=cp.indicadorNivel3&#xD;&#xA;where indicadorNivel1=2 -- Captaciones&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;/*----- Pasivo Operacion -----*/&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end &#xD;&#xA;&#xD;&#xA;select&#xD;&#xA; poIdFecha&#xD;&#xA;,poIdCliente&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,poSaldoOperacionUSD&#xD;&#xA;,poSaldoAcumuladoAnual&#xD;&#xA;,poSaldoPromedioAnual&#xD;&#xA;,poValorActPondRiesgoPromAnual&#xD;&#xA;,poValorComision&#xD;&#xA;,poValorIngresoServicio&#xD;&#xA;,poNumeroTransaccionesAnual&#xD;&#xA;,poValorCostoOperativo&#xD;&#xA;,poValorOperacionFinanciera&#xD;&#xA;,poValorInteresRealAnual&#xD;&#xA;,poValorInteresTasaPool&#xD;&#xA;,poValorMargenFinanciero&#xD;&#xA;,poValorMargenBancarioBasico&#xD;&#xA;,poValorMargenOrdinario&#xD;&#xA;,poValorMargenExplotacion&#xD;&#xA;,poValorUtilidadOperativa&#xD;&#xA;,poSaldoAcumuladoMensualFiscal&#xD;&#xA;,poCuentaAperturada = case when left(poIdFechaApertura,6) = left(poidfecha,6)  then 1 else 0 end &#xD;&#xA;into #PasivoOperacion&#xD;&#xA;from DWHPasivoOperacion po&#xD;&#xA;inner join #DWDFecha fe on po.poIdFecha=fe.feIdFecha&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;select&#xD;&#xA; poIdFecha&#xD;&#xA;,poIdCliente&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;&#xD;&#xA;,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0))&#xD;&#xA;,poSaldoAcumuladoAnual=sum(isnull(poSaldoAcumuladoAnual,0))&#xD;&#xA;,poSaldoPromedioAnual=sum(isnull(poSaldoPromedioAnual,0))&#xD;&#xA;,poValorActPondRiesgoPromAnual=sum(isnull(poValorActPondRiesgoPromAnual,0))&#xD;&#xA;&#xD;&#xA;,poValorComision=sum(isnull(poValorComision,0))&#xD;&#xA;,poValorIngresoServicio=sum(isnull(poValorIngresoServicio,0))&#xD;&#xA;,poNumeroTransaccionesAnual=sum(isnull(poNumeroTransaccionesAnual,0))&#xD;&#xA;,poValorCostoOperativo=sum(isnull(poValorCostoOperativo,0) +  (12*cta.ccCostoOperativo) ) &#xD;&#xA;,poValorOperacionFinanciera=sum(isnull(poValorOperacionFinanciera,0))&#xD;&#xA;,poValorInteresRealAnual=sum(isnull(poValorInteresRealAnual,0))&#xD;&#xA;,poValorInteresTasaPool=sum(isnull(poValorInteresTasaPool,0))&#xD;&#xA;,poValorMargenFinanciero=sum(isnull(poValorMargenFinanciero,0))&#xD;&#xA;,poValorMargenBancarioBasico=sum(isnull(poValorMargenBancarioBasico,0))&#xD;&#xA;,poValorMargenOrdinario=sum(isnull(poValorMargenOrdinario,0))&#xD;&#xA;,poValorMargenExplotacion=sum( (isnull(poValorMargenExplotacion,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenOrdinario - CostoOperativo&#xD;&#xA;,poValorUtilidadOperativa=sum( (isnull(poValorUtilidadOperativa,0)) - (case when cta.CtasAhoCorr=1 and isnull(poSaldoAcumuladoMensualFiscal,0)!=0 then 12*cta.ccCostoOperativo else 0 end) )  --------- ValorMargenExplotacion - PerdidaEsperada&#xD;&#xA;,poSaldoAcumuladoMensualFiscal=sum(isnull(poSaldoAcumuladoMensualFiscal,0))&#xD;&#xA;,poCuentaAperturada&#xD;&#xA;from #PasivoOperacion po&#xD;&#xA;inner join #DWDCuentaContable cta on po.poIdCuentaContable=cta.ccIdCuentaContable&#xD;&#xA;group by poIdFecha&#xD;&#xA;,poIdCliente&#xD;&#xA;,poIdCuentaContable&#xD;&#xA;,poCuentaAperturada&#xD;&#xA;&#xD;&#xA;if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end &#xD;&#xA;if object_id('tempdb..#CtasAhoCorr') is not null begin drop table #CtasAhoCorr end&#xD;&#xA;if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="poIdFecha" msprop:DbColumnName="poIdFecha" msprop:FriendlyName="poIdFecha" type="xs:int" minOccurs="0" />
@@ -87086,6 +87643,7 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
                           <xs:element name="poValorMargenExplotacion" msprop:DbColumnName="poValorMargenExplotacion" msprop:FriendlyName="poValorMargenExplotacion" type="xs:double" minOccurs="0" />
                           <xs:element name="poValorUtilidadOperativa" msprop:DbColumnName="poValorUtilidadOperativa" msprop:FriendlyName="poValorUtilidadOperativa" type="xs:double" minOccurs="0" />
                           <xs:element name="poSaldoAcumuladoMensualFiscal" msprop:DbColumnName="poSaldoAcumuladoMensualFiscal" msprop:FriendlyName="poSaldoAcumuladoMensualFiscal" type="xs:double" minOccurs="0" />
+                          <xs:element name="poCuentaAperturada" msprop:DbColumnName="poCuentaAperturada" msprop:FriendlyName="poCuentaAperturada" type="xs:int" minOccurs="0" />
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
@@ -87829,6 +88387,10 @@ CREATE KPI CURRENTCUBE.[ValClienteTotalVinculacion] AS Measures.[ValClienteTotal
             <Member>
               <Name>BANINTERN\BINXASTE</Name>
               <Sid>S-1-5-21-3084530191-2796110714-333732663-34271</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\bingod34</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-58887</Sid>
             </Member>
           </Members>
         </Role>
