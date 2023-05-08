@@ -3,38 +3,38 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Development</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{34e436a9-3a15-49fc-8b16-02814252ab9d}</ProjectGuid>
+    <ProjectGuid>{663c17a7-f39f-462e-9f5a-ad8ef3cedbd5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>MyRootNamespace</RootNamespace>
     <AssemblyName>MyAssemblyName</AssemblyName>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <OutputPath>bin\</OutputPath>
     <Name>CbMonitorIndicadoresCliente</Name>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
-    <OutputPath>bin\</OutputPath>
-    <DeploymentServerName>172.16.172.161</DeploymentServerName>
-    <DeploymentServerEdition>Enterprise</DeploymentServerEdition>
-    <DeploymentServerVersion>Unknown</DeploymentServerVersion>
-    <DeploymentServerDatabase>CbMonitorIndicadoresCliente</DeploymentServerDatabase>
-    <DeploymentServerCubeName>Model</DeploymentServerCubeName>
-    <DeploymentOptionProcessing>Full</DeploymentOptionProcessing>
-    <DeploymentOptionTransactionalDeployment>True</DeploymentOptionTransactionalDeployment>
-    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
-    <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
-    <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == '' ">
-    <DeploymentServerName>172.16.172.161</DeploymentServerName>
+    <DeploymentServerName>172.16.75.13</DeploymentServerName>
     <DeploymentServerEdition>Developer</DeploymentServerEdition>
-    <DeploymentServerVersion>Unknown</DeploymentServerVersion>
+    <DeploymentServerVersion>Version_11_0</DeploymentServerVersion>
     <DeploymentServerDatabase>CbMonitorIndicadoresCliente</DeploymentServerDatabase>
     <DeploymentServerCubeName>Model</DeploymentServerCubeName>
     <DeploymentOptionProcessing>Default</DeploymentOptionProcessing>
     <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
-    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
     <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
     <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
+    <OutputPath>bin\</OutputPath>
+    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
+    <DeploymentServerName>172.16.172.161</DeploymentServerName>
+    <DeploymentServerEdition>Developer</DeploymentServerEdition>
+    <DeploymentServerVersion>Version_11_0</DeploymentServerVersion>
+    <DeploymentServerDatabase>CbMonitorIndicadoresCliente</DeploymentServerDatabase>
+    <DeploymentServerCubeName>Model</DeploymentServerCubeName>
+    <DeploymentOptionProcessing>Full</DeploymentOptionProcessing>
+    <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
+    <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
+    <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == '' ">
+    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>

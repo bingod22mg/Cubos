@@ -247,14 +247,6 @@ drop table TempCarteraIndicadores&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandTy
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -796,14 +788,6 @@ from DWDCliente&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQ
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -1221,14 +1205,6 @@ from DWDCliente&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQ
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -1909,14 +1885,6 @@ from DWDCliente&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQ
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -2411,14 +2379,6 @@ select
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -2812,14 +2772,6 @@ select
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -3115,14 +3067,6 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -3217,6 +3161,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
               </Annotations>
               <ID>ccIdCuentaContable</ID>
               <Name>ccIdCuentaContable</Name>
+              <Description>id de la cuentacontable</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -3253,6 +3198,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
               </Annotations>
               <ID>Nivel1</ID>
               <Name>Nivel1</Name>
+              <Description>campo indicadorNivel1 de vista  vuClasificacionProductos</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -3288,6 +3234,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
               </Annotations>
               <ID>Nivel2</ID>
               <Name>Nivel2</Name>
+              <Description>Campo indicadorNivel2 de vista  vuClasificacionProductos</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -3323,6 +3270,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
               </Annotations>
               <ID>Familia</ID>
               <Name>Familia</Name>
+              <Description>Campo ProductoNivel1 de vista  vuClasificacionProductos</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -3358,6 +3306,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
               </Annotations>
               <ID>Grupo</ID>
               <Name>Grupo</Name>
+              <Description>Campo ProductoNivel2 de vista  vuClasificacionProductos</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -3393,6 +3342,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
               </Annotations>
               <ID>SubGrupo</ID>
               <Name>SubGrupo</Name>
+              <Description>campo ccSubGrupo de tabla DWDCuentaContable</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -3420,6 +3370,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
             <Attribute>
               <ID>Estado</ID>
               <Name>Estado</Name>
+              <Description>Campo EstadoProducto = 'VIG'  es 'Vigente' caso contrario 'Vencida'  de la vista vuClasificacionProductos</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -3445,6 +3396,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
             <Attribute>
               <ID>DescripcionPYG</ID>
               <Name>DescripcionPYG</Name>
+              <Description>Campo ProductoNivel6 de vista vuClasificacionProductosPYG, cuando es nulo es "NO DEFINIDO"</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -3472,6 +3424,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
             <Attribute>
               <ID>IndicadorFuente</ID>
               <Name>IndicadorFuente</Name>
+              <Description>Clasificacion por frupo de cuentas 1 = Cartera, 2= Captaciones, 5 -- Balance ,6 -- Ingreso,7 --PyGInversiones y pygOtrosdepositos</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -3499,6 +3452,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
             <Attribute>
               <ID>IndicadorPYG</ID>
               <Name>IndicadorPYG</Name>
+              <Description>Campo ccCodigoIndicadorMargenPYG de la tabla DWDCuentaContable</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -3526,6 +3480,7 @@ CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&
             <Attribute>
               <ID>ccCodigoNivel8</ID>
               <Name>ccCodigoNivel8</Name>
+              <Description>Campo desencriptado ccCodigoNivel8 de la tabal DWDCuentaContable</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>WChar</DataType>
@@ -3682,14 +3637,6 @@ having (
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -4243,14 +4190,6 @@ aoidcuentacontable&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -4838,14 +4777,6 @@ having sum(abs(isnull(aomontosaldodolar,0)))+sum(abs(isnull(aoSaldoPromedioMensu
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -5433,14 +5364,6 @@ having sum(abs(isnull(tcoSaldo,0)))+sum(abs(isnull(tcoSaldoPromedioMensual,0)))+
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -5962,14 +5885,6 @@ having sum(abs(isnull(tcoSaldo,0)))+sum(abs(isnull(tcoSaldoPromedioMensual,0)))+
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -7060,14 +6975,6 @@ having sum(abs(isnull(tcoSaldo,0)))+sum(abs(isnull(tcoSaldoPromedioMensual,0)))+
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
-          <DimensionPermissions>
-            <DimensionPermission>
-              <ID>DimensionPermission</ID>
-              <Name>DimensionPermission</Name>
-              <RoleID>Role</RoleID>
-              <Read>Allowed</Read>
-            </DimensionPermission>
-          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -9920,6 +9827,14 @@ having sum(abs(isnull(ioMontoIngreso,0))) + sum(abs(isnull(ioSaldoInteresRealFis
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+          <DimensionPermissions>
+            <DimensionPermission>
+              <ID>DimensionPermission</ID>
+              <Name>DimensionPermission</Name>
+              <RoleID>Role</RoleID>
+              <Read>Allowed</Read>
+            </DimensionPermission>
+          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -10399,6 +10314,14 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
             <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
           </ErrorConfiguration>
           <StorageMode valuens="ddl200_200">InMemory</StorageMode>
+          <DimensionPermissions>
+            <DimensionPermission>
+              <ID>DimensionPermission</ID>
+              <Name>DimensionPermission</Name>
+              <RoleID>Role</RoleID>
+              <Read>Allowed</Read>
+            </DimensionPermission>
+          </DimensionPermissions>
           <Language>12298</Language>
           <UnknownMemberName>Unknown</UnknownMemberName>
           <Attributes>
@@ -10477,6 +10400,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
               </Annotations>
               <ID>bsidfecha</ID>
               <Name>bsidfecha</Name>
+              <Description>fecha de transacción</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -10512,6 +10436,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
               </Annotations>
               <ID>bsidAgencia</ID>
               <Name>bsidAgencia</Name>
+              <Description>Id Agencia</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -10548,6 +10473,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
               </Annotations>
               <ID>bsidcuentacontable</ID>
               <Name>bsidcuentacontable</Name>
+              <Description>Id de Cuenta Contable</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -10584,6 +10510,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
               </Annotations>
               <ID>bsidSegmentacionCliente</ID>
               <Name>bsidSegmentacionCliente</Name>
+              <Description>Id Segmentacion por definicion es -1 = "NO DEFINIDO"</Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -10620,6 +10547,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
               </Annotations>
               <ID>bsSaldo</ID>
               <Name>bsSaldo</Name>
+              <Description>Campop de saldo en dolares </Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Double</DataType>
@@ -10656,6 +10584,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
               </Annotations>
               <ID>IdCanal</ID>
               <Name>IdCanal</Name>
+              <Description>IdCanal por definicion es -1 para no definido en la tabal de Balance no detalla canal </Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Integer</DataType>
@@ -10684,6 +10613,7 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
             <Attribute>
               <ID>bsSaldoPromedioMesFiscal</ID>
               <Name>bsSaldoPromedioMesFiscal</Name>
+              <Description>Calculo de saldo en dolare acumulado dividido para el numero de dias del mes </Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Double</DataType>
@@ -10707,11 +10637,11 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
                 </Source>
               </NameColumn>
               <OrderBy>Key</OrderBy>
-              <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
             </Attribute>
             <Attribute>
               <ID>bsPYGDiario</ID>
               <Name>bsPYGDiario</Name>
+              <Description>PyGDiario = saldo en dolares de este mes menos el saldo de cierre de mes anterior todo dividido para el numero de dias laborables del mes </Description>
               <KeyColumns>
                 <KeyColumn>
                   <DataType>Double</DataType>
@@ -11815,7 +11745,6 @@ if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo
                 </Attribute>
                 <Attribute>
                   <AttributeID>bsSaldoPromedioMesFiscal</AttributeID>
-                  <AttributeHierarchyVisible>false</AttributeHierarchyVisible>
                 </Attribute>
                 <Attribute>
                   <AttributeID>bsPYGDiario</AttributeID>
@@ -15057,41 +14986,6 @@ select
                 <Partition>
                   <ID>DWDCuentaContable_42f78d56-8f0e-4f42-b5b4-d298de5280d3</ID>
                   <Name>DWDCuentaContable</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
-
-OPEN SYMMETRIC KEY ClaveMIS02
-DECRYPTION BY CERTIFICATE Certi01
-
-select distinct
-ccIdCuentaContable,
-Nivel1 = vcp.indicadorNivel1 ,
-Nivel2 = vcp.indicadorNivel2 ,
-Familia = vcp.ProductoNivel1 ,
-Grupo = vcp.ProductoNivel2 ,
-SubGrupo = cc.ccSubGrupo ,
-Estado = case when vcp.CpEstadoProducto = 'VIG' THEN 'Vigente' ELSE 'Vencida' END ,
-IndicadorPYG = ISNULL(cc.ccCodigoIndicadorMargenPYG ,0),
-DescripcionPYG = isnull(vpg.ProductoNivel6,'NO DEFINIDO'),
-IndicadorFuente=case when vpg.IndicadorNivel2 = 1606 then 1 -- Cartera
-      when vpg.IndicadorNivel2 = 1607 then 2 -- Captaciones
-      when vpg.IndicadorNivel2 in (1600,1602,1604,1605) then 5 -- Balance
-      when vpg.IndicadorNivel2 in (1603) then 6 -- Ingreso
-      else 0 end,
-
-ccCodigoNivel8= CONVERT(varchar(12), DecryptByKey(cc.ccCodigoNivel8))
-
-
-from DWDCuentaContable cc
-left join vuClasificacionProductos vcp on cc.ccCodigoIndicador = vcp.indicadorNivel3
-left join vuClasificacionProductosPYG  vpg on cc.ccCodigoIndicadorMargenPYG = vpg.indicadorNivel6
-where isnull(vcp.indicadorNivel1,'') &lt;&gt; 64
-
-CLOSE SYMMETRIC KEY ClaveMIS02&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>7d301af5-1511-4470-9864-774509261219</DataSourceID>
                     <QueryDefinition>SET NOCOUNT ON
@@ -15112,16 +15006,14 @@ DescripcionPYG = isnull(vpg.ProductoNivel6,'NO DEFINIDO'),
 IndicadorFuente=case when vpg.IndicadorNivel2 = 1606 then 1 -- Cartera
       when vpg.IndicadorNivel2 = 1607 then 2 -- Captaciones
       when vpg.IndicadorNivel2 in (1600,1602,1604,1605) then 5 -- Balance
-      when vpg.IndicadorNivel2 in (1603) then 6 -- Ingreso
+      when vpg.IndicadorNivel2 in (1603) and cc.ccCodigoIndicadorMargenPYG not in (967,974,962)  then 6 -- Ingreso
+	  when cc.ccCodigoIndicadorMargenPYG in (967,974,962)   then 7--PyGInversiones y pygOtrosdepositos, pyginteresdemora
       else 0 end,
-
 ccCodigoNivel8= CONVERT(varchar(12), DecryptByKey(cc.ccCodigoNivel8))
-
-
 from DWDCuentaContable cc
 left join vuClasificacionProductos vcp on cc.ccCodigoIndicador = vcp.indicadorNivel3
 left join vuClasificacionProductosPYG  vpg on cc.ccCodigoIndicadorMargenPYG = vpg.indicadorNivel6
-where isnull(vcp.indicadorNivel1,'') &lt;&gt; 64
+where isnull(vcp.indicadorNivel1,'') &lt;&gt; 64  
 
 CLOSE SYMMETRIC KEY ClaveMIS02</QueryDefinition>
                   </Source>
@@ -17710,113 +17602,12 @@ CLOSE SYMMETRIC KEY ClaveMIS02</QueryDefinition>
                 <Partition>
                   <ID>DWHPasivoOperacion_d7b6e552-e185-4027-bed4-c34ff284800a</ID>
                   <Name>DWHPasivoOperacion</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
-
-declare @fechaIni int, @fechafin int, @fechaCirreMesAnt int, @Diasmes int, @NumDiasAnio int, @NumDiasAnioLab int, @DiaMesLaborables int
-
--- Valor rango periodo inicio de fechas --
-
-select 
- @fechaIni=concat(left(feidfecha,6),'01')
-,@fechafin=feIdFecha 
-,@Diasmes=feCalDia
-,@NumDiasAnioLab = feNumDiasAnioLab
- from DWDFecha where feMesAnterior = 1
-
- --Numero de dias laborable mes en curso segun el dia----
- select 
- @DiaMesLaborables = count(*)
- from DWDFecha where  feIdFecha between @fechaIni and @fechafin
-and (feferiado =0 and fefinsemana = 0) 
-
-  --Numero Dias Año --
-
-select @NumDiasAnio = copPorcentajeConstante 
-from DWDCONSTANTEOPERACION 
-WHERE COPTIPOCONSTANTE = 'NUMERO DIAS AÑO'
-
--- Tabla Pasivo Operacion --
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
-
-select poidfecha, poidCliente,poidcuentacontable,poSaldoOperacionUSD, poSaldoPromedioMensual
-,poSaldoPromedioAnual, poTasaNominal
-,poIntAcumuladoAnual,poIntAcumuladoMensual, poSaldoPromedioMensualFiscal,poIntPromedioMensual,poIntPromedioAnual
-into #PasivoOperacion
-from DWHPasivoOperacion
-where poIdFecha between @fechaIni and @fechafin
-
-select 
- po.poidfecha 
-,po.poidCliente
-,poidcuentacontable
-
-,poSaldoOperacionUSD=sum(isnull(poSaldoOperacionUSD,0)) 
-,posaldopromediomensual=sum(isnull(posaldopromediomensual,0)) 
-,posaldopromedioanual=sum(isnull(posaldopromedioanual,0)) 
-,poSaldoPromedioMensualFiscal=sum(isnull(poSaldoPromedioMensualFiscal,0))
-
-,poPYGDiario=sum((((isnull(poSaldoOperacionUSD,0)*isnull(potasanominal,0))/100)/@NumDiasAnioLab))
-,poInteresMes=sum(isnull(poIntPromedioMensual,0)) -- sum(posaldopromediomensual*potasanominal) 
-,poInteresAnio= sum(isnull(poIntPromedioAnual,0)) 
-                                           
-from #PasivoOperacion po
-group by po.poidfecha 
-,po.poidCliente
-,po.poidcuentacontable,potasanominal
-having (
- abs(sum(isnull(po.poSaldoOperacionUSD,0)))
-+abs(sum(isnull(po.poSaldoPromedioMensual,0)))
-+abs(sum(isnull(po.poSaldoPromedioAnual,0)))
-+abs(sum(isnull(poSaldoPromedioMensualFiscal,0)))
-+abs(sum((((isnull(poSaldoOperacionUSD,0)*isnull(potasanominal,0))/100)/@NumDiasAnioLab)))
-+abs(sum(isnull(po.poIntPromedioMensual,0)))
-+abs(sum(isnull(po.poIntPromedioAnual,0)))
-)&gt;0
-
-if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
-
-/*
-union all
-
-select top 1
- po.poidfecha 
-,po.poidCliente
-,poidcuentacontable
-,poSaldoOperacionUSD=sum(poSaldoOperacionUSD) 
-,posaldopromediomensual=sum(posaldopromediomensual) 
-,posaldopromedioanual=sum(posaldopromedioanual) 
-,poInteres= sum(poSaldoOperacionUSD*potasanominal)
-,poInteresMes=sum(posaldopromediomensual*potasanominal) 
-,poInteresAnio=sum(posaldopromedioanual*potasanominal) 
-,poSaldoPromedioPYG = sum(isnull(po.poSaldoPromedioMensual,0))
-,poPYGDiario=sum(isnull(po.poIntAcumuladoMensualFiscal,0)) 
-,poPYGMensual=sum(isnull(po.poIntAcumuladoAnual,0))
-from dwhcorporativohistorico..DWHPasivoOperacion
-inner join #DWDCuentaContable cc on po.poIdCuentaContable = cc.ccIdCuentaContable
-group by po.poidfecha 
-,po.poidCliente
-,po.poidcuentacontable
-having (
- abs(sum(isnull(po.poSaldoOperacionUSD,0)))
-+abs(sum(isnull(po.poSaldoPromedioMensual,0)*cc.ccSignoMargenPYG))
-+abs(sum(isnull(po.poSaldoPromedioAnual,0)))
-+abs(sum(isnull(po.poSaldoOperacionUSD,0)*isnull(poTasaNominal,0)))
-+abs(sum(isnull(po.poSaldoPromedioMensual,0)*isnull(poTasaNominal,0)))
-+abs(sum(isnull(po.poSaldoPromedioAnual,0)*isnull(poTasaNominal,0)))
-+abs(sum(isnull(po.poIntAcumuladoMensualFiscal,0)))
-+abs(sum(isnull(po.poIntAcumuladoAnual,0)))
-)&gt;0
-*/&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>7d301af5-1511-4470-9864-774509261219</DataSourceID>
                     <QueryDefinition>SET NOCOUNT ON
 
+if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
+
 declare @fechaIni int, @fechafin int, @fechaCirreMesAnt int, @Diasmes int, @NumDiasAnio int, @NumDiasAnioLab int, @DiaMesLaborables int
 
 -- Valor rango periodo inicio de fechas --
@@ -17840,6 +17631,25 @@ select @NumDiasAnio = copPorcentajeConstante
 from DWDCONSTANTEOPERACION 
 WHERE COPTIPOCONSTANTE = 'NUMERO DIAS AÑO'
 
+--Cuenta contbale para que no calcule PYGDIARIO
+
+OPEN SYMMETRIC KEY ClaveMIS02
+DECRYPTION BY CERTIFICATE Certi01
+
+select distinct
+ccIdCuentaContable,
+IndicadorPYG = ISNULL(cc.ccCodigoIndicadorMargenPYG ,0),
+DescripcionPYG = isnull(vpg.ProductoNivel6,'NO DEFINIDO'),
+ccCodigoNivel8= CONVERT(varchar(12), DecryptByKey(cc.ccCodigoNivel8))
+into #DWDCuentaContable
+from DWDCuentaContable cc 
+left join vuClasificacionProductos vcp on cc.ccCodigoIndicador = vcp.indicadorNivel3
+left join vuClasificacionProductosPYG  vpg on cc.ccCodigoIndicadorMargenPYG = vpg.indicadorNivel6
+where isnull(vcp.indicadorNivel1,'') &lt;&gt; 64  and cc.ccCodigoIndicadorMargenPYG = 100 and vpg.IndicadorNivel2 = 1607 
+
+CLOSE SYMMETRIC KEY ClaveMIS02
+
+
 -- Tabla Pasivo Operacion --
 
 if object_id('tempdb..#PasivoOperacion') is not null begin drop table #PasivoOperacion end
@@ -17861,7 +17671,8 @@ select
 ,posaldopromedioanual=sum(isnull(posaldopromedioanual,0)) 
 ,poSaldoPromedioMensualFiscal=sum(isnull(poSaldoPromedioMensualFiscal,0))
 
-,poPYGDiario=sum((((isnull(poSaldoOperacionUSD,0)*isnull(potasanominal,0))/100)/@NumDiasAnioLab))
+,poPYGDiario=case when poidcuentacontable in (select ccidcuentacontable from #DWDCuentaContable  ) 
+then 0 else sum((((isnull(poSaldoOperacionUSD,0)*isnull(potasanominal,0))/100)/@NumDiasAnioLab)) end
 ,poInteresMes=sum(isnull(poIntPromedioMensual,0)) -- sum(posaldopromediomensual*potasanominal) 
 ,poInteresAnio= sum(isnull(poIntPromedioAnual,0)) 
                                            
@@ -30254,42 +30065,6 @@ order by 1</QueryDefinition>
                 <Partition>
                   <ID>DWHIngresoOperacion_368f0d89-1c37-4d83-9899-15367622a625</ID>
                   <Name>DWHIngresoOperacion</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;Set nocount on
-
-declare @FechaMesAntCierre int,@DiasLaborablesMes int
-
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
-
-select distinct 
-ccIdCuentaContable,
-DescripcionPYG = vpg.ProductoNivel6
-into #DWDCuentaContable
-from DWDCuentaContable cc
-inner join vuClasificacionProductosPYG vpg on cc.ccCodigoIndicadorMargenPYG = vpg.indicadorNivel6
-where vpg.IndicadorNivel2=1603 -- Agrupacion PyG
-
-
-select @FechaMesAntCierre=feIdFecha from DWDFecha where feMesAnterior=1 
-
-select 
- ioIdFecha
-,ioIdCliente
-,ioIdCuentaContablePrincipal
-,ioMontoIngreso = sum(isnull(ioMontoIngreso,0))
-,ioSaldoInteresRealFiscal = sum(isnull(ioSaldoInteresRealFiscal,0))  --pyg
-from DWHIngresoOperacion iop
-inner join #DWDCuentaContable cc on iop.ioIdCuentaContablePrincipal = cc.ccIdCuentaContable
-where  ioIdFecha = @FechaMesAntCierre
-group by 
-ioIdFecha,
-ioIdCliente,
-ioIdCuentaContablePrincipal --idCta para todos los productos
-having sum(abs(isnull(ioMontoIngreso,0))) + sum(abs(isnull(ioSaldoInteresRealFiscal,0)))&gt;0&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>7d301af5-1511-4470-9864-774509261219</DataSourceID>
                     <QueryDefinition>Set nocount on
@@ -32438,172 +32213,18 @@ having sum(abs(isnull(ioMontoIngreso,0))) + sum(abs(isnull(ioSaldoInteresRealFis
                 <Partition>
                   <ID>DWHBalanceSaldo_d48d3d50-f47b-4fa3-9841-95ea4e536cb3</ID>
                   <Name>DWHBalanceSaldo</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
-
-declare @fechaIni int, @fechafin int ,@DiasLaborablesMes int, @feidFecha int, @Feidfechamesant int ,@DiaMesLaborables int--,@Anio int,@Mes int,@FechaMesAntCierre int
-
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-
-select @feidFecha =feidfecha
-,@Feidfechamesant=feIdFechaHaceUnMesLab
-, @fechaIni= concat(left(feidfecha,6),'01')
-,@fechafin=feIdFecha from DWDFecha where feMesAnterior = 1
-
- --Numero de dias laborable mes en curso segun el dia----
- select 
- @DiaMesLaborables = count(*)
- from DWDFecha where  feIdFecha between @fechaIni and @fechafin
-and (feferiado =0 and fefinsemana = 0) 
-
-select 
- feidfecha
-,NumDiasMesFiscalLab=isnull(feNumDiasMesFiscalLab,0)
-into #DWDFecha
-from DWDFecha
-where feidfecha between @fechaIni and @fechafin
-and feFinSemana=0
-and feFeriado=0
-
--- Se realiza  un producto cartesiano para asignar por fecha la lista de fechas asiganda a cada una Ejm: para la fecha 20220604 las fechas asignadas son 20220601, 20220602,2022603,20220604
-
-if object_id('tempdb..#FechasAcumulados') is not null begin drop table #FechasAcumulados end
-
-select distinct 
- IdFecha=Fecha2
-,NumDiasMesFis
-,IdListaFechas=Fecha1
-into #FechasAcumulados
-from 
-(
- select distinct
-  Fecha1=fe1.feidfecha
- ,Fecha2=fe2.feidfecha
- ,NumDiasMesFis=fe2.NumDiasMesFiscalLab
- ,BanderaMesFiscal=case when fe1.feidfecha&lt;=fe2.feidfecha and left(fe1.feidfecha,6)=left(fe2.feidfecha,6) then 1 else 0 end
- from #DWDFecha fe1
- inner join #DWDFecha fe2 on 1=1
-) as t
-where BanderaMesFiscal=1
-
- /*PyG Solo Otros Depositos y operaciones financieras */
-
-declare @saldomes float, @saldomesant float ,@idcuentaprincod int,@idcuentaprincof int
-
-if object_id('tempdb..#bsMesActual') is not null begin drop table #bsMesActual end
-if object_id('tempdb..#bsMesAnterior') is not null begin drop table #bsMesAnterior end
-
-select top 1 @idcuentaprincod =  ccidcuentacontable from dwdcuentaContable where ccCodigoIndicadorMargenPYG = 949 ---cuenta de obligaciones financieras
-select top 1 @idcuentaprincof =  ccidcuentacontable from dwdcuentaContable where ccCodigoIndicadorMargenPYG = 944 --cuenta de otros depositos
-
-select ccidcuentacontable = case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-								 when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end 
-,bssaldo= isnull(sum(bsSaldoDolarizado) ,0) 
-into #bsMesActual
-from dwhbalancesaldo bs
-inner join DWDCuentaContable cc on bs.bsidcuentacontable = cc.ccidcuentacontable
-where bsidfecha = @feidFecha
-and bsIdCuentaContable in (select ccidcuentacontable from  DWDCuentaContable where ccCodigoIndicadorMargenPYG in (967,965))
-group by case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-			  when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end
-
---select * from #bsMesActual
-
-select ccidcuentacontable = case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-							     when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end 
-,bssaldo= isnull(sum(bsSaldoDolarizado) ,0) 
-into #bsMesAnterior
-from dwhbalancesaldo bs
-inner join DWDCuentaContable cc on bs.bsidcuentacontable = cc.ccidcuentacontable
-where bsidfecha = @feidfechamesant
-and bsIdCuentaContable in (select ccidcuentacontable from  DWDCuentaContable where ccCodigoIndicadorMargenPYG in (967,965))
-group by case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-			  when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end
-
-
-
-/* --- Balance Saldo --- */
-
-if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo end
-
--- se carga del saldo diario --
-
-select
- bs.bsidfecha
-,bs.bsidAgencia
-,bs.bsidcuentacontable
-,bsSaldo = sum(isnull(bs.bsSaldoDolarizado,0)) 
-,bsSaldoPromedioMesFiscal=cast(0 as float)
-,bsPYGDiario=cast(0 as float)
-into #BalanceSaldo
-from DWHBalanceSaldo bs
-inner join #DWDFecha fe on bs.bsIdFecha = fe.feidfecha
-group by bs.bsidfecha
-,bs.bsidAgencia
-,bs.bsidcuentacontable
-having sum(abs(isnull(bsSaldoDolarizado,0)))&gt;0
-
--- proceso acumulado mes fiscal promedio --
-
-insert into #BalanceSaldo
-select
- bsidfecha=fe.IdFecha
-,bs.bsidAgencia
-,bs.bsidcuentacontable
-,bsSaldo = 0
-,bsSaldoPromedioMesFiscal=sum( case when fe.NumDiasMesFis=0 then 0 else isnull(bs.bsSaldoDolarizado,0)/fe.NumDiasMesFis end )
-,bsPYGDiario = 0
-from DWHBalanceSaldo bs
-inner join #FechasAcumulados fe on bs.bsIdFecha = fe.IdListaFechas
-group by fe.IdFecha
-,bs.bsidAgencia
-,bs.bsidcuentacontable
-having sum( case when fe.NumDiasMesFis=0 then 0 else isnull(bs.bsSaldoDolarizado,0)/fe.NumDiasMesFis end )!=0
-
---resultado final
-select 
- bsidfecha	
-,bsidAgencia	
-,bsidcuentacontable	
-,bsidSegmentacionCliente = -1 --asignanión por defecto
-,IdCanal= -1
-,bsSaldo=sum(bsSaldo)
-,bsSaldoPromedioMesFiscal=sum(isnull(bsSaldoPromedioMesFiscal,0))
-,bsPYGDiario= 0
-from #BalanceSaldo
-group by bsidfecha	
-,bsidAgencia	
-,bsidcuentacontable	
-
-union 
-
-select 
- @feidfecha	
-,1	
-,ba.ccidcuentacontable
-,-1 --asignanión por defecto
-,-1
-,bsSaldo=0
-,bsSaldoPromedioMesFiscal=0
-,bsPYGDiario= (ba.bssaldo - isnull(ban.bssaldo,0))/ @DiaMesLaborables
-from #bsMesActual ba
-inner join #bsMesAnterior ban on ba.ccidcuentacontable = ban.ccidcuentacontable
- 
-if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>7d301af5-1511-4470-9864-774509261219</DataSourceID>
                     <QueryDefinition>SET NOCOUNT ON
 
-declare @fechaIni int, @fechafin int ,@DiasLaborablesMes int, @feidFecha int, @Feidfechamesant int ,@DiaMesLaborables int--,@Anio int,@Mes int,@FechaMesAntCierre int
+declare @fechaIni int, @fechafin int ,@DiasLaborablesMes int, @feidFecha int, @Feidfechamesantcierre int 
+		,@DiaMesLaborables int, @fechaInimesant int, @fechafinmesant int--,@Anio int,@Mes int,@FechaMesAntCierre int
 
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
+if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
 
 select @feidFecha =feidfecha
-,@Feidfechamesant=feIdFechaHaceUnMesLab
+,@Feidfechamesantcierre=feMesAntCierr ---feIdFechaHaceUnMesLab
 , @fechaIni= concat(left(feidfecha,6),'01')
 ,@fechafin=feIdFecha from DWDFecha where feMesAnterior = 1
 
@@ -32616,6 +32237,7 @@ and (feferiado =0 and fefinsemana = 0)
 select 
  feidfecha
 ,NumDiasMesFiscalLab=isnull(feNumDiasMesFiscalLab,0)
+,feIdFechaHaceUnMesLab
 into #DWDFecha
 from DWDFecha
 where feidfecha between @fechaIni and @fechafin
@@ -32643,41 +32265,85 @@ from
 ) as t
 where BanderaMesFiscal=1
 
- /*PyG Solo Otros Depositos y operaciones financieras */
+/*Cuentas Saldo que se resta el mes anterior en saldo */
+OPEN SYMMETRIC KEY ClaveMIS02
+DECRYPTION BY CERTIFICATE Certi01
 
-declare @saldomes float, @saldomesant float ,@idcuentaprincod int,@idcuentaprincof int
+select ccidcuentacontable,
+ccCodigoNivel8=CONVERT(varchar(12), DecryptByKey(ccCodigoNivel8))  
+,ccCodigoIndicadorMargenPYG
+into #DWDCuentaContable 
+from DWDCuentaContable 
+where 
+ ccCodigoIndicadorMargenPYG in (967,974,962) ---grupos PYGINversiones, PYGOtrosdepositos, PYGInteresMora
+order by 1
 
+CLOSE SYMMETRIC KEY ClaveMIS02
+
+
+ /*PyG Solo Otros Depositos y operaciones financieras caso especial */
+ 
+declare @saldomes float, @saldomesant float ,@idcuentaprincod int,@idcuentaprincof int, @idcuentaprincprf int, @idcuentaprinc int
+
+if object_id('tempdb..#bsMesActualPYG') is not null begin drop table #bsMesActualPYG end
+if object_id('tempdb..#bsMesAnteriorPYG') is not null begin drop table #bsMesAnteriorPYG end
 if object_id('tempdb..#bsMesActual') is not null begin drop table #bsMesActual end
 if object_id('tempdb..#bsMesAnterior') is not null begin drop table #bsMesAnterior end
 
-select top 1 @idcuentaprincod =  ccidcuentacontable from dwdcuentaContable where ccCodigoIndicadorMargenPYG = 949 ---cuenta de obligaciones financieras
-select top 1 @idcuentaprincof =  ccidcuentacontable from dwdcuentaContable where ccCodigoIndicadorMargenPYG = 944 --cuenta de otros depositos
+select top 1 @idcuentaprincof =  ccidcuentacontable from dwdcuentaContable where ccCodigoIndicadorMargenPYG = 946 ---cuenta de obligaciones financieras
+select top 1 @idcuentaprincod =  ccidcuentacontable from dwdcuentaContable where ccCodigoIndicadorMargenPYG = 949 --cuenta de otros depositos
+select top 1 @idcuentaprincprf =  ccidcuentacontable from dwdcuentaContable where ccCodigoIndicadorMargenPYG = 972 --cuenta de Portafolio
 
 select ccidcuentacontable = case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-								 when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end 
-,bssaldo= isnull(sum(bsSaldoDolarizado) ,0) 
+								 when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof 
+								 when cc.ccCodigoIndicadorMargenPYG in (963,974) then @idcuentaprincprf 
+								 else cc.ccidcuentacontable end 
+,bssaldo= isnull(sum(bsSaldoDolarizado) ,0) , df.feidfecha
+into #bsMesActualPYG
+from dwhbalancesaldo bs
+inner join DWDCuentaContable cc on bs.bsidcuentacontable = cc.ccidcuentacontable
+inner join #DWDFecha df on df.feidfecha = bs.bsIdFecha
+where bsIdCuentaContable in (select ccidcuentacontable from  DWDCuentaContable where ccCodigoIndicadorMargenPYG in (967,965,963,974))
+group by case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
+			  when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof 
+			  when cc.ccCodigoIndicadorMargenPYG in (963,974) then @idcuentaprincprf 
+			  else cc.ccidcuentacontable end,df.feidfecha
+
+--saldo mes anterior a la fecha de cierre
+
+select ccidcuentacontable = case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
+							     when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof 
+								 when cc.ccCodigoIndicadorMargenPYG in (963,974) then @idcuentaprincprf 
+								 else cc.ccidcuentacontable end 
+,bssaldo=case when month(convert(date ,cast(@Feidfechamesantcierre as varchar),112)) = 12 then 0 
+		 else  isnull(sum(bsSaldoDolarizado) ,0) end --controla para enero se resetea la cuenta
+into #bsMesAnteriorPYG
+from dwhbalancesaldo bs
+inner join DWDCuentaContable cc on bs.bsidcuentacontable = cc.ccidcuentacontable
+where bs.bsidfecha = @Feidfechamesantcierre 
+and bsIdCuentaContable in (select ccidcuentacontable from  DWDCuentaContable where ccCodigoIndicadorMargenPYG in (967,965,963,974))
+group by case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
+			  when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof 
+			  when cc.ccCodigoIndicadorMargenPYG in (963,974) then @idcuentaprincprf 
+			  else cc.ccidcuentacontable end
+
+/*---Balance Saldo caso especial cuentas que se debe restar el mes anterior PYGINversiones, PYGOtros depositos, PYGInteresMora*/
+
+select ccidcuentacontable 
+,bssaldo= isnull(sum(bsSaldoDolarizado) ,0) , df.feidfecha
 into #bsMesActual
 from dwhbalancesaldo bs
 inner join DWDCuentaContable cc on bs.bsidcuentacontable = cc.ccidcuentacontable
-where bsidfecha = @feidFecha
-and bsIdCuentaContable in (select ccidcuentacontable from  DWDCuentaContable where ccCodigoIndicadorMargenPYG in (967,965))
-group by case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-			  when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end
+inner join #DWDFecha df on df.feidfecha = bs.bsIdFecha
+where bsIdCuentaContable in (select ccidcuentacontable from  #DWDCuentaContable)
+group by ccidcuentacontable,df.feidfecha
 
---select * from #bsMesActual
-
-select ccidcuentacontable = case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-							     when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end 
-,bssaldo= isnull(sum(bsSaldoDolarizado) ,0) 
+select ccidcuentacontable ,bssaldo= isnull(sum(bsSaldoDolarizado) ,0) 
 into #bsMesAnterior
 from dwhbalancesaldo bs
-inner join DWDCuentaContable cc on bs.bsidcuentacontable = cc.ccidcuentacontable
-where bsidfecha = @feidfechamesant
-and bsIdCuentaContable in (select ccidcuentacontable from  DWDCuentaContable where ccCodigoIndicadorMargenPYG in (967,965))
-group by case when cc.ccCodigoIndicadorMargenPYG = 967 then @idcuentaprincod 
-			  when cc.ccCodigoIndicadorMargenPYG = 965 then @idcuentaprincof end
-
-
+inner join #DWDCuentaContable cc on bs.bsidcuentacontable = cc.ccidcuentacontable
+where bs.bsidfecha = @Feidfechamesantcierre 
+group by ccidcuentacontable
 
 /* --- Balance Saldo --- */
 
@@ -32695,6 +32361,7 @@ select
 into #BalanceSaldo
 from DWHBalanceSaldo bs
 inner join #DWDFecha fe on bs.bsIdFecha = fe.feidfecha
+where bs.bsidcuentacontable not in (select ccidcuentacontable from #DWDCuentaContable)
 group by bs.bsidfecha
 ,bs.bsidAgencia
 ,bs.bsidcuentacontable
@@ -32712,6 +32379,7 @@ select
 ,bsPYGDiario = 0
 from DWHBalanceSaldo bs
 inner join #FechasAcumulados fe on bs.bsIdFecha = fe.IdListaFechas
+where bs.bsidcuentacontable not in (select ccidcuentacontable from #DWDCuentaContable)
 group by fe.IdFecha
 ,bs.bsidAgencia
 ,bs.bsidcuentacontable
@@ -32726,8 +32394,9 @@ select
 ,IdCanal= -1
 ,bsSaldo=sum(bsSaldo)
 ,bsSaldoPromedioMesFiscal=sum(isnull(bsSaldoPromedioMesFiscal,0))
-,bsPYGDiario= 0
+,bsPYGDiario= 0 
 from #BalanceSaldo
+where bsidcuentacontable not in (select ccidcuentacontable from #DWDCuentaContable)
 group by bsidfecha	
 ,bsidAgencia	
 ,bsidcuentacontable	
@@ -32735,17 +32404,31 @@ group by bsidfecha
 union 
 
 select 
- @feidfecha	
+bs.feIdFecha
 ,1	
-,ba.ccidcuentacontable
+,bs.ccidcuentacontable
 ,-1 --asignanión por defecto
 ,-1
 ,bsSaldo=0
 ,bsSaldoPromedioMesFiscal=0
-,bsPYGDiario= (ba.bssaldo - isnull(ban.bssaldo,0))/ @DiaMesLaborables
-from #bsMesActual ba
-inner join #bsMesAnterior ban on ba.ccidcuentacontable = ban.ccidcuentacontable
- 
+,bsPYGDiario= ((bs.bssaldo) - isnull(bsa.bssaldo,0))/@DiaMesLaborables
+from #bsMesActualPYG bs
+left join #bsMesAnteriorPYG bsa on bs.ccidcuentacontable = bsa.ccidcuentacontable 
+
+union
+
+select 
+bs.feIdFecha
+,1	a
+,bs.ccidcuentacontable
+,-1 s --asignanión por defecto
+,-1 s1--,bs.bssaldo,bsa.bssaldo
+,bsSaldo=((bs.bssaldo) - isnull(bsa.bssaldo,0))
+,bsSaldoPromedioMesFiscal=((bs.bssaldo) - isnull(bsa.bssaldo,0))
+,bsPYGDiario= 0 
+from #bsMesActual bs
+inner join #bsMesAnterior bsa on bs.ccidcuentacontable = bsa.ccidcuentacontable 
+
 if object_id('tempdb..#BalanceSaldo') is not null begin drop table #BalanceSaldo end</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
@@ -33078,7 +32761,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValActivoSaldoPromedioMesFiscal]=SUM(DWHAc
 
 
 CREATE MEASURE 'DWHActivoOperacion'[aoValPYGTotalSaldoDiario]=CALCULATE([aoValActivoSaldoDiario],DWDCuentaContable[IndicadorFuente]=1)+CALCULATE([tcoValTarjetaSaldoDiario],DWDCuentaContable[IndicadorFuente]=1)
-+CALCULATE([poValPasivoSaldoDiario],DWDCuentaContable[IndicadorFuente]=2)+CALCULATE([bsValBalanceSaldoDiario],DWDCuentaContable[IndicadorFuente]=5)+CALCULATE([ioValPyGIngresoSaldoDiario],DWDCuentaContable[IndicadorFuente]=6);
++CALCULATE([poValPasivoSaldoDiario],DWDCuentaContable[IndicadorFuente]=2)+CALCULATE([bsValBalanceSaldoDiario],DWDCuentaContable[IndicadorFuente]=5)+CALCULATE([ioValPyGIngresoSaldoDiario],DWDCuentaContable[IndicadorFuente]=6)+CALCULATE([bsValBalanceSaldoDiario],DWDCuentaContable[IndicadorFuente]=7);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -33249,7 +32932,7 @@ CREATE MEASURE 'DWHIngresoOperacion'[ioValPyGIngresoSaldoDiario]=SUM(DWHIngresoO
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHIngresoOperacion'[ioValPYGTotalInteresMes]=CALCULATE(SUM(DWHIngresoOperacion[ioSaldoInteresRealFiscal]),DWDCuentaContable[IndicadorFuente]=6);
+CREATE MEASURE 'DWHIngresoOperacion'[ioValPYGTotalInteresMes]=CALCULATE(SUM(DWHIngresoOperacion[ioSaldoInteresRealFiscal]),DWDCuentaContable[IndicadorFuente]=6)+CALCULATE([bsValBalanceSaldoDiario],DWDCuentaContable[IndicadorFuente]=7);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -33567,6 +33250,7 @@ CREATE MEASURE 'DWHBalanceSaldo'[bsValInteres]=sum(DWHBalanceSaldo[bsPYGDiario])
                   </Annotations>
                   <CalculationReference>[bsValBalanceSaldoDiario]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>suma de campo bssaldo</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -33588,6 +33272,7 @@ CREATE MEASURE 'DWHBalanceSaldo'[bsValInteres]=sum(DWHBalanceSaldo[bsPYGDiario])
                   </Annotations>
                   <CalculationReference>[bsValBalanceSaldoPromedioMesFiscal]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>suma de campo bsSaldoPromedioMesFiscal</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -33988,6 +33673,7 @@ CREATE MEASURE 'DWHBalanceSaldo'[bsValInteres]=sum(DWHBalanceSaldo[bsPYGDiario])
                   </Annotations>
                   <CalculationReference>[bsValInteres]</CalculationReference>
                   <CalculationType>Member</CalculationType>
+                  <Description>suma de campo bspygDiario</Description>
                   <FormatString>''</FormatString>
                 </CalculationProperty>
                 <CalculationProperty>
@@ -34018,11 +33704,12 @@ CREATE MEASURE 'DWHBalanceSaldo'[bsValInteres]=sum(DWHBalanceSaldo[bsPYGDiario])
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.172.161;Persist Security Info=True;User ID=dwh;Initial Catalog=DWHCORPORATIVO</ConnectionString>
+          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\bingod22</Account>
+            <Account>banintern\bincarro</Account>
           </ImpersonationInfo>
+          <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>50</MaxActiveConnections>
         </DataSource>
@@ -34674,18 +34361,24 @@ CREATE MEASURE 'DWHBalanceSaldo'[bsValInteres]=sum(DWHBalanceSaldo[bsPYGDiario])
               <Sid>S-1-5-21-3084530191-2796110714-333732663-4933</Sid>
             </Member>
             <Member>
-              <Name>BANINTERN\binaguia</Name>
-              <Sid>S-1-5-21-3084530191-2796110714-333732663-4377</Sid>
-            </Member>
-            <Member>
               <Name>BANINTERN\binflorf</Name>
               <Sid>S-1-5-21-3084530191-2796110714-333732663-4497</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\bingod22</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-57840</Sid>
             </Member>
           </Members>
         </Role>
         <Role>
           <ID>Role 1</ID>
           <Name>Admin</Name>
+          <Members>
+            <Member>
+              <Name>BANINTERN\bingod22</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-57840</Sid>
+            </Member>
+          </Members>
         </Role>
       </Roles>
       <DatabasePermissions>

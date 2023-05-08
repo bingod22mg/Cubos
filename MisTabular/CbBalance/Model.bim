@@ -35493,9 +35493,10 @@ CREATE KPI CURRENTCUBE.[ProyeccionResumen_Miles_UsdOtrosG] AS Measures.[Proyecci
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Data Source=172.16.75.16,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=True;User ID=dwh</ConnectionString>
+          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
-            <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
+            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
+            <Account>banintern\bincarro</Account>
           </ImpersonationInfo>
           <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
@@ -36165,12 +36166,6 @@ CREATE KPI CURRENTCUBE.[ProyeccionResumen_Miles_UsdOtrosG] AS Measures.[Proyecci
         <Role>
           <ID>Role 1</ID>
           <Name>Admin</Name>
-          <Members>
-            <Member>
-              <Name>BANINTERN\bincarro</Name>
-              <Sid>S-1-5-21-3084530191-2796110714-333732663-34750</Sid>
-            </Member>
-          </Members>
         </Role>
       </Roles>
       <DatabasePermissions>

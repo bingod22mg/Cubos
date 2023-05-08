@@ -55399,7 +55399,7 @@ CREATE KPI CURRENTCUBE.[sffControlCostosVariacionMilesMargen] AS Measures.[sffCo
       <DataSources>
         <DataSource xsi:type="RelationalDataSource">
           <ID>d48e96d1-bbd7-4d91-accd-3951929f89e8</ID>
-          <Name>CxCorporativo</Name>
+          <Name>SqlServer 172.16.72.160 DWHCORPORATIVO</Name>
           <Annotations>
             <Annotation>
               <Name>ConnectionEditUISource</Name>
@@ -55983,6 +55983,16 @@ CREATE KPI CURRENTCUBE.[sffControlCostosVariacionMilesMargen] AS Measures.[sffCo
         <Role>
           <ID>Role 1</ID>
           <Name>Administrator</Name>
+          <Members>
+            <Member>
+              <Name>BANINTERN\bincarro</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-34750</Sid>
+            </Member>
+            <Member>
+              <Name>S-1-5-21-3084530191-2796110714-333732663-5143</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-5143</Sid>
+            </Member>
+          </Members>
         </Role>
       </Roles>
       <DatabasePermissions>

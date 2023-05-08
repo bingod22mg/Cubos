@@ -87111,9 +87111,16 @@ CREATE MEASURE 'DWHPasivoOperacion'[ValCalTasaImplicitaAperturada]=CALCULATE(DIV
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
+<<<<<<< HEAD
+          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
+          <ImpersonationInfo>
+            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
+            <Account>banintern\bincarro</Account>
+=======
           <ConnectionString>Data Source=172.16.77.10,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=True;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
+>>>>>>> testing
           </ImpersonationInfo>
           <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>

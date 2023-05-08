@@ -3,38 +3,38 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Development</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3b7aa2a6-6cf5-42a2-8138-a5d01831a2b9}</ProjectGuid>
+    <ProjectGuid>{af86ad58-d425-46dd-b999-9c4fb47d6b53}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>MyRootNamespace</RootNamespace>
     <AssemblyName>MyAssemblyName</AssemblyName>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <OutputPath>bin\</OutputPath>
     <Name>CbIngresos</Name>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
-    <OutputPath>bin\</OutputPath>
-    <DeploymentServerName>172.16.172.161</DeploymentServerName>
+    <DeploymentServerName>172.16.78.11</DeploymentServerName>
     <DeploymentServerEdition>Developer</DeploymentServerEdition>
-    <DeploymentServerVersion>Unknown</DeploymentServerVersion>
-    <DeploymentServerDatabase>CbIngresos</DeploymentServerDatabase>
-    <DeploymentServerCubeName>Modelo</DeploymentServerCubeName>
-    <DeploymentOptionProcessing>Default</DeploymentOptionProcessing>
-    <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
-    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
-    <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
-    <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == '' ">
-    <DeploymentServerName>172.16.172.161</DeploymentServerName>
-    <DeploymentServerEdition>Developer</DeploymentServerEdition>
-    <DeploymentServerVersion>Unknown</DeploymentServerVersion>
+    <DeploymentServerVersion>Version_11_0</DeploymentServerVersion>
     <DeploymentServerDatabase>CbIngresos</DeploymentServerDatabase>
     <DeploymentServerCubeName>Model</DeploymentServerCubeName>
     <DeploymentOptionProcessing>Default</DeploymentOptionProcessing>
     <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
-    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
     <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
     <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
+    <OutputPath>bin\</OutputPath>
+    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
+    <DeploymentServerName>172.16.172.161</DeploymentServerName>
+    <DeploymentServerEdition>Developer</DeploymentServerEdition>
+    <DeploymentServerVersion>Version_11_0</DeploymentServerVersion>
+    <DeploymentServerDatabase>CbIngresos</DeploymentServerDatabase>
+    <DeploymentServerCubeName>Model</DeploymentServerCubeName>
+    <DeploymentOptionProcessing>Full</DeploymentOptionProcessing>
+    <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
+    <DeploymentOptionDirectQueryMode>InMemory</DeploymentOptionDirectQueryMode>
+    <DeploymentOptionQueryImpersonation>Default</DeploymentOptionQueryImpersonation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == '' ">
+    <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>

@@ -10952,7 +10952,7 @@ LEFT OUTER JOIN
 ON C.pnIdFecha = E.eIdFecha AND C.ccIdCuentaContable = E.ccIdCuentaContable
 --where c.ccIdCuentaContable = 1137
 GROUP BY C.pnIdFecha, C.pnIdCuentaContable
-having SUM(isnull(C.pnValorPresupuesto,0)) + SUM(isnull(C.pnValorProyeccion ,0)) + sum(isnull(E.valor,0))&gt;0</QueryDefinition>
+having SUM(isnull(abs(C.pnValorPresupuesto),0)) + SUM(isnull(abs(C.pnValorProyeccion) ,0)) + sum(isnull(abs(E.valor),0))&gt;0</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -11048,7 +11048,7 @@ LEFT OUTER JOIN
 ON C.pnIdFecha = E.eIdFecha AND C.ccIdCuentaContable = E.ccIdCuentaContable
 --where c.ccIdCuentaContable = 1137
 GROUP BY C.pnIdFecha, C.pnIdCuentaContable --
-having SUM(isnull(C.pnValorPresupuesto,0)) + SUM(isnull(C.pnValorProyeccion ,0)) + sum(isnull(E.valor,0))&lt;&gt;0</QueryDefinition>
+having SUM(isnull(abs(C.pnValorPresupuesto),0)) + SUM(isnull(abs(C.pnValorProyeccion),0)) + sum(isnull(abs(E.valor),0))&lt;&gt;0</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -11139,7 +11139,7 @@ LEFT OUTER JOIN
 ON C.pnIdFecha = E.eIdFecha AND C.ccIdCuentaContable = E.ccIdCuentaContable
 --where c.ccIdCuentaContable = 1137
 GROUP BY C.pnIdFecha, C.pnIdCuentaContable
-having SUM(isnull(C.pnValorPresupuesto,0)) + SUM(isnull(C.pnValorProyeccion ,0)) + sum(isnull(E.valor,0))&gt;0</QueryDefinition>
+having SUM(isnull(abs(C.pnValorPresupuesto),0)) + SUM(isnull(abs(C.pnValorProyeccion),0)) + sum(isnull(abs(E.valor),0))&gt;0</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -14773,9 +14773,10 @@ CREATE KPI CURRENTCUBE.[KPI_presupuesto_acumulado] AS Measures.[KPI_presupuesto_
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Data Source=172.16.75.16,2433;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
+          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
-            <ImpersonationMode>ImpersonateServiceAccount</ImpersonationMode>
+            <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
+            <Account>banintern\bincarro</Account>
           </ImpersonationInfo>
           <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>

@@ -18508,6 +18508,14 @@ group by ffrCodigoMedidaFinanciera&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandT
               <Read>Allowed</Read>
               <ReadSourceData>None</ReadSourceData>
             </CubePermission>
+            <CubePermission>
+              <ID>CubePermission 1</ID>
+              <Name>CubePermission 1</Name>
+              <RoleID>Role 1</RoleID>
+              <Process>true</Process>
+              <Read>Allowed</Read>
+              <ReadSourceData>None</ReadSourceData>
+            </CubePermission>
           </CubePermissions>
           <MeasureGroups>
             <MeasureGroup>
@@ -27065,6 +27073,8 @@ if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuen
                 <Partition>
                   <ID>DWHActivoOperacion_8576c10d-796c-4c0f-8f6a-4700b2fa7db9</ID>
                   <Name>DWHActivoOperacionDicAnt</Name>
+<<<<<<< HEAD
+=======
                   <Annotations>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
@@ -27180,10 +27190,14 @@ if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
 if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
                     </Annotation>
                   </Annotations>
+>>>>>>> testing
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>set nocount on
 
+<<<<<<< HEAD
+					declare @anio int, @mes int, @FechaActual int, @UltimoCierreAnio int, @feCalAnioActual int, @fechaIniAct int
+=======
 declare @anio int, @mes int, @FechaActual int, @UltimoCierreAnio int, @feCalAnioActual int, @fechaIniAct int
 
 set @mes = 12
@@ -27247,9 +27261,18 @@ select
 ,ao.aoIdCuentaContable
 ,aoMontoSaldoDolar=sum(isnull(ao.aoMontoSaldoDolar,0))
 ,ao.aoIdProducto
+>>>>>>> testing
 
-into #DWHActivoOperacion
+					set @mes = 12
 
+<<<<<<< HEAD
+					select
+					@anio = feCalAnio-1
+					,@feCalAnioActual=feCalAnio
+					,@FechaActual = feIdFecha
+					from DWDFecha
+					where  feDiaActual=1
+=======
 from DWHActivoOperacion ao
 inner join #DWDFecha fe on aoIdFecha = fe.feIdFecha
 Where ao.aoidfecha&gt;=@fechaIniAct
@@ -27257,9 +27280,14 @@ group by ao.aoidfecha
 ,ao.aoidcliente
 ,ao.aoIdCuentaContable
 ,ao.aoIdProducto
+>>>>>>> testing
 
-Union
+					select @fechaIniAct = min(aoidfecha) from DWHActivoOperacion -- Se obtiene la última fecha de la tabla Activo Operacion
 
+<<<<<<< HEAD
+					if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
+					if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
+=======
 Select 
  ao.aoidfecha
 ,ao.aoidcliente
@@ -27273,25 +27301,100 @@ group by ao.aoidfecha
 ,ao.aoidcliente
 ,ao.aoIdCuentaContable
 ,ao.aoIdProducto
+>>>>>>> testing
+
+					/* --  Fecha --- */
+
+					-- Identificacion del año del último cierre anual real --
+					select @UltimoCierreAnio=@feCalAnioActual-1
+					if( @FechaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@feCalAnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+					begin
+					select @UltimoCierreAnio=@feCalAnioActual
+					end
+
+					create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int, feNumeroAnioAnt int)
+
+					insert into #DWDFecha
+					select feidfecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
+					from DWDFecha
+					where feCalAnio = @anio
+					and feCalMes = @mes
+					and feFeriado &lt;&gt; 1
+					and feFinSemana &lt;&gt; 1
+					and feCierreMesTodosAnios = 1
+					and feIdFecha&lt;@FechaActual
+					Union
+					select feIdFecha,feCalAnio,feCalMes, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
+					from DWDFecha
+					where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12 -- Se obtiene los cierres de año de 5 periodos de fechas
+					and feIdFecha&lt;@FechaActual
+
+					/* ---- Cuenta Contable  ---- */
+
+					if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end
+
+					select distinct ccIdCuentaContable
+					into #DWDCuentaContable
+					from DWDCuentaContable cc
+					inner join vuClasificacionProductos cp on cc.ccCodigoIndicador = cp.indicadorNivel3
+					where cp.indicadorNivel1 = 1 -- Cartera
 
 
-select
- ao.aoIdFecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
-,aoMontoSaldoDolar = sum(ao.aoMontoSaldoDolar)
-from #DWHActivoOperacion ao
-inner join #DWDCuentaContable cc on ao.aoIdCuentaContable = cc.ccIdCuentaContable
-where abs(ao.aoMontoSaldoDolar) &lt;&gt; 0
-group by ao.aoIdFecha
-,ao.aoidcliente
-,ao.aoIdCuentaContable
-,ao.aoIdProducto
+					/* ------------------ */
+					/* DWHActivoOperacion */
+					/* ------------------ */
 
-if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
-if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
-if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end</QueryDefinition>
+					select
+					ao.aoidfecha
+					,ao.aoidcliente
+					,ao.aoIdCuentaContable
+					,aoMontoSaldoDolar=sum(isnull(ao.aoMontoSaldoDolar,0))
+					,ao.aoIdProducto
+
+					into #DWHActivoOperacion
+
+					from DWHActivoOperacion ao
+					inner join #DWDFecha fe on aoIdFecha = fe.feIdFecha
+					Where ao.aoidfecha&gt;=@fechaIniAct
+					group by ao.aoidfecha
+					,ao.aoidcliente
+					,ao.aoIdCuentaContable
+					,ao.aoIdProducto
+
+					Union
+
+					Select
+					ao.aoidfecha
+					,ao.aoidcliente
+					,ao.aoIdCuentaContable
+					,aoMontoSaldoDolar=sum(isnull(ao.aoMontoSaldoDolar,0))
+					,ao.aoIdProducto
+					from DWHCORPORATIVOHISTORICO.dbo.DWHActivoOperacion ao
+					inner join #DWDFecha fe on aoIdFecha = fe.feIdFecha
+					Where ao.aoidfecha&lt;@fechaIniAct
+					group by ao.aoidfecha
+					,ao.aoidcliente
+					,ao.aoIdCuentaContable
+					,ao.aoIdProducto
+
+
+					select
+					ao.aoIdFecha
+					,ao.aoidcliente
+					,ao.aoIdCuentaContable
+					,ao.aoIdProducto
+					,aoMontoSaldoDolar = sum(ao.aoMontoSaldoDolar)
+					from #DWHActivoOperacion ao
+					inner join #DWDCuentaContable cc on ao.aoIdCuentaContable = cc.ccIdCuentaContable
+					where abs(ao.aoMontoSaldoDolar) &lt;&gt; 0
+					group by ao.aoIdFecha
+					,ao.aoidcliente
+					,ao.aoIdCuentaContable
+					,ao.aoIdProducto
+
+					if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
+					if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
+					if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuentaContable end</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -27306,6 +27409,84 @@ if object_id('tempdb..#DWDCuentaContable') is not null begin drop table #DWDCuen
                 <Partition>
                   <ID>DWHActivoOperacion_6de2edc3-d35b-4c77-bc11-4ef1dac2299b</ID>
                   <Name>DWHActivoOperacionAnterior</Name>
+<<<<<<< HEAD
+                  <Source xsi:type="QueryBinding">
+                    <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
+                    <QueryDefinition>---16 MIN
+					set nocount on
+
+					declare @fechaFin int, @fechaIni int, @fechaIniAct int
+
+					select
+					@fechaFin=concat(fecalanio-1,'1130')
+					from DWDFecha
+					where  feDiaActual=1
+
+					select @fechaIni=convert(varchar(10) , dateadd(mm,-25, cast(cast(@fechaFin as varchar(10)) as date) ) , 112)
+
+					select @fechaIniAct = min(aoidfecha) from DWHActivoOperacion -- En la tabla DWHActivoOperacion se guardan dos años respecto a la ultima fecha de corte
+
+					if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
+					if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end
+
+					/* --  Fecha --- */
+
+					create table #DWDFecha (feidfecha int,fecalanio int,fecalmes int)
+
+					insert into #DWDFecha
+					select feidfecha,feCalAnio,feCalMes
+					from DWDFecha
+					where feidfecha between @fechaIni and @fechaFin
+					and feFeriado &lt;&gt; 1
+					and feFinSemana &lt;&gt; 1
+					and feCierreMesTodosAnios = 1
+					and feCalMes&lt;&gt;12 -- En la partición DWHActivoOperacionDicAnt se guardan los historicos de los cierres de año por esos se exluyen de esta partición
+
+					/* ------------------------ */
+					/* -- DWHActivoOperacion -- */
+					/* ------------------------ */
+
+					select aoidfecha,
+					aoidcliente,
+					aoIdCuentaContable,
+					aoMontoSaldoDolar,
+					aoIdProducto
+					into #DWHActivoOperacion
+					from DWHActivoOperacion
+					inner join DWDCuentaContable on aoIdCuentaContable = ccIdCuentaContable
+					inner join vuClasificacionProductos on ccCodigoIndicador = indicadorNivel3
+					inner join #DWDFecha fe on aoIdFecha = fe.feIdFecha
+					where abs(aoMontoSaldoDolar) &gt; 0 and indicadorNivel1 = 1
+					and aoidfecha&gt;=@fechaIniAct -- Fecha Inicio de la tabla DWHActivoOperacion
+
+					insert into #DWHActivoOperacion
+					select aoidfecha,
+					aoidcliente,
+					aoIdCuentaContable,
+					aoMontoSaldoDolar,
+					aoIdProducto
+					from DWHCORPORATIVOHISTORICO..DWHActivoOperacion
+					inner join DWDCuentaContable on aoIdCuentaContable = ccIdCuentaContable
+					inner join vuClasificacionProductos on ccCodigoIndicador = indicadorNivel3
+					inner join #DWDFecha fe on aoIdFecha = fe.feIdFecha
+					where abs(aoMontoSaldoDolar) &gt; 0 and indicadorNivel1 = 1
+					and aoidfecha&lt;@fechaIniAct -- Fecha Inicio de la tabla DWHActivoOperacion
+
+					select
+					ao.aoIdFecha
+					, ao.aoidcliente
+					, ao.aoIdCuentaContable
+					, ao.aoIdProducto
+					, aoMontoSaldoDolar = sum( isnull(ao.aoMontoSaldoDolar,0)  )
+					from #DWHActivoOperacion ao
+					group by ao.aoIdFecha
+					,ao.aoidcliente
+					,ao.aoIdCuentaContable
+					,ao.aoIdProducto
+
+					if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
+					if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
+=======
                   <Annotations>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
@@ -27461,6 +27642,7 @@ group by ao.aoIdFecha
 
 if object_id('tempdb..#DWHActivoOperacion') is not null begin drop table #DWHActivoOperacion end
 if object_id('tempdb..#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
+>>>>>>> testing
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -38872,6 +39054,8 @@ end</QueryDefinition>
                 <Partition>
                   <ID>DWHPresupuestoNegocio_c8cc2431-3847-42b2-ba98-e25ae56e6763</ID>
                   <Name>DWHPresupuestoNegocio</Name>
+<<<<<<< HEAD
+=======
                   <Annotations>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
@@ -38939,10 +39123,73 @@ order by 1
 if object_id('tempdb..#CTE_Fecha') is not null begin drop table #CTE_Fecha end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
                     </Annotation>
                   </Annotations>
+>>>>>>> testing
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>SET NOCOUNT ON
 
+<<<<<<< HEAD
+					--------------------------------------------------------------
+					--Script generacion de hechos de Pronostico Producto
+					---------------------------------------------------------------
+
+					declare @feCierreAnioActual int
+					,@feFecha26MesesAtras int
+					,@feFechaMesActual int
+					,@feFecha date
+					,@feFecha30DiasAnt int
+					,@feFecha15DiasFuturo int
+
+					select @feFecha = feFecha from DWDFecha where feDiaActual = 1
+					select @feFecha26MesesAtras = convert(varchar(8), dateadd(Month, -26, @feFecha), 112)
+					select @feFecha15DiasFuturo = convert(varchar(8), dateadd(Day, 15, @feFecha), 112)
+					select @feFecha30DiasAnt = convert(varchar(8), dateadd(Day, -29, @feFecha), 112)
+					select @feCierreAnioActual=concat(year(@feFecha),'1231')
+
+					--Resumen de Fechas
+
+					if object_id('tempdb..#CTE_Fecha') is not null begin drop table #CTE_Fecha end
+
+					select feIdFecha, feConcentracion = 0
+					into #CTE_Fecha
+					from DWDFecha
+					where feIdFecha &gt; @feFecha26MesesAtras
+					and feIdFecha &lt;= @feCierreAnioActual
+					and feCierreMesTodosAnios = 1
+
+					UNION
+
+					select feIdFecha, feConcentracion = 0
+					from DWDFecha
+					where feIdFecha between @feFecha30DiasAnt and @feFecha15DiasFuturo
+					and feferiado = 0
+					and fefinsemana =0
+
+					UNION
+
+					select feIdFechaAnioAnt,feConcentracion = 0 from DWDFecha where feIdFecha=convert(varchar(8),@feFecha,112)  -- Campo feIdFechaAnioAnt: Fecha de hace un anio con respeto a la fecha actual
+
+
+					select
+					pn.pnIdFecha
+					,pn.pnIdBanca
+					,pn.pnIdCanal
+					,pn.pnIdAgencia
+					,pn.pnIdAsesor
+					,pnIdCuentaContable
+					,case when ccCodigoIndicador = 513 then 171 else pnIdProducto end pnIdProducto
+					,pn.pnValorPresupuesto
+					,pn.pnValorProyeccion
+					,pn.pnIdIndicadorMedidaFinanciera
+					,pnValorPresupuestoAcum=isnull(pn.pnValorPresupuestoAcum,0)
+					from DWHPresupuestoNegocio pn
+					inner join #CTE_Fecha fe on pn.pnIdFecha = fe.feIdFecha
+					inner join DWDCuentaContable on pnidcuentacontable = ccidcuentacontable
+					where pn.pnIdIndicadorMedidaFinanciera = -10
+					order by 1
+
+					if object_id('tempdb..#CTE_Fecha') is not null begin drop table #CTE_Fecha end</QueryDefinition>
+=======
 --------------------------------------------------------------
 --Script generacion de hechos de Pronostico Producto
 ---------------------------------------------------------------
@@ -39003,6 +39250,7 @@ where pn.pnIdIndicadorMedidaFinanciera = -10
 order by 1
 
 if object_id('tempdb..#CTE_Fecha') is not null begin drop table #CTE_Fecha end</QueryDefinition>
+>>>>>>> testing
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -51185,6 +51433,8 @@ if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end<
                 <Partition>
                   <ID>DWHTarjetaCreditoOperacion_8c568375-c7e2-4008-a61c-a87da6ed0538</ID>
                   <Name>DWHTarjetaCreditoOperacionDicAnioAnt</Name>
+<<<<<<< HEAD
+=======
                   <Annotations>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
@@ -51255,10 +51505,14 @@ where tcoSaldo!=0  and tcoIdFecha&lt;@FechaIniTC
 if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
                     </Annotation>
                   </Annotations>
+>>>>>>> testing
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>SET NOCOUNT ON
 
+<<<<<<< HEAD
+					declare @FechaActual int, @FechaMesAnt int, @AnioMes int, @Mes int, @AnioActual int, @UltimoCierreAnio int, @FechaIniTC int
+=======
 declare @FechaActual int, @FechaMesAnt int, @AnioMes int, @Mes int, @AnioActual int, @UltimoCierreAnio int, @FechaIniTC int
 
 set @Mes=12
@@ -51274,33 +51528,32 @@ where feDiaActual=1
 select @FechaIniTC=min(tcoIdFecha) from DWHTarjetaCreditoOperacion -- Idendificacion de la fecha inicio de tarjeta de credito
 
 /* -- Fecha -- */
+>>>>>>> testing
 
-if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
+					set @Mes=12
 
--- Identificacion del año del último cierre anual real --
-select @UltimoCierreAnio=@AnioActual-1
-if( @FechaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@AnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
-begin
- select @UltimoCierreAnio=@AnioActual
-end
+					select
+					@FechaActual = feIdFecha
+					,@AnioActual = feCalAnio
+					,@FechaMesAnt = feMesAntCierr -- Fecha del cierre del mes anterior respecto a la fecha actual
+					,@AnioMes =  ( (feCalAnio-1) * 100 ) + @Mes -- Por ser cambio de año se debe restar uno al año actual
+					from DWDFecha
+					where feDiaActual=1
 
-create table #DWDFecha (feIdFecha int, feNumeroAnioAnt int)
+					select @FechaIniTC=min(tcoIdFecha) from DWHTarjetaCreditoOperacion -- Idendificacion de la fecha inicio de tarjeta de credito
 
--- Se obtiene la fecha del cierre de mes --
+					/* -- Fecha -- */
 
-insert into #DWDFecha
-select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
-from DWDFecha
-where left(feIdFecha,6)=@AnioMes
-and feCierreMesTodosAnios = 1   
-and feIdFecha&lt;@FechaActual
-Union
-select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
-from DWDFecha
-where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12  -- Se obtiene los cierres de año de 5 periodos de fechas
-and feIdFecha&lt;@FechaActual
+					if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
 
-
+<<<<<<< HEAD
+					-- Identificacion del año del último cierre anual real --
+					select @UltimoCierreAnio=@AnioActual-1
+					if( @FechaActual = (select max(feIdFecha) from DWDFecha where feCalAnio=@AnioActual and feFeriado=0 and feFinSemana=0 and feCalMes=12)) -- se valida si la fecha de corte es un cierre de año real
+					begin
+					select @UltimoCierreAnio=@AnioActual
+					end
+=======
 /* -- Tarjeta Credito -- */
 
 select 
@@ -51320,8 +51573,46 @@ select
 from DWHCORPORATIVOHISTORICO.dbo.DWHTarjetaCreditoOperacion tco
 inner join #DWDFecha fe on tco.tcoIdFecha=fe.feIdFecha
 where tcoSaldo!=0  and tcoIdFecha&lt;@FechaIniTC
+>>>>>>> testing
 
-if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
+					create table #DWDFecha (feIdFecha int, feNumeroAnioAnt int)
+
+					-- Se obtiene la fecha del cierre de mes --
+
+					insert into #DWDFecha
+					select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
+					from DWDFecha
+					where left(feIdFecha,6)=@AnioMes
+					and feCierreMesTodosAnios = 1
+					and feIdFecha&lt;@FechaActual
+					Union
+					select feIdFecha, feNumeroAnioAnt=(@UltimoCierreAnio-feCalAnio)+1
+					from DWDFecha
+					where feCalAnio between (@UltimoCierreAnio-4) and @UltimoCierreAnio and feCierreMes = 1 and feCalMes = 12  -- Se obtiene los cierres de año de 5 periodos de fechas
+					and feIdFecha&lt;@FechaActual
+
+
+					/* -- Tarjeta Credito -- */
+
+					select
+					tcoIdFecha
+					,tcoIdCliente
+					,tcoIdCuentaContable
+					,tcoSaldo
+					from DWHTarjetaCreditoOperacion tco
+					inner join #DWDFecha fe on tco.tcoIdFecha=fe.feIdFecha
+					where tcoSaldo!=0 and tcoIdFecha&gt;=@FechaIniTC
+					Union
+					select
+					tcoIdFecha
+					,tcoIdCliente
+					,tcoIdCuentaContable
+					,tcoSaldo
+					from DWHCORPORATIVOHISTORICO.dbo.DWHTarjetaCreditoOperacion tco
+					inner join #DWDFecha fe on tco.tcoIdFecha=fe.feIdFecha
+					where tcoSaldo!=0  and tcoIdFecha&lt;@FechaIniTC
+
+					if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -51332,11 +51623,12 @@ if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end<
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHTarjetaCreditoOperacion_837924e6-bf42-4e26-859a-25e907f07b21</ID>
                   <Name>DWHTarjetaCreditoOperacionAnterior</Name>
+<<<<<<< HEAD
+=======
                   <Annotations>
                     <Annotation>
                       <Name>QueryEditorSerialization</Name>
@@ -51393,10 +51685,25 @@ and tcoIdFecha&lt;@FechaIniTC -- Fecha Inicio de la tabla DWHTarjetaCreditoOpera
 if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
                     </Annotation>
                   </Annotations>
+>>>>>>> testing
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>95a81485-86f8-4d0c-bf17-069290c4ae0c</DataSourceID>
                     <QueryDefinition>SET NOCOUNT ON
 
+<<<<<<< HEAD
+					declare @FechaIniTC int, @FechaFin int, @fechaIni int
+
+					select
+					@FechaFin=concat( feCalAnio-1 ,'1130' )
+					from DWDFecha
+					where feDiaActual=1
+
+					select @fechaIni=convert(varchar(10) , dateadd(mm,-25, cast(cast(@fechaFin as varchar(10)) as date) ) , 112)
+
+					select @FechaIniTC=min(tcoIdFecha) from DWHTarjetaCreditoOperacion -- La tabla Tarjeta de Credito de la bdd corporativo tiene solo los datos desde hace dos años hasta la fecha actual
+
+					/* -- Fecha -- */
+=======
 declare @FechaIniTC int, @FechaFin int, @fechaIni int
 
 select
@@ -51407,11 +51714,46 @@ where feDiaActual=1
 select @fechaIni=convert(varchar(10) , dateadd(mm,-25, cast(cast(@fechaFin as varchar(10)) as date) ) , 112)
 
 select @FechaIniTC=min(tcoIdFecha) from DWHTarjetaCreditoOperacion -- La tabla Tarjeta de Credito de la bdd corporativo tiene solo los datos desde hace dos años hasta la fecha actual
+>>>>>>> testing
 
-/* -- Fecha -- */
+					if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
 
-if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end
+					select feIdFecha
+					into #DWDFecha
+					from DWDFecha
+					where feIdFecha between @fechaIni and @FechaFin
+					and feCierreMesTodosAnios = 1
+					and feCalMes&lt;&gt;12 -- En la partición DWHTarjetaCreditoOperacionDicAnioAnt se guardan los historicos de los cierres de año por esos se exluyen de esta partición
 
+<<<<<<< HEAD
+					/* --------------------- */
+					/* -- Tarjeta Credito -- */
+					/* --------------------- */
+
+					select
+					tcoIdFecha
+					,tcoIdCliente
+					,tcoIdCuentaContable
+					,tcoSaldo
+					from DWHTarjetaCreditoOperacion tco
+					inner join #DWDFecha fe on tco.tcoIdFecha=fe.feIdFecha
+					where tcoSaldo!=0
+					and tcoIdFecha&gt;=@FechaIniTC -- Fecha Inicio de la tabla DWHTarjetaCreditoOperacion
+
+					union
+
+					select
+					tcoIdFecha
+					,tcoIdCliente
+					,tcoIdCuentaContable
+					,tcoSaldo
+					from DWHCORPORATIVOHISTORICO..DWHTarjetaCreditoOperacion tco -- la bdd dwhcorporativohistorio tiene toda la historia de tarjeta de credito
+					inner join #DWDFecha fe on tco.tcoIdFecha=fe.feIdFecha
+					where tcoSaldo!=0
+					and tcoIdFecha&lt;@FechaIniTC -- Fecha Inicio de la tabla DWHTarjetaCreditoOperacion
+
+					if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
+=======
 select feIdFecha 
 into #DWDFecha
 from DWDFecha
@@ -51446,6 +51788,7 @@ where tcoSaldo!=0
 and tcoIdFecha&lt;@FechaIniTC -- Fecha Inicio de la tabla DWHTarjetaCreditoOperacion
 
 if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end</QueryDefinition>
+>>>>>>> testing
                   </Source>
                   <StorageMode valuens="ddl200_200">InMemory</StorageMode>
                   <ProcessingMode>Regular</ProcessingMode>
@@ -51456,7 +51799,6 @@ if object_id('tempdb.dbo.#DWDFecha') is not null begin drop table #DWDFecha end<
                     <ForceRebuildInterval>-PT1S</ForceRebuildInterval>
                     <Source xsi:type="ProactiveCachingInheritedBinding" />
                   </ProactiveCaching>
-                  <ddl300_300:DirectQueryUsage>InMemoryOnly</ddl300_300:DirectQueryUsage>
                 </Partition>
                 <Partition>
                   <ID>DWHTarjetaCreditoOperacion_c52a2eb2-00ce-4536-873d-41cd341669aa</ID>
@@ -52573,7 +52915,7 @@ group by ffrCodigoMedidaFinanciera</QueryDefinition>
               <Commands>
                 <Command>
                   <Text>CALCULATE; 
-CREATE MEMBER CURRENTCUBE.Measures.[__No measures defined] AS 1, VISIBLE = 0; 
+CREATE MEMBER CURRENTCUBE.Measures.[__No measures defined] AS 1; 
 ALTER CUBE CURRENTCUBE UPDATE DIMENSION Measures, Default_Member = [__No measures defined]; </Text>
                 </Command>
                 <Command>
@@ -53057,7 +53399,11 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCrecimientoMesAnterior]=IF([poValSaldoM
 ----------------------------------------------------------
 
 
+<<<<<<< HEAD
+CREATE MEASURE 'DWHPasivoOperacion'[poValNumCuentasAperturadasAnioAct]=CALCULATE(SUM([poNumeroDeOperaciones]),FILTER(DWHPasivoOperacion,DWHPasivoOperacion[poCuentaAperturada]=1),DWDFecha[feCalBanderaEsHace1Anios]=1||DWDFecha[feCalBanderaEsHace1Anios]=3);
+=======
 CREATE MEASURE 'DWHPasivoOperacion'[poValNumCuentasAperturadasAnioAct]=CALCULATE(SUM([poNumeroDeOperaciones]),FILTER(DWHPasivoOperacion,DWHPasivoOperacion[poCuentaAperturada]=1),DWDFecha[feCalBanderaEsHace1Anios]=1 || DWDFecha[feCalBanderaEsHace1Anios]=3);
+>>>>>>> testing
 </Text>
                   <Annotations>
                     <Annotation>
@@ -54387,7 +54733,11 @@ CREATE MEASURE 'DWHPasivoOperacion'[poSaldoPromedioDiarioPortafolio]=DIVIDE([poV
 ----------------------------------------------------------
 
 
+<<<<<<< HEAD
+CREATE MEASURE 'DWHPasivoOperacion'[poValNumCuentasActivasAnioAct]=CALCULATE(SUM([poNumeroDeOperaciones]),FILTER(DWHPasivoOperacion,DWHPasivoOperacion[poCuentaActiva]=1),DWDFecha[feCalBanderaEsHace1Anios]=1||DWDFecha[feCalBanderaEsHace1Anios]=3);
+=======
 CREATE MEASURE 'DWHPasivoOperacion'[poValNumCuentasActivasAnioAct]=CALCULATE(SUM([poNumeroDeOperaciones]),FILTER(DWHPasivoOperacion,DWHPasivoOperacion[poCuentaActiva]=1),DWDFecha[feCalBanderaEsHace1Anios]=1 ||DWDFecha[feCalBanderaEsHace1Anios]=3);
+>>>>>>> testing
 </Text>
                   <Annotations>
                     <Annotation>
@@ -72426,11 +72776,16 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF(
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
+<<<<<<< HEAD
+          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Integrated Security=SSPI;Persist Security Info=false;User ID=dwh</ConnectionString>
+=======
           <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.76.4;Integrated Security=SSPI;Initial Catalog=DWHCORPORATIVO_PROD</ConnectionString>
+>>>>>>> testing
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
-            <Account>banintern\binxaste</Account>
+            <Account>banintern\bincarro</Account>
           </ImpersonationInfo>
+          <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
           <MaxActiveConnections>80</MaxActiveConnections>
         </DataSource>
@@ -73193,12 +73548,26 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF(
               <Sid>S-1-5-21-3084530191-2796110714-333732663-2708</Sid>
             </Member>
             <Member>
-              <Name>BANINTERN\binxramr</Name>
-              <Sid>S-1-5-21-3084530191-2796110714-333732663-34272</Sid>
-            </Member>
-            <Member>
               <Name>BANINTERN\bingranj</Name>
               <Sid>S-1-5-21-3084530191-2796110714-333732663-57734</Sid>
+            </Member>
+          </Members>
+        </Role>
+        <Role>
+          <ID>Role 1</ID>
+          <Name>Admin</Name>
+          <Members>
+            <Member>
+              <Name>BANINTERN\bincarro</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-34750</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\BINXASTE</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-34271</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\bingod34</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-58887</Sid>
             </Member>
           </Members>
         </Role>
@@ -73209,6 +73578,14 @@ CREATE MEASURE 'DWHPasivoOperacion'[poValCaptacionesVarAnualMesFiscPorcSFC]=IF(
           <Name>DatabasePermission</Name>
           <RoleID>Role</RoleID>
           <Read>Allowed</Read>
+        </DatabasePermission>
+        <DatabasePermission>
+          <ID>DatabasePermission 1</ID>
+          <Name>DatabasePermission 1</Name>
+          <RoleID>Role 1</RoleID>
+          <Process>true</Process>
+          <Read>Allowed</Read>
+          <Administer>true</Administer>
         </DatabasePermission>
       </DatabasePermissions>
     </Database>

@@ -4765,7 +4765,7 @@ declare @hoy varchar(8),@hoyini varchar(8)
 select 
 @hoy = feidfecha,
 @hoyini = left(feidfecha,6)+'01'
-from DWDFecha1 
+from DWDFecha
 where feDiaActual = 1
 
 if object_id('[tempdb]..#dwhinformacionfinancieracliente') is not null
@@ -4781,7 +4781,8 @@ end
 select CpCodigoIndicador 
 into #DWDClasificacionProductos
 from DWDClasificacionProductos 
-where (CpCodigoIndicador in (1003,1004,1005,1007,1008,1009,1010,1011,1012,1013,1014,1053,1061,1062,1060,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072)
+where (CpCodigoIndicador in (1003,1004,1005,1007,1008,1009,1010,1011,1012,1013,1014,1053,1061,1062,1060,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,
+1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083)
 OR CpCodigoIndicador &gt; 1200)
 
 select  dfcIdFecha,
@@ -9369,32 +9370,6 @@ where cpcodigoindicador &gt; 1000&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandTy
                 <Partition>
                   <ID>DWDEntidadFinancieraRiesgo_70e0f8ba-51cc-46d8-8ed3-f0caec2eccff</ID>
                   <Name>DWDEntidadFinancieraRiesgo</Name>
-                  <Annotations>
-                    <Annotation>
-                      <Name>QueryEditorSerialization</Name>
-                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;select 
-ifIdInstitucionFinanciera,
-ifNombreInstitucionFinanciera efDescripcionEntidad,
-ifTipoInstitucionFinanciera efTipoEntidad,
-case ifIdInstitucionFinanciera
-when 1023 THEN '#FF8000' --INTERNACIONAL
-when 1029 THEN '#FFFF00' --PICHINCHA
-when 1028 THEN '#81DAF5' --PACIFICO
-when 1033 THEN '#86B404' --PRODUBANCO
-when 1006 THEN '#0080FF' --GUAYAQUIL
-when 1025 THEN '#01DF3A' --LOJA
-when 1002 THEN '#58ACFA' --AMAZONAS
-when 1004 THEN '#81DAF5' --AUSTRO
-when 4624 THEN '#2E64FE' --DINERS
-when 1026 THEN '#173B0B' --MACHALA
-when 1011 THEN '#0B610B' --MANABI
-when 1007 THEN '#088A85' --BOLIVARIANO
-when 1009 THEN '#FE2E2E' --CITIBANK
-when 1020 THEN '#8A0808' --RUMIÑAHUI
-else 'Automatic' end efColorEntidad
-from DWDInstitucionFinanciera&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
-                    </Annotation>
-                  </Annotations>
                   <Source xsi:type="QueryBinding">
                     <DataSourceID>aa175e45-e970-475e-b30a-6f53b05b0304</DataSourceID>
                     <QueryDefinition>select 
@@ -9406,7 +9381,7 @@ when 1023 THEN '#FF8000' --INTERNACIONAL
 when 1029 THEN '#FFFF00' --PICHINCHA
 when 1028 THEN '#81DAF5' --PACIFICO
 when 1033 THEN '#86B404' --PRODUBANCO
-when 1006 THEN '#0080FF' --GUAYAQUIL
+when 1006 THEN '#ff35c2' --GUAYAQUIL	  #0080FF
 when 1025 THEN '#01DF3A' --LOJA
 when 1002 THEN '#58ACFA' --AMAZONAS
 when 1004 THEN '#81DAF5' --AUSTRO
@@ -15417,9 +15392,10 @@ deIdProducto</QueryDefinition>
                 <Partition>
                   <ID>DWHRentabilidad_538177e5-6192-40ca-bf36-d4f2e80952c7</ID>
                   <Name>DWHRentabilidad</Name>
-                  <Source xsi:type="QueryBinding">
-                    <DataSourceID>aa175e45-e970-475e-b30a-6f53b05b0304</DataSourceID>
-                    <QueryDefinition>SET NOCOUNT ON
+                  <Annotations>
+                    <Annotation>
+                      <Name>QueryEditorSerialization</Name>
+                      <Value>&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="QueryEditorSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;RSQueryCommandText&gt;SET NOCOUNT ON
 
 --===========================================================================
 --DESCRIPCION: Script de garantias + Rentabilidad + Linea Crédito + Forex + 
@@ -15437,11 +15413,6 @@ select
 @hoyini = left(feidfecha,6)+'01'
 from DWDFecha
 where feDiaActual = 1
-
-select feidfecha
-into #dwdfecha
-from dwdfecha
-where feIdFecha between @hoyini and @hoy
 
 if object_id('[tempdb]..#dwhinformacionfinancieracliente') is not null
 begin
@@ -15477,7 +15448,114 @@ dfcValorProm12MesesIndicador
 into #dwhinformacionfinancieracliente
 from dwhinformacionfinancieracliente
 inner join #DWDClasificacionProductos ON dfcIdCodigoIndicador = CpCodigoIndicador
-inner join #dwdfecha on feidfecha = dfcIdFecha
+where dfcIdFecha between @hoyini and @hoy
+
+--sistema Financiero
+insert into #dwhinformacionfinancieracliente
+select dfcIdFecha,
+dfcIdFechaTransaccion,
+dfcIdcliente,
+dfcIdCodigoIndicador,
+dfcIdEntidad,
+-1 dfcIdCalificacionCliente,
+-1 dfcIdTipoCredito,
+sum(isnull(dfcValorIndicador,0)) rcTotal,
+sum(isnull(dfcValorAcumAnioIndicador,0)),
+sum(isnull(dfcValorPromAnioIndicador,0)),
+sum(isnull(dfcValorPromTrimFiscalIndicador,0)),
+sum(isnull(dfcValorTrimFiscalIndicador,0)),
+sum(isnull(dfcValor12MesesIndicador,0)),
+sum(isnull(dfcValorProm12MesesIndicador,0))
+from dwhinformacionfinancieracliente
+where dfcIdFecha = @hoy
+and dfcIdTipoRiesgo = 1
+and dfcIdCodigoIndicador = 1026
+group by dfcIdFechaTransaccion,
+dfcIdcliente,
+dfcIdEntidad,
+dfcIdCodigoIndicador,
+dfcIdFecha
+
+select dfcIdFecha,
+dfcIdFechaTransaccion=isnull(dfcIdFechaTransaccion,0),
+dfcIdcliente,
+dfcIdCodigoIndicador,
+dfcIdEntidad,
+isnull(dfcIdCalificacionCliente,-1) dfcIdCalificacionCliente,
+dfcIdTipoCredito,
+SUM(isnull(dfcValorIndicador,0)) dfcValorIndicador,
+sum(isnull(dfcValorAcumAnioIndicador,0)) dfcValorAcumAnioIndicador,
+sum(isnull(dfcValorPromAnioIndicador,0)) dfcValorPromAnioIndicador,
+sum(isnull(dfcValorPromTrimFiscalIndicador,0)) dfcValorPromTrimFiscalIndicador,
+sum(isnull(dfcValorTrimFiscalIndicador,0)) dfcValorTrimFiscalIndicador,
+sum(isnull(dfcValor12MesesIndicador,0)) dfcValor12MesesIndicador,
+sum(isnull(dfcValorProm12MesesIndicador,0)) dfcValorProm12MesesIndicador
+from #dwhinformacionfinancieracliente
+group by dfcIdFechaTransaccion,
+dfcIdcliente,
+dfcIdCodigoIndicador,
+dfcIdCalificacionCliente,
+dfcIdEntidad,
+dfcIdFecha,
+dfcIdTipoCredito&lt;/RSQueryCommandText&gt;&lt;RSQueryCommandType&gt;Text&lt;/RSQueryCommandType&gt;&lt;RSQueryDesignState&gt;&lt;/RSQueryDesignState&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;</Value>
+                    </Annotation>
+                  </Annotations>
+                  <Source xsi:type="QueryBinding">
+                    <DataSourceID>aa175e45-e970-475e-b30a-6f53b05b0304</DataSourceID>
+                    <QueryDefinition>SET NOCOUNT ON
+
+--===========================================================================
+--DESCRIPCION: Script de garantias + Rentabilidad + Linea Crédito + Forex + 
+--      Adquiriencia + Transporte Valores + CRM
+--FECHA:  2019/07/11
+--AUTOR: FERNANDO CARRILLO
+--===========================================================================
+
+
+--Variables
+declare @hoy varchar(8),@hoyini varchar(8)
+
+select 
+@hoy = feidfecha,
+@hoyini = left(feidfecha,6)+'01'
+from DWDFecha
+where feDiaActual = 1
+
+if object_id('[tempdb]..#dwhinformacionfinancieracliente') is not null
+begin
+ drop table #dwhinformacionfinancieracliente
+end
+
+if object_id('[tempdb]..#DWDClasificacionProductos') is not null
+begin
+ drop table #DWDClasificacionProductos
+end
+
+select CpCodigoIndicador 
+into #DWDClasificacionProductos
+from DWDClasificacionProductos 
+where (CpCodigoIndicador in (1003,1004,1005,1007,1008,1009,1010,1011,1012,1013,1014,1053,1061,1062,1060,1063,1064,1065,1066,1067,1068,1069,1070,1071,1072,
+1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083)
+OR CpCodigoIndicador &gt; 1200)
+
+select  dfcIdFecha,
+dfcIdFechaTransaccion,
+dfcIdcliente,
+dfcIdCodigoIndicador,
+dfcIdEntidad,
+dfcIdCalificacionCliente,
+dfcIdTipoCredito,
+dfcValorIndicador,
+dfcValorAcumAnioIndicador,
+dfcValorPromAnioIndicador,
+dfcValorPromTrimFiscalIndicador,
+dfcValorTrimFiscalIndicador,
+dfcValor12MesesIndicador,
+dfcValorProm12MesesIndicador
+into #dwhinformacionfinancieracliente
+from dwhinformacionfinancieracliente
+inner join #DWDClasificacionProductos ON dfcIdCodigoIndicador = CpCodigoIndicador
+where dfcIdFecha between @hoyini and @hoy
 
 --sistema Financiero
 insert into #dwhinformacionfinancieracliente

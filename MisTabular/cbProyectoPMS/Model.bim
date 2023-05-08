@@ -2997,6 +2997,23 @@ IF(LEFT(DWHFechaFaseProyecto[ffFeMesanio],3)="DEC",REPLACE(DWHFechaFaseProyecto[
               </Attributes>
             </Dimension>
           </Dimensions>
+          <CubePermissions>
+            <CubePermission>
+              <ID>CubePermission</ID>
+              <Name>CubePermission</Name>
+              <RoleID>Role</RoleID>
+              <Read>Allowed</Read>
+              <ReadSourceData>None</ReadSourceData>
+            </CubePermission>
+            <CubePermission>
+              <ID>CubePermission 1</ID>
+              <Name>CubePermission 1</Name>
+              <RoleID>Role 1</RoleID>
+              <Process>true</Process>
+              <Read>Allowed</Read>
+              <ReadSourceData>None</ReadSourceData>
+            </CubePermission>
+          </CubePermissions>
           <MeasureGroups>
             <MeasureGroup>
               <ID>DWDProyecto_8bdbfb93-f28a-4a23-b644-69195e26c15b</ID>
@@ -5606,19 +5623,21 @@ CREATE KPI CURRENTCUBE.[ffKPIPrueba] AS Measures.[ffKPIPrueba], ASSOCIATED_MEASU
       <DataSources>
         <DataSource xsi:type="RelationalDataSource">
           <ID>387641c2-3ef8-481f-af55-8a2d15dd21cb</ID>
-          <Name>CxConexion</Name>
+          <Name>SqlServer 172.16.72.181 PMS</Name>
           <Annotations>
             <Annotation>
               <Name>ConnectionEditUISource</Name>
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.172.161;Persist Security Info=True;User ID=dwh;Initial Catalog=DWHCORPORATIVO</ConnectionString>
+          <ConnectionString>Data Source=172.16.172.161;Initial Catalog=DWHCORPORATIVO;Persist Security Info=true;User ID=dwh</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
             <Account>banintern\bincarro</Account>
           </ImpersonationInfo>
+          <ManagedProvider>System.Data.SqlClient</ManagedProvider>
           <Timeout>PT0S</Timeout>
+          <MaxActiveConnections>50</MaxActiveConnections>
         </DataSource>
       </DataSources>
       <DataSourceViews>
@@ -5805,6 +5824,50 @@ CREATE KPI CURRENTCUBE.[ffKPIPrueba] AS Measures.[ffKPIPrueba], ASSOCIATED_MEASU
           </Schema>
         </DataSourceView>
       </DataSourceViews>
+      <Roles>
+        <Role>
+          <ID>Role</ID>
+          <Name>Read</Name>
+          <Members>
+            <Member>
+              <Name>BANINTERN\binmendr</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-7132</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\bintrabj</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-21158</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\binalegj</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-8578</Sid>
+            </Member>
+            <Member>
+              <Name>BANINTERN\binmazaj</Name>
+              <Sid>S-1-5-21-3084530191-2796110714-333732663-2650</Sid>
+            </Member>
+          </Members>
+        </Role>
+        <Role>
+          <ID>Role 1</ID>
+          <Name>Admin</Name>
+        </Role>
+      </Roles>
+      <DatabasePermissions>
+        <DatabasePermission>
+          <ID>DatabasePermission</ID>
+          <Name>DatabasePermission</Name>
+          <RoleID>Role</RoleID>
+          <Read>Allowed</Read>
+        </DatabasePermission>
+        <DatabasePermission>
+          <ID>DatabasePermission 1</ID>
+          <Name>DatabasePermission 1</Name>
+          <RoleID>Role 1</RoleID>
+          <Process>true</Process>
+          <Read>Allowed</Read>
+          <Administer>true</Administer>
+        </DatabasePermission>
+      </DatabasePermissions>
     </Database>
   </ObjectDefinition>
 </Alter>
