@@ -63985,7 +63985,11 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValNumClientes]=DISTINCTCOUNT(DWHR
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaComMicr]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120))) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaComMicr]=
+IF( abs(CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))) &lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))
+);
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64004,7 +64008,11 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaComMicr]=CALCULATE(SUM(DW
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaConsumoTC]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaConsumoTC]=
+IF(abs( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) )&lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ))
++ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64023,7 +64031,12 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaConsumoTC]=CALCULATE(SUM(
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaVivienda]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarDiaVivienda]=
+if( abs( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122) )&lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoDiaria]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122) 
+)
+ + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64099,7 +64112,12 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTppVarDiaVivienda]=CALCULATE(DI
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesComMicr]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120))) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesComMicr]=
+if( abs( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120))) )&lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))
+)
+ + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64118,7 +64136,12 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesComMicr]=CALCULATE(SUM(DW
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesConsumoTC]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesConsumoTC]=
+IF( abs( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) ) &lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 )
+)
++ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64137,7 +64160,11 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesConsumoTC]=CALCULATE(SUM(
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesVivienda]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesVivienda]=
+IF( abs( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122) )&lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoMensual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122))
+ + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64156,7 +64183,11 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarMesVivienda]=CALCULATE(SUM(D
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualComMicr]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120))) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualComMicr]=
+IF( abs ( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120))) )&lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120))) )
+ + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64175,7 +64206,11 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualComMicr]=CALCULATE(SUM(
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualConsumoTC]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualConsumoTC]=
+IF( abs( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) )&lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) )
+ + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -64194,7 +64229,11 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualConsumoTC]=CALCULATE(SU
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualVivienda]=CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValVarAnualVivienda]=
+IF( ABS( CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122) )&lt;0.01
+,0
+,CALCULATE(SUM(DWHReportesVariacionSaldos[rvCalVariacionMontoAnual]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122)
+) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -75219,7 +75258,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValVolumenPorc]=DIVIDE(
               <Value>SqlServer</Value>
             </Annotation>
           </Annotations>
-          <ConnectionString>Provider=SQLNCLI11.1;Integrated Security=SSPI;Persist Security Info=False;User ID=;Initial Catalog=DWHCORPORATIVO_21873;Data Source=172.16.172.161;Initial File Name=;Server SPN=</ConnectionString>
+          <ConnectionString>Provider=SQLNCLI11.1;Data Source=172.16.76.4;Integrated Security=SSPI;Initial Catalog=DWHCORPORATIVO</ConnectionString>
           <ImpersonationInfo>
             <ImpersonationMode>ImpersonateAccount</ImpersonationMode>
             <Account>banintern\binxaste</Account>
