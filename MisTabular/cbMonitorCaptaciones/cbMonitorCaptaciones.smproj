@@ -23,10 +23,10 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
     <OutputPath>bin\</OutputPath>
     <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
-    <DeploymentServerName>172.16.76.4</DeploymentServerName>
+    <DeploymentServerName>172.16.172.191</DeploymentServerName>
     <DeploymentServerEdition>Developer</DeploymentServerEdition>
     <DeploymentServerVersion>Version_11_0</DeploymentServerVersion>
-    <DeploymentServerDatabase>cbMonitorCaptaciones</DeploymentServerDatabase>
+    <DeploymentServerDatabase>cbMonitorCaptaciones_25181</DeploymentServerDatabase>
     <DeploymentServerCubeName>Model</DeploymentServerCubeName>
     <DeploymentOptionProcessing>DoNotProcess</DeploymentOptionProcessing>
     <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
@@ -36,10 +36,9 @@
   <PropertyGroup Condition=" '$(Configuration)' == '' ">
     <DeploymentOptionADALCache>Default</DeploymentOptionADALCache>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="Model.bim">
-      <SubType>Code</SubType>
+      <SubType>Content</SubType>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Business Intelligence Semantic Model\1.0\Microsoft.AnalysisServices.VSHostBuilder.targets" />
