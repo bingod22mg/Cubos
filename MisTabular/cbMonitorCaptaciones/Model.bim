@@ -65165,7 +65165,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValVolumenPorc]=DIVIDE(
 CREATE MEASURE 'DWHActivoOperacion'[aoValMorosidad]=var CarteraDificultades = CALCULATE([aoValTotalCartera], KEEPFILTERS( DWDCuentaContable[ccCalEstadoProducto]="NDE" || DWDCuentaContable[ccCalEstadoProducto]="VEN") )
 var CarteraTotal = CALCULATE([aoValTotalCartera], ALL(DWDCuentaContable))
 var Morosidad = DIVIDE(CarteraDificultades,CarteraTotal,0) + 0
-return IF(Morosidad=0,BLANK(),Morosidad);
+return Morosidad;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -65875,7 +65875,9 @@ var MorosidadResRef = DIVIDE( (CarteraDificultades+CarteraResRef) ,CarteraTotal,
 
  
 
-return if(MorosidadResRef=0,BLANK(),MorosidadResRef);
+ 
+
+return MorosidadResRef;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -65951,7 +65953,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValMorosidadResRef3Anio]=CALCULATE([aoValM
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoCarteraM]=CALCULATE(DIVIDE([pnValorRealPresupuesto],1000),FILTER(DWDCuentaContable,DWDCuentaContable[ccCalIndicadorNivel1]=1));
+CREATE MEASURE 'DWHPresupuestoNegocio'[pnValPresupuestoCarteraM]=CALCULATE([pnValorRealPresupuesto],FILTER(DWDCuentaContable,DWDCuentaContable[ccCalIndicadorNivel1]=1));
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66819,7 +66821,7 @@ CREATE MEASURE 'DWHActivoOperacion'[aoValMorosidadResRefHaceUnAnio]=CALCULATE( [
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalAyerVivienda]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAyer]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122)+ 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalAyerVivienda]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAyer])/100,DWHReportesVariacionSaldos[rvIndicadorNivel2]=122)+ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66838,7 +66840,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalAyerVivienda]=CALCUL
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrAyer]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAyer]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))+ 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrAyer]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAyer])/100,FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))+ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66857,7 +66859,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrAyer]=CALCULA
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCAyer]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAyer]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCAyer]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAyer])/100,DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66876,7 +66878,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCAyer]=CALCU
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalViviendaMesAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalMesAnt]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122)+ 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalViviendaMesAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalMesAnt])/100,DWHReportesVariacionSaldos[rvIndicadorNivel2]=122)+ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66895,7 +66897,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalViviendaMesAnt]=CALC
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrMesAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalMesAnt]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))+ 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrMesAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalMesAnt])/100,FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))+ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66914,7 +66916,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrMesAnt]=CALCU
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCMesAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalMesAnt]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCMesAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalMesAnt])/100,DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66933,7 +66935,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCMesAnt]=CAL
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalViviendaAnioAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAnioAnt]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=122)+ 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalViviendaAnioAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAnioAnt])/100,DWHReportesVariacionSaldos[rvIndicadorNivel2]=122)+ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66952,7 +66954,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalViviendaAnioAnt]=CAL
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrAnioAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAnioAnt]),FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))+ 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrAnioAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAnioAnt])/100,FILTER(DWHReportesVariacionSaldos, OR (DWHReportesVariacionSaldos[rvIndicadorNivel2]=126,DWHReportesVariacionSaldos[rvIndicadorNivel2]=120)))+ 0;
 </Text>
                   <Annotations>
                     <Annotation>
@@ -66971,7 +66973,7 @@ CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalComMicrAnioAnt]=CALC
 ----------------------------------------------------------
 
 
-CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCAnioAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAnioAnt]),DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
+CREATE MEASURE 'DWHReportesVariacionSaldos'[rvValTasaNominalConsumoTCAnioAnt]=CALCULATE(MAX(DWHReportesVariacionSaldos[rvValTasaNominalAnioAnt])/100,DWHReportesVariacionSaldos[rvIndicadorNivel2]=121 || DWHReportesVariacionSaldos[rvIndicadorNivel2]=124 ) + 0;
 </Text>
                   <Annotations>
                     <Annotation>
